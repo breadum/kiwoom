@@ -32,14 +32,14 @@ err = {
 }
 
 
-def error(ecode):
+def err_msg(ecode):
     etype, msg = err[ecode]
     return f'{ecode} : {etype} ({msg})'
 
 
-def err_msg(fn):
+def catch_error(fn):
     def wrapper(*args, **kwargs):
         out = fn(*args, **kwargs)
-        if out != 0:
-            raise Exception(f'An exception occurred from {fn.__name__}.\n  - {error(out)}')
+        if out != 0:  # 0: ('OP_ERR_NONE', '정상처리')
+            raise Exception(f'An exception occurred from {fn.__name__}.\n  - {err_msg(out)}')
     return wrapper

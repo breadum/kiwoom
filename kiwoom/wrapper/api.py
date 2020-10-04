@@ -1,5 +1,17 @@
-from kiwoom.config.error import err_msg
+from kiwoom.config.error import catch_error
 from PyQt5.QAxContainer import QAxWidget
+
+
+event_handlers = [
+    'on_event_connect',
+    'on_receive_msg',
+    'on_receive_tr_data'
+    'on_receive_real_data',
+    'on_receive_chejan_data',
+    'on_receive_condition_ver'
+    'on_receive_tr_condition',
+    'on_receive_real_condition'
+]
 
 
 class API(QAxWidget):
@@ -48,7 +60,7 @@ class API(QAxWidget):
         return self.call("GetLoginInfo(QString)", tag)
 
     # 조회와 실시간데이터처리
-    @err_msg
+    @catch_error
     def comm_rq_data(self, rq_name, tr_code, prev_next, scr_no):
         """
         CommRqData(
@@ -134,7 +146,7 @@ class API(QAxWidget):
         """
         return self.call("GetRepeatCnt(QString, QString)", tr_code, rq_name)
 
-    @err_msg
+    @catch_error
     def comm_kw_rq_data(self, arr_code, next, code_cnt, type_flag, rq_name, scr_no):
         """
         CommKwRqData(
@@ -266,7 +278,7 @@ class API(QAxWidget):
         return self.call("GetCommDataEx(QString, QString)", tr_code, rq_name)
 
     # 주문과 잔고처리
-    @err_msg
+    @catch_error
     def send_order(self, rq_name, scr_no, acc_no, ord_type, code, qty, price, hoga_gb, org_order_no):
         """
         SendOrder(
@@ -339,7 +351,7 @@ class API(QAxWidget):
         args = (rq_name, scr_no, acc_no, code, ord_kind, sl_by_tp, ord_tp, qty, price, org_ord_no)
         return self.call(fn, args)
 
-    @err_msg
+    @catch_error
     def send_order_credit(self, rq_name, scr_no, acc_no, order_type, code, qty, 
                           price, hoga_gb, credit_gb, loan_date, org_order_no):
         """
@@ -465,7 +477,7 @@ class API(QAxWidget):
         """
         self.call("SendConditionStop(QString, QString, Int)", scr_no, cond_name, index)
 
-    @err_msg
+    @catch_error
     def set_real_reg(self, scr_no, code_list, fid_list, opt_type):
         """
         [SetRealReg() 함수]
@@ -812,7 +824,8 @@ class API(QAxWidget):
         -101 서버접속 실패
         -102 버전처리 실패
         """
-        self.bot.on_event_connect(err_code)
+        pass
+        # self.bot.on_event_connect(err_code)
         
     def on_receive_msg(self, scr_no, rq_name, tr_code, msg):
         """
@@ -829,7 +842,8 @@ class API(QAxWidget):
         메시지에는 6자리 코드번호가 포함되는데 이 코드번호는 통보없이 수시로 변경될 수 있습니다.
         따라서 주문이나 오류관련처리를 이 코드번호로 분류하시면 안됩니다.
         """
-        self.bot.on_receive_msg(scr_no, rq_name, tr_code, msg)
+        pass
+        # self.bot.on_receive_msg(scr_no, rq_name, tr_code, msg)
     
     def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next):
         """
@@ -850,7 +864,8 @@ class API(QAxWidget):
         조회요청 응답을 받거나 조회데이터를 수신했을때 호출됩니다.
         조회데이터는 이 이벤트내부에서 GetCommData()함수를 이용해서 얻어올 수 있습니다.
         """
-        self.bot.on_receive_tr_data(scr_no, rq_name, tr_code, record_name, prev_next)
+        pass
+        # self.bot.on_receive_tr_data(scr_no, rq_name, tr_code, record_name, prev_next)
 
     def on_receive_real_data(self, code, real_type, real_data):
         """
@@ -865,7 +880,8 @@ class API(QAxWidget):
         실시간 데이터 수신할때마다 호출되며 SetRealReg()함수로 등록한 실시간 데이터도 이 이벤트로 전달됩니다.
         GetCommRealData()함수를 이용해서 실시간 데이터를 얻을수 있습니다.
         """
-        self.bot.on_receive_real_data(code, real_type, real_data)
+        pass
+        # self.bot.on_receive_real_data(code, real_type, real_data)
 
     def on_receive_chejan_data(self, gubun, item_cnt, fid_list):
         """
@@ -879,7 +895,8 @@ class API(QAxWidget):
 
         주문요청후 주문접수, 체결통보, 잔고통보를 수신할 때 마다 호출되며 GetChejanData()함수를 이용해서 상세한 정보를 얻을수 있습니다.
         """
-        self.bot.on_receive_chejan_data(gubun, item_cnt, fid_list)
+        pass
+        # self.bot.on_receive_chejan_data(gubun, item_cnt, fid_list)
 
     def on_receive_condition_ver(self, ret, msg):
         """
@@ -912,7 +929,8 @@ class API(QAxWidget):
         ------------------------------------------------------------------------------------------------------
 
         """
-        self.bot.on_receive_condition_ver(ret, msg)
+        pass
+        # self.bot.on_receive_condition_ver(ret, msg)
 
     def on_receive_tr_condition(self, scr_no, code_list, cond_name, index, next):
         """
@@ -947,7 +965,8 @@ class API(QAxWidget):
         ------------------------------------------------------------------------------------------------------
 
         """
-        self.bot.on_receive_tr_condition(scr_no, code_list, cond_name, index, next)
+        pass
+        # self.bot.on_receive_tr_condition(scr_no, code_list, cond_name, index, next)
     
     def on_receive_real_condition(self, code, type, cond_name, cond_index):
         """
@@ -986,4 +1005,5 @@ class API(QAxWidget):
         ------------------------------------------------------------------------------------------------------
 
         """
-        self.bot.on_receive_real_condition(code, type, cond_name, cond_index)
+        pass
+        # self.bot.on_receive_real_condition(code, type, cond_name, cond_index)
