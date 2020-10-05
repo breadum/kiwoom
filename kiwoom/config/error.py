@@ -1,3 +1,6 @@
+from functools import wraps
+
+
 err = {
     0: ('OP_ERR_NONE', '정상처리'),
     -10: ('OP_ERR_FAIL', '실패'),
@@ -38,6 +41,7 @@ def err_msg(ecode):
 
 
 def catch_error(fn):
+    @wraps(fn)  # keep docstring of original function, fn.
     def wrapper(*args, **kwargs):
         out = fn(*args, **kwargs)
         if out != 0:  # 0: ('OP_ERR_NONE', '정상처리')

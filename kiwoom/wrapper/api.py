@@ -16,6 +16,9 @@ event_handlers = [
 
 class API(QAxWidget):
     def __init__(self):
+        # QAxWidget init
+        super().__init__()
+
         # To shorten codes
         self.call = self.dynamicCall
 
@@ -423,7 +426,7 @@ class API(QAxWidget):
         조건검색 목록 요청을 성공하면 1, 아니면 0을 리턴합니다.
         """
         return self.call("GetConditionLoad()")
-    
+
     def get_condition_name_list(self):
         """
         [GetConditionNameList() 함수]
@@ -808,7 +811,7 @@ class API(QAxWidget):
         """
         return self.call("KOA_Functions(QString, QString)", function_name, str(arg))
 
-    # 이벤트 슬롯
+    # 개발가이드 > 로그인 버전처리
     def on_event_connect(self, err_code):
         """
         [OnEventConnect()이벤트]
@@ -825,8 +828,8 @@ class API(QAxWidget):
         -102 버전처리 실패
         """
         pass
-        # self.bot.on_event_connect(err_code)
-        
+
+    # 개발가이드 > 로그인 버전처리, 조회와 실시간데이터처리, 주문과 잔고처리
     def on_receive_msg(self, scr_no, rq_name, tr_code, msg):
         """
         [OnReceiveMsg()이벤트]
@@ -843,8 +846,8 @@ class API(QAxWidget):
         따라서 주문이나 오류관련처리를 이 코드번호로 분류하시면 안됩니다.
         """
         pass
-        # self.bot.on_receive_msg(scr_no, rq_name, tr_code, msg)
-    
+
+    # 개발가이드 > 조회와 실시간데이터처리, 주문과 잔고처리
     def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next):
         """
         [OnReceiveTrData() 이벤트]
@@ -865,8 +868,8 @@ class API(QAxWidget):
         조회데이터는 이 이벤트내부에서 GetCommData()함수를 이용해서 얻어올 수 있습니다.
         """
         pass
-        # self.bot.on_receive_tr_data(scr_no, rq_name, tr_code, record_name, prev_next)
 
+    # 개발가이드 > 조회와 실시간데이터처리
     def on_receive_real_data(self, code, real_type, real_data):
         """
         [OnReceiveRealData()이벤트]
@@ -881,8 +884,8 @@ class API(QAxWidget):
         GetCommRealData()함수를 이용해서 실시간 데이터를 얻을수 있습니다.
         """
         pass
-        # self.bot.on_receive_real_data(code, real_type, real_data)
 
+    # 개발가이드 > 주문과 잔고처리
     def on_receive_chejan_data(self, gubun, item_cnt, fid_list):
         """
         [OnReceiveChejanData() 이벤트]
@@ -896,8 +899,8 @@ class API(QAxWidget):
         주문요청후 주문접수, 체결통보, 잔고통보를 수신할 때 마다 호출되며 GetChejanData()함수를 이용해서 상세한 정보를 얻을수 있습니다.
         """
         pass
-        # self.bot.on_receive_chejan_data(gubun, item_cnt, fid_list)
 
+    # 개발가이드 > 조건검색
     def on_receive_condition_ver(self, ret, msg):
         """
         [OnReceiveConditionVer() 이벤트]
@@ -930,8 +933,8 @@ class API(QAxWidget):
 
         """
         pass
-        # self.bot.on_receive_condition_ver(ret, msg)
 
+    # 개발가이드 > 조건검색
     def on_receive_tr_condition(self, scr_no, code_list, cond_name, index, next):
         """
         [OnReceiveTrCondition() 이벤트]
@@ -966,8 +969,8 @@ class API(QAxWidget):
 
         """
         pass
-        # self.bot.on_receive_tr_condition(scr_no, code_list, cond_name, index, next)
-    
+
+    # 개발가이드 > 조건검색
     def on_receive_real_condition(self, code, type, cond_name, cond_index):
         """
         [OnReceiveRealCondition() 이벤트]
@@ -1006,4 +1009,3 @@ class API(QAxWidget):
 
         """
         pass
-        # self.bot.on_receive_real_condition(code, type, cond_name, cond_index)

@@ -2,21 +2,17 @@ from kiwoom.wrapper.api import API, event_handlers
 from kiwoom.config.error import err_msg
 from kiwoom.core.connector import Connector
 
-from textwrap import dedent
 from PyQt5.QtCore import QEventLoop
 from PyQt5.QtCore import pyqtRemoveInputHook
-from inspect import ismethod, isfunction, isclass, ismodule, getattr_static
 
 import sys
 
 
 class Kiwoom(API):
-
-    def __init__(self, bot=None):
+    def __init__(self):
         super().__init__()
         self.msg = True
         self.qloop = QEventLoop()
-        self.setControl("KHOPENAPI.KHOpenAPICtrl.1")
 
         # To connect signals and slots
         self._signals = dict()
@@ -29,6 +25,10 @@ class Kiwoom(API):
         def except_hook(cls, exception, traceback):
             sys.__excepthook__(cls, exception, traceback)
         sys.excepthook = except_hook
+
+        # To connect default slots to the most basic two event handlers
+        self.connect(slot=self.__on_event_connect_slot, event='on_event_connect')
+        self.connect(slot=self.__on_receive_msg_slot, event='on_receive_msg')
 
     def loop(self):
         if not self.qloop.isRunning():
@@ -91,13 +91,11 @@ class Kiwoom(API):
     # Event Handlers
     @Connector()
     def on_event_connect(self, err_code):
-        print(f'\n로그인 {err_msg(err_code)}')
-        print(f'\n* 시스템 점검\n  - 월 ~ 토 : 05:05 ~ 05:10\n  - 일 : 04:00 ~ 04:30\n')
+        pass
 
     @Connector()
     def on_receive_msg(self, scr_no, rq_name, tr_code, msg):
-        if self.msg:
-            print(f'\n화면번호: {scr_no}, 요청이름: {rq_name}, TR코드: {tr_code} \n{msg}\n')
+        pass
 
     @Connector(key='rq_name')
     def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next):
@@ -122,3 +120,14 @@ class Kiwoom(API):
     @Connector()
     def on_receive_real_condition(self, code, type, cond_name, cond_index):
         pass
+
+    # Default event slot for on_event_connect
+    def __on_event_connect_slot(self, err_code):
+        print(f'\n로그인 {err_msg(err_code)}')
+        print(f'\n* 시스템 점검\n  - 월 ~ 토 : 05:05 ~ 05:10\n  - 일 : 04:00 ~ 04:30\n')
+        self.unloop()
+
+    # Default event slot for on_receive_msg_slot
+    def __on_receive_msg_slot(self, scr_no, rq_name, tr_code, msg):
+        if self.msg:
+            print(f'\n화면번호: {scr_no}, 요청이름: {rq_name}, TR코드: {tr_code} \n{msg}\n')
