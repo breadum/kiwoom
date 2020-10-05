@@ -7,7 +7,9 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 
 ## Main Features
 
-- 매번 입력해야하는 dynamicCall 제거
+- 지저분한 코드 간결화
+
++ 매번 입력해야하는 dynamicCall 제거
 
 Before
 
