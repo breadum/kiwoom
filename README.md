@@ -11,12 +11,16 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 
 Before
 
-	QAxWidget.dynamicCall("CommRqData(QString, QString, Int, QString)", rq_name, tr_code, prev_next, scr_no)
+```python
+QAxWidget.dynamicCall("CommRqData(QString, QString, Int, QString)", rq_name, tr_code, prev_next, scr_no)
+```
+	
 
 After
 
-
-	api.comm_rq_data(rq_name, tr_code, prev_next, scr_no)
+```python
+api.comm_rq_data(rq_name, tr_code, prev_next, scr_no)
+```
 
 - asd
 
