@@ -8,13 +8,18 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 ## Main Features
 
 - 매번 입력해야하는 dynamicCall 제거
+
 Before
-'''Python
+
+'''Python	
 QAxWidget.dynamicCall("CommRqData(QString, QString, Int, QString)", rq_name, tr_code, prev_next, scr_no)
 '''
+
 After
+
 '''Python
 api.comm_rq_data(rq_name, tr_code, prev_next, scr_no)
 '''
+
 - asd
 
