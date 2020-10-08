@@ -62,8 +62,9 @@ class API(QAxWidget):
         """
         return self.call("GetLoginInfo(QString)", tag)
 
-    # 조회와 실시간데이터처리
-    @catch_error
+    """
+    조회와 실시간데이터처리
+    """
     def comm_rq_data(self, rq_name, tr_code, prev_next, scr_no):
         """
         CommRqData(
@@ -149,7 +150,6 @@ class API(QAxWidget):
         """
         return self.call("GetRepeatCnt(QString, QString)", tr_code, rq_name)
 
-    @catch_error
     def comm_kw_rq_data(self, arr_code, next, code_cnt, type_flag, rq_name, scr_no):
         """
         CommKwRqData(
@@ -280,8 +280,9 @@ class API(QAxWidget):
         """
         return self.call("GetCommDataEx(QString, QString)", tr_code, rq_name)
 
-    # 주문과 잔고처리
-    @catch_error
+    """
+    주문과 잔고처리
+    """
     def send_order(self, rq_name, scr_no, acc_no, ord_type, code, qty, price, hoga_gb, org_order_no):
         """
         SendOrder(
@@ -354,7 +355,6 @@ class API(QAxWidget):
         args = (rq_name, scr_no, acc_no, code, ord_kind, sl_by_tp, ord_tp, qty, price, org_ord_no)
         return self.call(fn, args)
 
-    @catch_error
     def send_order_credit(self, rq_name, scr_no, acc_no, order_type, code, qty, 
                           price, hoga_gb, credit_gb, loan_date, org_order_no):
         """
@@ -417,7 +417,9 @@ class API(QAxWidget):
         """
         return self.call("GetChejanData(Int)", fid)
 
-    # 조건검색
+    """
+    조건검색
+    """
     def get_condition_load(self):
         """
         [GetConditionLoad() 함수]
@@ -480,7 +482,6 @@ class API(QAxWidget):
         """
         self.call("SendConditionStop(QString, QString, Int)", scr_no, cond_name, index)
 
-    @catch_error
     def set_real_reg(self, scr_no, code_list, fid_list, opt_type):
         """
         [SetRealReg() 함수]
@@ -530,7 +531,9 @@ class API(QAxWidget):
         """
         self.call("SetRealRemove(QString, QString)", scr_no, del_code)
 
-    # 기타함수
+    """
+    기타함수
+    """
     def get_code_list_by_market(self, market):
         """
         [GetCodeListByMarket() 함수]
@@ -811,6 +814,9 @@ class API(QAxWidget):
         """
         return self.call("KOA_Functions(QString, QString)", function_name, str(arg))
 
+    """
+    Event Handlers
+    """
     # 개발가이드 > 로그인 버전처리
     def on_event_connect(self, err_code):
         """
