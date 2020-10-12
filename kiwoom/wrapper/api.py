@@ -35,7 +35,9 @@ class API(QAxWidget):
         self.OnReceiveTrCondition.connect(self.on_receive_tr_condition)
         self.OnReceiveRealCondition.connect(self.on_receive_real_condition)
 
-    # 로그인 버전처리
+    """
+    로그인 버전처리
+    """
     def comm_connect(self):
         """
         수동 로그인설정인 경우 로그인창을 출력해서 로그인을 시도하거나

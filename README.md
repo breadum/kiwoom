@@ -22,14 +22,20 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 > self.comm_rq_data(rq_name, tr_code, prev_next, scr_no)
 > ```
 
-- 서버에 데이터를 요청하는 함수(Signal)와 데이터를 받는 함수(Slot)를 분리해서 작성
+#### 2. 통신을 위한 체계적인 코드 작성 지원
 
-  + TR 예시
+- 데이터를 요청하는 함수와 데이터를 받는 함수를 분리해서 작성 후 서로 연결
 
-- loop/unloop 기능을 통해 간단한 QEventLoop 제어
+- 요청하는 함수(Signal) 
 
-```python
-self.loop()
-self.unloop()
-```
+> ```python
+> hello
+> ```
+
+#### 3. loop/unloop 기능을 통해 간단한 QEventLoop 제어
+
+> ```python
+> self.loop()
+> self.unloop()
+> ```
 
