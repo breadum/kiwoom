@@ -819,9 +819,10 @@ class API(QAxWidget):
     """
     Event Handlers
     """
-    # 개발가이드 > 로그인 버전처리
     def on_event_connect(self, err_code):
         """
+        # 개발가이드 > 로그인 버전처리
+
         [OnEventConnect()이벤트]
 
         OnEventConnect(
@@ -837,9 +838,10 @@ class API(QAxWidget):
         """
         pass
 
-    # 개발가이드 > 로그인 버전처리, 조회와 실시간데이터처리, 주문과 잔고처리
     def on_receive_msg(self, scr_no, rq_name, tr_code, msg):
         """
+        # 개발가이드 > 로그인 버전처리, 조회와 실시간데이터처리, 주문과 잔고처리
+
         [OnReceiveMsg()이벤트]
 
         OnReceiveMsg(
@@ -855,9 +857,10 @@ class API(QAxWidget):
         """
         pass
 
-    # 개발가이드 > 조회와 실시간데이터처리, 주문과 잔고처리
     def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next):
         """
+        # 개발가이드 > 조회와 실시간데이터처리, 주문과 잔고처리
+
         [OnReceiveTrData() 이벤트]
 
         void OnReceiveTrData(
@@ -877,9 +880,10 @@ class API(QAxWidget):
         """
         pass
 
-    # 개발가이드 > 조회와 실시간데이터처리
     def on_receive_real_data(self, code, real_type, real_data):
         """
+        # 개발가이드 > 조회와 실시간데이터처리
+
         [OnReceiveRealData()이벤트]
 
         OnReceiveRealData(
@@ -893,9 +897,10 @@ class API(QAxWidget):
         """
         pass
 
-    # 개발가이드 > 주문과 잔고처리
     def on_receive_chejan_data(self, gubun, item_cnt, fid_list):
         """
+        # 개발가이드 > 주문과 잔고처리
+
         [OnReceiveChejanData() 이벤트]
 
         OnReceiveChejanData(
@@ -908,9 +913,10 @@ class API(QAxWidget):
         """
         pass
 
-    # 개발가이드 > 조건검색
     def on_receive_condition_ver(self, ret, msg):
         """
+        # 개발가이드 > 조건검색
+
         [OnReceiveConditionVer() 이벤트]
 
         OnReceiveConditionVer(
@@ -942,9 +948,10 @@ class API(QAxWidget):
         """
         pass
 
-    # 개발가이드 > 조건검색
     def on_receive_tr_condition(self, scr_no, code_list, cond_name, index, next):
         """
+        # 개발가이드 > 조건검색
+
         [OnReceiveTrCondition() 이벤트]
 
         OnReceiveTrCondition(
@@ -978,9 +985,10 @@ class API(QAxWidget):
         """
         pass
 
-    # 개발가이드 > 조건검색
     def on_receive_real_condition(self, code, type, cond_name, cond_index):
         """
+        # 개발가이드 > 조건검색
+
         [OnReceiveRealCondition() 이벤트]
 
         OnReceiveRealCondition(
