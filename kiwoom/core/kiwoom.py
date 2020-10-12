@@ -46,20 +46,55 @@ class Kiwoom(API):
 
     def connect(self, signal=None, slot=None, event=None, key=None):
         """
-        :param event: the name of event handler
-        :param signal: a bound method (i.e. instance method)
-        :param slot: a bound method (i.e. instance method)
+        :param signal: a method that requests to the server
+        :param slot: a method that reacts the server's response
+        :param event: string of event handler name
         :param key: string
 
-        Manually connect signal to slot or signal with rq_name to the given slot.
-        Use this function when a method's name is different in signal and slot.
+        A method that connects signal and slot
+        Decorator @Connector uses this info
+
+        possible combinations:
+        1) signal, slot
+            connects signal and slot by its method name as a key
+            ex) self.connect(signal.balance, slot.balance)
+                >>
+                def signal.balance():
+                    tr_code = 'opw00018':  # 계좌평가잔고내역요청
+                    inputs = dict{
+                        '계좌번호': 'xxxxxxxx',
+                        '비밀번호': 'xxxx',
+                        '비밀번호입력매체구분': '00',
+                        '조회구분': '1'
+                    }
+                    for key, val in inputs.items():
+                        self.api.set_input_value(key, val)
+
+                    self.api.comm_rq_data('balance', tr_code, '0', 'xxxx')
+                    self.api.loop()
+
+                def slot.balance(self, scr_no, rq_name, tr_code, record_name, prev_next):
+
+
+
+
+
+
+                 --> on_receive_tr_data(rq_name='balance') --> slot.balance()
+
+        2) signal, slot, key
+            connects signal and slot by given key
+            ex) signal.tick() --> on_receive_tr_data(rq_name='history') --> slot.balance()
+
+        3) slot, event
+            connects slot to event
         """
         valid = False
         connectable = Connector.connectable
 
         # Connect signal and slot with/without key
-        if signal is not None and connectable(signal):
-            if slot is not None and connectable(slot):
+        if connectable(signal):
+            if connectable(slot):
                 valid = True
                 if key is None:
                     self._signals[getattr(slot, '__name__')] = signal
@@ -69,7 +104,7 @@ class Kiwoom(API):
                     self._slots[key] = slot
 
         # Connect slot and event
-        elif slot is not None and connectable(slot):
+        elif connectable(slot):
             if event is not None:
                 if event not in event_handlers:
                     raise KeyError(f"{event} is not a valid event handler.\nSelect one of {event_handlers}.")
@@ -78,7 +113,7 @@ class Kiwoom(API):
 
         # Nothing is connected
         if not valid:
-            raise RuntimeError(f"Unsupported combination of inputs. Please read below.\n\n{help(self.connect)}")
+            raise RuntimeError(f"Unsupported combination of inputs. Please read below.\n\n{self.connect.__doc__}")
 
     def signal(self, key):
         return self._signals[key]

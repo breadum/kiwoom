@@ -74,7 +74,7 @@ class Connector:
                             """
                         )
                         print(msg)
-                        # raise RuntimeWarning(msg)
+
         return wrapper
 
     @classmethod
@@ -83,6 +83,10 @@ class Connector:
 
     @staticmethod
     def connectable(fn):
+        # None
+        if fn is None:
+            return False
+
         # Instance method, Class method
         if ismethod(fn):
             return True
@@ -132,11 +136,11 @@ class Connector:
             if not hasattr(fn, '__self__'):
                 raise ValueError(dedent(
                     f"""
-                        Given '{getattr(fn, '__qualname__')} must be bound to instance.
-                        Try to make an instance first as followings.
-    
-                          >> var = {getattr(fn, '__name__')}(*args, **kwargs)
-                          >> kiwoom.connect(.., var, ..)
+                    Given '{getattr(fn, '__qualname__')} must be bound to instance.
+                    Try to make an instance first as followings.
+
+                      >> var = {getattr(fn, '__name__')}(*args, **kwargs)
+                      >> kiwoom.connect(.., var, ..)
                     """
                 ))  # False
 
@@ -144,5 +148,5 @@ class Connector:
         else:
             from kiwoom.core.kiwoom import Kiwoom  # Dynamic import to avoid circular import
             raise ValueError(
-                f"Unsupported type, {type(fn)}. Please try with valid args.\n\n{help(Kiwoom.connect)}."
+                f"Unsupported type, {type(fn)}. Please try with valid args.\n\n{Kiwoom.connect.__doc__}."
             )  # False
