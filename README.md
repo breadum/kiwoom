@@ -17,12 +17,9 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 > Before
 
 > ```python
+> # Before
 > self.dynamicCall("CommRqData(QString, QString, Int, QString)", rq_name, tr_code, prev_next, scr_no)
-> ```
-	
-> After
-
-> ```python
+> # After
 > self.comm_rq_data(rq_name, tr_code, prev_next, scr_no)
 > ```
 
