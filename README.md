@@ -10,15 +10,14 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 
 ## Main Features
 
-#### Open API+ 함수 호출 간소화
+#### 1. Open API+ 함수 호출 간소화
 
-> 반복되는 dynamicCall 제거
-
-> Before
+- 반복되는 dynamicCall 제거
 
 > ```python
 > # Before
 > self.dynamicCall("CommRqData(QString, QString, Int, QString)", rq_name, tr_code, prev_next, scr_no)
+> 
 > # After
 > self.comm_rq_data(rq_name, tr_code, prev_next, scr_no)
 > ```
