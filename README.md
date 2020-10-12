@@ -14,11 +14,11 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 
   + 반복되는 dynamicCall 제거
 
-Before
+      Before
 
-```python
-self.dynamicCall("CommRqData(QString, QString, Int, QString)", rq_name, tr_code, prev_next, scr_no)
-```
+      ```python
+      self.dynamicCall("CommRqData(QString, QString, Int, QString)", rq_name, tr_code, prev_next, scr_no)
+      ```
 
 After
 
