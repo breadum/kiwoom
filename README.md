@@ -20,11 +20,11 @@ Python wrapper of Kiwoom Open API+ (키움증권)
       self.dynamicCall("CommRqData(QString, QString, Int, QString)", rq_name, tr_code, prev_next, scr_no)
       ```
 
-After
+	After
 
-```python
-self.comm_rq_data(rq_name, tr_code, prev_next, scr_no)
-```
+	```python
+	self.comm_rq_data(rq_name, tr_code, prev_next, scr_no)
+	```
 
 - 서버에 데이터를 요청하는 함수(Signal)와 데이터를 받는 함수(Slot)를 분리해서 작성
 
