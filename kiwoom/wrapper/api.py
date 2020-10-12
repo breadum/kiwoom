@@ -3,6 +3,7 @@ from PyQt5.QAxContainer import QAxWidget
 
 
 event_handlers = [
+    # event slots
     'on_event_connect',
     'on_receive_msg',
     'on_receive_tr_data'
