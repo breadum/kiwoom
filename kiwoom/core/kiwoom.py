@@ -1,4 +1,5 @@
-from kiwoom.wrapper.api import API, event_handlers
+from kiwoom.wrapper.api import API
+from kiwoom.config.general import event_handlers
 from kiwoom.config.error import err_msg, catch_error
 from kiwoom.core.connector import Connector
 
@@ -52,14 +53,15 @@ class Kiwoom(API):
         :param key: string
 
         A method that connects signal and slot
-        Decorator @Connector uses this info
+        Decorator @Connector uses this information
 
-        possible combinations:
+        Possible Combinations:
         1) signal, slot
-            connects signal and slot by its method name as a key
+            Connects signal and slot by its method name as a key
             ex) self.connect(signal.balance, slot.balance)
-                >>
-                def signal.balance():
+                >> Please refer to sample code below
+
+                def signal.balance(prev_next='0'):
                     tr_code = 'opw00018':  # 계좌평가잔고내역요청
                     inputs = dict{
                         '계좌번호': 'xxxxxxxx',
@@ -70,24 +72,92 @@ class Kiwoom(API):
                     for key, val in inputs.items():
                         self.api.set_input_value(key, val)
 
-                    self.api.comm_rq_data('balance', tr_code, '0', 'xxxx')
-                    self.api.loop()
+                    # NOTICE HERE : rq_name='balance'
+                    self.api.comm_rq_data(rq_name='balance', tr_code, prev_next, scr_no='xxxx')
+                    self.api.loop()  # prevent executing further before completion of downloading
 
                 def slot.balance(self, scr_no, rq_name, tr_code, record_name, prev_next):
+                    # To initiate downloading and saving data
+                    if not self.is_downloading:
+                        self.data = defaultdict(list)
+                        self.is_downloading = True
 
+                    # To fetch multi data and save
+                    cnt = self.api.get_repeat_cnt(tr_code, rq_name)
+                    for i in range(cnt):
+                        for key in ['종목번호', '종목명', '평가손익', ...]:
+                            self.data[key].append(
+                                str.strip(  # or int(), float()
+                                    self.api.get_comm_data(tr_code, rq_name, i, key)
+                                )
+                            )
 
+                    # NOTICE HERE : key='balance'
+                    if prev_next == '2':
+                        fn = self.api.signal('balance')  # or self.api.signal(rq_name)
+                        fn(prev_next)  # call signal function again to receive remaining data
 
+                    else:
+                        # To fetch single data
+                        for key in ['총평가손익금액', '총수익률(%)']:
+                            self.data[key].append(
+                                float(self.api.get_comm_data(tr_code, rq_name, 0, key)
+                            )
 
+                        # Downloading completed
+                        self.is_downloading = False
+                        self.api.unloop()
 
-
-                 --> on_receive_tr_data(rq_name='balance') --> slot.balance()
+                @Connector(key='rq_name')  # already implemented in library
+                def kiwoom.on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next):
+                    # NOTICE HERE
+                    #   if 'balance' is given to 'rq_name', Connector(key='rq_name') automatically
+                    #   forwards args to slot.balance(scr_no, 'balance', tr_code, record_name, prev_next)
+                    pass
 
         2) signal, slot, key
-            connects signal and slot by given key
-            ex) signal.tick() --> on_receive_tr_data(rq_name='history') --> slot.balance()
+            Connects signal and slot by given key
+            ex) self.connect(signal.balance, slot.balance, 'xxxx')
+                >> Please refer to sample code below
+                >> Note that usage for this combination highly depends on implementor
+                >> Below is just a sample and not a recommended way for usage
+
+                # Almost same with above code but rq_name
+                def signal.balance(prev_next='0'):
+                    ...
+                    self.api.comm_rq_data(rq_name='xxxx', tr_code, prev_next, scr_no='xxxx')
+                    self.api.loop()
+
+                # Almost same with above code but rq_name
+                def slot.balance(self, scr_no, rq_name, tr_code, record_name, prev_next):
+                    ...
+                    if prev_next == '2':
+                        fn = self.api.signal('xxxx')  # or self.api.signal(rq_name)
+                        fn(prev_next)  # call signal function again to receive remaining data
+                    ...
+
+                @Connector(key='rq_name')  # already implemented in library
+                def kiwoom.on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next):
+                    # NOTICE HERE
+                    #   if 'xxxx' is given to 'rq_name', Connector(key='rq_name') automatically
+                    #   forwards args to slot.balance(scr_no, 'xxxx', tr_code, record_name, prev_next)
+                    pass
 
         3) slot, event
-            connects slot to event
+            Connects slot to one of pre-defined 8 events  # print(kiwoom.event_handlers)
+            ex) self.connect(slot.message, 'on_receive_msg')
+                >> Please refer to sample code below
+                >> Note that default slot for on_receive_msg is already set in library.
+
+                def slot.message(scr_no, rq_name, tr_code, msg):
+                    logger.log(scr_no, rq_name, tr_code, msg)
+
+                @Connector()  # already implemented in library
+                def on_receive_msg(self, scr_no, rq_name, tr_code, msg):
+                    # NOTICE HERE
+                    #   if on_receive_msg is called, then Connector automatically
+                    #   forwards args to slot.message(scr_no, rq_name, tr_code, msg)
+                    pass
         """
         valid = False
         connectable = Connector.connectable

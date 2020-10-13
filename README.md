@@ -22,20 +22,25 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 > self.comm_rq_data(rq_name, tr_code, prev_next, scr_no)
 > ```
 
+- loop / unloop 기능을 통해 간단히 QEventLoop 제어
+
+> ```python
+> from kiwoom import *
+>
+> api = Kiwoom()
+> api.loop()
+> api.unloop()
+> ```
+
 #### 2. 통신을 위한 체계적인 코드 작성 지원
 
-- 데이터를 요청하는 함수와 데이터를 받는 함수를 분리해서 작성 후 서로 연결
+1) 데이터를 요청하는 함수와 (Signal), 데이터를 받는 함수를 (Slot) 분리해서 작성
 
-- 요청하는 함수(Signal) 
+2) Signal과 Slot을 connect 함수로 연결
+
+- 이벤트에 여러가지 슬롯을 연결해서  
 
 > ```python
 > hello
-> ```
-
-#### 3. loop/unloop 기능을 통해 간단한 QEventLoop 제어
-
-> ```python
-> self.loop()
-> self.unloop()
 > ```
 

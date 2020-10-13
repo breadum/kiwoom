@@ -1,13 +1,19 @@
+# Namespace Control
+from kiwoom.config import event_handlers
+from kiwoom.core.kiwoom import Kiwoom
+from kiwoom.wrapper.api import API
+
+
 import sys
 # sys.path.append('C:\\Users\\Bread Um\\PycharmProjects\\OpenAPI')
 
 from PyQt5.QtWidgets import QApplication
 
-from kiwoom.config.error import err_msg, catch_error
-from kiwoom.core.kiwoom import Kiwoom
-from kiwoom.wrapper.api import API
-
 import kiwoom
+from kiwoom.config.error import err_msg, catch_error
+# from kiwoom.core.kiwoom import Kiwoom
+# from kiwoom.wrapper.api import API
+
 
 if __name__ == '__main__':
 
@@ -28,7 +34,7 @@ if __name__ == '__main__':
             self.api = api
 
         def on_event_connect(self, err_code):
-            print(f'로그인 {kiwoom.err_msg(err_code)}')
+            print(f'로그인 {err_msg(err_code)}')
             self.api.unloop()
 
     # Initialize
