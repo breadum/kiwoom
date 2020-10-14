@@ -113,3 +113,52 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 >     # 데이터 수신을 위해 스크립트 종료 방지
 >     app.exec()
 > ```
+
+#### 3. 디버깅을 위한 에러 출력
+
+- PyQt5 모듈을 사용하는 경우 Pycharm과 같은 IDE 사용 시 에러 메세지가 발생하지 않는 문제 해결
+
+#### 4. 간단한 기능 지원
+
+- 로그인
+
+> ```python
+> from kiwoom import *
+> api = Kiwoom()
+> api.login()
+> ```
+
+- 주가, 지수, 섹터, 국내선옵 Historical Market Data 다운로드 (지원예정)
+
+> ```python
+> api.history(market='KOSPI', period='tick', start='20201001', merge=True)
+> ```
+
+## Installation
+
+#### Prerequisite
+
+1. 키움 Open API+ 모듈 및 KOA Studio
+
+     https://www1.kiwoom.com/nkw.templateFrameSet.do?m=m1408000000
+
+2. 32-bit Python 3.7 이상의 Windows 환경
+
+> ```python
+> import platform 
+>
+> print(platform.architecture())
+> ```
+
+#### From pip
+
+> ```bash
+> pip install kiwoom
+> ```
+
+#### From source
+
+> ```bash
+> # After git clone and cd into the dir
+> python3 setup.py install
+> ```
