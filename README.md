@@ -36,7 +36,7 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 
 - 데이터를 요청하는 함수와 데이터를 받는 함수를 분리해서 작성 (Signal & Slot)
 
-- 작성 후 Kiwoom.connect( ) 함수로 매핑시켜 서버에서 응답 시 자동 호출 지원
+- 작성 후 Kiwoom.connect() 함수로 매핑시켜 서버에서 응답 시 자동 호출 지원
 
 > ```python
 > # 서버에 데이터를 요청하는 클래스
@@ -47,7 +47,7 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 >     def balance(self, prev_next='0'):
 >         ...
 >         # '계좌평가잔고내역'을 받기 위해 서버로 rq_name='balance'로 요청 전송
->         self.api.comm_rq_data(rq_name='balance', tr_code='opw00018', prev_next='0', scr_no='xxxx')
+>         self.api.comm_rq_data(rq_name='balance', tr_code='opw00018', prev_next='0', scr_no='0000')
 >         self.api.loop()  # 데이터를 받기 전까지 
 >         ...
 >
@@ -74,14 +74,14 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 > # 구현되어있는 메인 클래스
 > class Kiwoom:
 >     ...
->     # rq_name = 'balance' 라면, @Connector가 매핑된 함수를 자동 호출
+>     # rq_name = 'balance'라면, @Connector가 매핑된 함수를 자동 호출
 >     # >> slot.balance(scr_no, rq_name, tr_code, record_name, prev_next)
 >     @Connector(key='rq_name')
 >     def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next):
 >         pass
 > ```
 
-- 실행 스크립트 gh예시
+- 실행 스크립트 예시
 > ```python 
 > from PyQt5.QtWidgets import QApplication
 > from kiwoom import *
