@@ -39,7 +39,7 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 - 작성 후 Kiwoom.connect() 함수로 매핑시켜 서버에서 응답 시 자동 호출 지원
 
 > ```python
-> # 서버에 데이터를 요청하는 클래스
+> # 서버에 데이터를 요청하는 클래스 (사용자 작성)
 > class Signal: 
 >     def __init__(self, api):
 >         self.api = api
@@ -51,7 +51,7 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 >         self.api.loop()  # 데이터를 다 받을 때까지 대기
 >         ...
 >
-> # 서버에서 데이터를 받는 클래스
+> # 서버에서 데이터를 받는 클래스 (사용자 작성)
 > class Slot:
 >     def __init__(self, api):
 >         self.api = api
@@ -97,7 +97,7 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 >     api = Kiwoom()
 >     signal, slot = Signal(api), Slot(api)
 >
->     # connect 함수를 이용해 signal과 slot을 서로 매핑
+>     # Kiwoom.connect() 함수를 이용해 signal과 slot을 서로 매핑
 >     # 자세한 내용은 >> help(Kiwoom.connect) 참조
 >     api.connect(signal.balance, slot.balance)
 > 

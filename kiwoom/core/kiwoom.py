@@ -221,6 +221,10 @@ class Kiwoom(API):
         """
         return self._slots[key]
 
+    def login(self):
+        self.api.comm_connect()
+        self.api.loop()
+
     """
     Event Handlers (8)
         on_event_connect
