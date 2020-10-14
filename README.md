@@ -22,7 +22,7 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 > self.comm_rq_data(rq_name, tr_code, prev_next, scr_no)
 > ```
 
-- loop / unloop 기능을 통해 간단히 QEventLoop 제어
+- loop / unloop 함수를 통해 간단히 코드 실행 / 대기 제어 (QEventLoop)
 
 > ```python
 > from kiwoom import *
@@ -48,7 +48,7 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 >         ...
 >         # '계좌평가잔고내역'을 받기 위해 서버로 rq_name='balance'로 요청 전송
 >         self.api.comm_rq_data(rq_name='balance', tr_code='opw00018', prev_next='0', scr_no='0000')
->         self.api.loop()  # 데이터를 받기 전까지 
+>         self.api.loop()  # 데이터를 다 받을 때까지 대기
 >         ...
 >
 > # 서버에서 데이터를 받는 클래스
@@ -81,7 +81,8 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 >         pass
 > ```
 
-- 실행 스크립트 예시
+- 간단한 실행 스크립트 예시
+
 > ```python 
 > from PyQt5.QtWidgets import QApplication
 > from kiwoom import *
@@ -100,9 +101,15 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 >     # 자세한 내용은 >> help(Kiwoom.connect) 참조
 >     api.connect(signal.balance, slot.balance)
 > 
+>     # 버전처리 및 로그인 
+>     api.login()
+>
 >     # 계좌평가잔고내역 요청
 >     signal.balance()
 >     
 >     # 전송된 데이터 확인
 >     print(slot.data)
+>
+>     # 데이터 수신을 위해 스크립트 종료 방지
+>     app.exec()
 > ```
