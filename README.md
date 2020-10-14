@@ -3,7 +3,7 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 
 ## What is it?
 
-- 키움증권에서 제공하는 Open API+ 인터페이스의 Simple Python Wrapper 모듈
+- 키움증권에서 제공하는 Open API+ 인터페이스의 간단한 Python Wrapper 모듈
 
 - PyQt5를 이용해 직접 개발하고자 하는 분들을 위한 모듈로 부가적인 기능은 최대한 배제
 
@@ -34,13 +34,75 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 
 #### 2. 통신을 위한 체계적인 코드 작성 지원
 
-1) 데이터를 요청하는 함수와 (Signal), 데이터를 받는 함수를 (Slot) 분리해서 작성
+- 데이터를 요청하는 함수와 데이터를 받는 함수를 분리해서 작성 (Signal & Slot)
 
-2) Signal과 Slot을 connect 함수로 연결
-
-- 이벤트에 여러가지 슬롯을 연결해서  
+- 작성 후 Kiwoom.connect( ) 함수로 매핑시켜 서버에서 응답 시 자동 호출 지원
 
 > ```python
-> hello
+> # 서버에 데이터를 요청하는 클래스
+> class Signal: 
+>     def __init__(self, api):
+>         self.api = api
+>     
+>     def balance(self, prev_next='0'):
+>         ...
+>         # '계좌평가잔고내역'을 받기 위해 서버로 rq_name='balance'로 요청 전송
+>         self.api.comm_rq_data(rq_name='balance', tr_code='opw00018', prev_next='0', scr_no='xxxx')
+>         self.api.loop()  # 데이터를 받기 전까지 
+>         ...
+>
+> # 서버에서 데이터를 받는 클래스
+> class Slot:
+>     def __init__(self, api):
+>         self.api = api
+>         self.data = defaultdict(list)
+>         self.is_downloading = False
+>
+>     def balance(self, scr_no, rq_name, tr_code, record_name, prev_next):
+>         ...
+>         # 만일 데이터가 더 있을 경우 연결했던 Signal 함수 다시 호출
+>         if prev_next == '2':
+>             fn = self.api.signal(rq_name)  # rq_name='balance'
+>             fn(prev_next)  # signal.balance(prev_next='2')
+>
+>         # 데이터를 다 받았다면 unloop을 통해 대기중인 코드 실행
+>         else:
+>             ...
+>             self.is_downloading = False
+>             self.api.unloop()
+>
+> # 구현되어있는 메인 클래스
+> class Kiwoom:
+>     ...
+>     # rq_name = 'balance' 라면, @Connector가 매핑된 함수를 자동 호출
+>     # >> slot.balance(scr_no, rq_name, tr_code, record_name, prev_next)
+>     @Connector(key='rq_name')
+>     def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next):
+>         pass
 > ```
 
+- 실행 스크립트 gh예시
+> ```python 
+> from PyQt5.QtWidgets import QApplication
+> from kiwoom import *
+>
+> import sys
+>
+> if __name__ == '__main__':
+>     # 통신을 위해 QApplication 활용
+>     app = QApplication(sys.argv)
+>
+>     # 인스턴스 생성
+>     api = Kiwoom()
+>     signal, slot = Signal(api), Slot(api)
+>
+>     # connect 함수를 이용해 signal과 slot을 서로 매핑
+>     # 자세한 내용은 >> help(Kiwoom.connect) 참조
+>     api.connect(signal.balance, slot.balance)
+> 
+>     # 계좌평가잔고내역 요청
+>     signal.balance()
+>     
+>     # 전송된 데이터 확인
+>     print(slot.data)
+> ```

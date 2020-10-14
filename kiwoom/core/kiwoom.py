@@ -59,85 +59,103 @@ class Kiwoom(API):
         1) signal, slot
             Connects signal and slot by its method name as a key
             ex) self.connect(signal.balance, slot.balance)
-                >> Please refer to sample code below
+                >> Please refer to the sample code below
 
-                def signal.balance(prev_next='0'):
-                    tr_code = 'opw00018':  # 계좌평가잔고내역요청
-                    inputs = dict{
-                        '계좌번호': 'xxxxxxxx',
-                        '비밀번호': 'xxxx',
-                        '비밀번호입력매체구분': '00',
-                        '조회구분': '1'
-                    }
-                    for key, val in inputs.items():
-                        self.api.set_input_value(key, val)
+                api = Kiwoom()
+                signal, slot = Signal(api), Slot(api)
+                signal.balance()  # send request for balance data
+                print(slot.data)  # check received data from server
 
-                    # NOTICE HERE : rq_name='balance'
-                    self.api.comm_rq_data(rq_name='balance', tr_code, prev_next, scr_no='xxxx')
-                    self.api.loop()  # prevent executing further before completion of downloading
+                class Signal:
+                    def __init__(self, api):
+                        self.api = api
 
-                def slot.balance(self, scr_no, rq_name, tr_code, record_name, prev_next):
-                    # To initiate downloading and saving data
-                    if not self.is_downloading:
+                    def balance(self, prev_next='0'):
+                        tr_code = 'opw00018':  # 계좌평가잔고내역요청
+                        inputs = dict{
+                            '계좌번호': 'xxxxxxxx',
+                            '비밀번호': 'xxxx',
+                            '비밀번호입력매체구분': '00',
+                            '조회구분': '1'
+                        }
+                        for key, val in inputs.items():
+                            self.api.set_input_value(key, val)
+
+                        # NOTICE HERE : rq_name='balance'
+                        self.api.comm_rq_data(rq_name='balance', tr_code, prev_next, scr_no='xxxx')
+                        self.api.loop()  # prevent executing further before completion of downloading
+
+                class Slot:
+                    def __init__(self, api):
+                        self.api = api
                         self.data = defaultdict(list)
-                        self.is_downloading = True
-
-                    # To fetch multi data and save
-                    cnt = self.api.get_repeat_cnt(tr_code, rq_name)
-                    for i in range(cnt):
-                        for key in ['종목번호', '종목명', '평가손익', ...]:
-                            self.data[key].append(
-                                str.strip(  # or int(), float()
-                                    self.api.get_comm_data(tr_code, rq_name, i, key)
-                                )
-                            )
-
-                    # NOTICE HERE : key='balance'
-                    if prev_next == '2':
-                        fn = self.api.signal('balance')  # or self.api.signal(rq_name)
-                        fn(prev_next)  # call signal function again to receive remaining data
-
-                    else:
-                        # To fetch single data
-                        for key in ['총평가손익금액', '총수익률(%)']:
-                            self.data[key].append(
-                                float(self.api.get_comm_data(tr_code, rq_name, 0, key)
-                            )
-
-                        # Downloading completed
                         self.is_downloading = False
-                        self.api.unloop()
 
-                @Connector(key='rq_name')  # already implemented in library
-                def kiwoom.on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next):
-                    # NOTICE HERE
-                    #   if 'balance' is given to 'rq_name', Connector(key='rq_name') automatically
-                    #   forwards args to slot.balance(scr_no, 'balance', tr_code, record_name, prev_next)
-                    pass
+                    def balance(self, scr_no, rq_name, tr_code, record_name, prev_next):
+                        # To initiate downloading and saving data
+                        if not self.is_downloading:
+                            self.data = defaultdict(list)
+                            self.is_downloading = True
+
+                        # To fetch multi data and save
+                        cnt = self.api.get_repeat_cnt(tr_code, rq_name)
+                        for i in range(cnt):
+                            for key in ['종목번호', '종목명', '평가손익', ...]:
+                                self.data[key].append(
+                                    str.strip(  # or int(), float()
+                                        self.api.get_comm_data(tr_code, rq_name, i, key)
+                                    )
+                                )
+
+                        # NOTICE HERE : key='balance'
+                        if prev_next == '2':
+                            fn = self.api.signal('balance')  # or self.api.signal(rq_name)
+                            fn(prev_next)  # call signal function again to receive remaining data
+
+                        else:
+                            # To fetch single data
+                            for key in ['총평가손익금액', '총수익률(%)']:
+                                self.data[key].append(
+                                    float(self.api.get_comm_data(tr_code, rq_name, 0, key)
+                                )
+
+                            # Downloading completed
+                            self.is_downloading = False
+                            self.api.unloop()
+
+                class Kiwoom:  # already implemented in library
+                    ...
+                    @Connector(key='rq_name')  # already implemented in library
+                    def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next):
+                        # NOTICE HERE
+                        #   if 'balance' is given to 'rq_name', Connector(key='rq_name') automatically
+                        #   forwards args to slot.balance(scr_no, 'balance', tr_code, record_name, prev_next)
+                        pass
 
         2) signal, slot, key
             Connects signal and slot by given key
             ex) self.connect(signal.balance, slot.balance, 'xxxx')
-                >> Please refer to sample code below
+                >> Please refer to the sample code below
                 >> Note that usage for this combination highly depends on implementor
                 >> Below is just a sample and not a recommended way for usage
 
-                # Almost same with above code but rq_name
-                def signal.balance(prev_next='0'):
+                # Signal - Almost same with the above code but rq_name
+                def balance(prev_next='0'):
                     ...
                     self.api.comm_rq_data(rq_name='xxxx', tr_code, prev_next, scr_no='xxxx')
                     self.api.loop()
 
-                # Almost same with above code but rq_name
-                def slot.balance(self, scr_no, rq_name, tr_code, record_name, prev_next):
+                # Slot - Almost same with the above code but rq_name
+                def balance(self, scr_no, rq_name, tr_code, record_name, prev_next):  # Slot
                     ...
                     if prev_next == '2':
                         fn = self.api.signal('xxxx')  # or self.api.signal(rq_name)
                         fn(prev_next)  # call signal function again to receive remaining data
                     ...
 
-                @Connector(key='rq_name')  # already implemented in library
-                def kiwoom.on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next):
+                # Kiwoom - Already implemented in library
+                @Connector(key='rq_name')
+                def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next):
                     # NOTICE HERE
                     #   if 'xxxx' is given to 'rq_name', Connector(key='rq_name') automatically
                     #   forwards args to slot.balance(scr_no, 'xxxx', tr_code, record_name, prev_next)
@@ -146,13 +164,15 @@ class Kiwoom(API):
         3) slot, event
             Connects slot to one of pre-defined 8 events  # print(kiwoom.event_handlers)
             ex) self.connect(slot.message, 'on_receive_msg')
-                >> Please refer to sample code below
+                >> Please refer to the sample code below
                 >> Note that default slot for on_receive_msg is already set in library.
 
-                def slot.message(scr_no, rq_name, tr_code, msg):
+                # Slot
+                def message(scr_no, rq_name, tr_code, msg):
                     logger.log(scr_no, rq_name, tr_code, msg)
 
-                @Connector()  # already implemented in library
+                # Kiwoom - Already implemented in library
+                @Connector()
                 def on_receive_msg(self, scr_no, rq_name, tr_code, msg):
                     # NOTICE HERE
                     #   if on_receive_msg is called, then Connector automatically
@@ -186,9 +206,19 @@ class Kiwoom(API):
             raise RuntimeError(f"Unsupported combination of inputs. Please read below.\n\n{self.connect.__doc__}")
 
     def signal(self, key):
+        """
+
+        :param key:
+        :return:
+        """
         return self._signals[key]
 
     def slot(self, key):
+        """
+
+        :param key:
+        :return:
+        """
         return self._slots[key]
 
     """
