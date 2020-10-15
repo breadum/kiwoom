@@ -1,23 +1,21 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
+
+# Project Information
 VERSION = "1.0"
 DISTNAME = "kiwoom"
 DESCRIPTION = "Python API of Kiwoom OPEN API+"
-LONG_DESCRIPTION = """
-This module provides a python wrapper for Kiwoom OPEN API+ module.
-The project aims to one who wants to develop own trading system by oneself.
-Considering the purpose, the package tries to be simple as possible.
+LONG_DESCRIPTION = open('README.md').read()
+PROJECT_URLS = {
+    # TODO "Documentation": "",
+    "Source Code": "https://github.com/breadum/kiwoom",
+}
 
-
-"""
-
+# Author Information
 AUTHOR = "Breadum"
 EMAIL = "breadum.kr@gmail.com"
 
-PROJECT_URLS = {
-    # "Documentation": "",  #TODO
-    "Source Code": "https://github.com/breadum/kiwoom",
-}
+# Miscellaneous
 LICENSE = "MIT License"
 CLASSIFIERS = [
     "Development Status :: 2 - Pre-Alpha",
@@ -35,11 +33,9 @@ CLASSIFIERS = [
 def setup_package():
     kwargs = {
         "install_requires": [
-
+            'PyQt5 >= 5.15'
         ],
-        "setup_requires": [
-
-        ],
+        "setup_requires": [],
         'zip_safe': False
     }
 
@@ -50,9 +46,10 @@ def setup_package():
         version=VERSION,
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
-        platforms="",
+        packages=find_packages(),
         python_requires=">=3.7",
         license=LICENSE,
+        classifiers=CLASSIFIERS,
         **kwargs
     )
 

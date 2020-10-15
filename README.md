@@ -36,7 +36,7 @@ Python wrapper of Kiwoom Open API+
 
 - 데이터를 요청하는 함수와 데이터를 받는 함수를 분리해서 작성 (Signal & Slot)
 
-- 작성 후 Kiwoom.connect() 함수로 매핑시켜 서버에서 응답 시 자동 호출 지원
+- 작성 후 Kiwoom.connect() 함수로 서로 연결시켜 서버에서 응답 시 자동 호출 지원
 
 > ```python
 > # 서버에 데이터를 요청하는 클래스 (사용자 작성)
@@ -248,7 +248,7 @@ Python wrapper of Kiwoom Open API+
 
 ## License
 
-- MIT
+- [MIT License][mit]
 
 ## Finally
 
@@ -258,5 +258,6 @@ Python wrapper of Kiwoom Open API+
 
 - 버그, 기능요청, 문의사항 등은 [Github 이슈 게시판][issue] 및 [E-mail][email]을 통해 남겨주세요.
 
+[mit]: https://github.com/breadum/kiwoom/blob/main/LICENSE
 [issue]: https://github.com/breadum/kiwoom/issues
 [email]: https://github.com/breadum
