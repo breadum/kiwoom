@@ -1,7 +1,6 @@
 # Namespace Control
-from kiwoom.config import event_handlers
-from kiwoom.core.kiwoom import Kiwoom
 from kiwoom.wrapper.api import API
+from kiwoom.core.kiwoom import Kiwoom
 
 
 import sys

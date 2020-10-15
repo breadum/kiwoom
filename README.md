@@ -22,14 +22,14 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 > self.comm_rq_data(rq_name, tr_code, prev_next, scr_no)
 > ```
 
-- loop / unloop 함수를 통해 간단히 코드 실행 / 대기 제어 (QEventLoop)
+- 함수명과 변수명을 Python 방식으로 변경
 
 > ```python
-> from kiwoom import *
->
-> api = Kiwoom()
-> api.loop()
-> api.unloop()
+> # Before
+> OnReceiveTrCondition(BSTR sScrNo, BSTR strCodeList, BSTR strConditionName, int nIndex, int nNext)
+> 
+> # After
+> on_receive_tr_condition(scr_no, code_list, cond_name, index, next)
 > ```
 
 #### 2. 통신을 위한 체계적인 코드 작성 지원
@@ -126,6 +126,16 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 > from kiwoom import *
 > api = Kiwoom()
 > api.login()
+> ```
+
+- loop / unloop 함수를 통해 간단히 코드 실행 / 대기 제어 (QEventLoop)
+
+> ```python
+> from kiwoom import *
+>
+> api = Kiwoom()
+> api.loop()
+> api.unloop()
 > ```
 
 - 주가, 지수, 섹터, 국내선옵 Historical Market Data 다운로드 (지원예정)
