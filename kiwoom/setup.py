@@ -13,22 +13,22 @@ Considering the purpose, the package tries to be simple as possible.
 
 AUTHOR = "Breadum"
 EMAIL = "breadum.kr@gmail.com"
-LICENSE = "MIT"
 
-"""
 PROJECT_URLS = {
-    "Documentation": "",
+    # "Documentation": "",  #TODO
     "Source Code": "https://github.com/breadum/kiwoom",
 }
-"""
+LICENSE = "MIT License"
 CLASSIFIERS = [
-    "Operating System :: ",
+    "Development Status :: 2 - Pre-Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
-    "Topic :: trading-systems/algorithmic-trading"
+    "Topic :: Office/Business :: Financial :: Investment"
 ]
 
 
@@ -39,7 +39,8 @@ def setup_package():
         ],
         "setup_requires": [
 
-        ]
+        ],
+        'zip_safe': False
     }
 
     setup(
@@ -51,6 +52,7 @@ def setup_package():
         long_description=LONG_DESCRIPTION,
         platforms="",
         python_requires=">=3.7",
+        license=LICENSE,
         **kwargs
     )
 

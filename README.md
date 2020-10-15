@@ -1,5 +1,5 @@
 # Kiwoom Open API+
-Python wrapper of Kiwoom Open API+ (키움증권)
+Python wrapper of Kiwoom Open API+
 
 ## What is it?
 
@@ -12,7 +12,7 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 
 #### 1. Open API+ 함수 호출 간소화
 
-- 반복되는 dynamicCall 제거
+- 반복되는 dynamicCall 제거 
 
 > ```python
 > # Before
@@ -50,7 +50,8 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 >         self.api.comm_rq_data(rq_name='balance', tr_code='opw00018', prev_next='0', scr_no='0000')
 >         self.api.loop()  # 데이터를 다 받을 때까지 대기
 >         ...
->
+> ```
+> ```python
 > # 서버에서 데이터를 받는 클래스 (사용자 작성)
 > class Slot:
 >     def __init__(self, api):
@@ -70,7 +71,8 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 >             ...
 >             self.is_downloading = False
 >             self.api.unloop()
->
+> ```
+> ```python
 > # 구현되어있는 메인 클래스
 > class Kiwoom:
 >     ...
@@ -153,11 +155,22 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 >         return super().send_order(rq_name, scr_no, acc_no, ord_type, code, qty, price, hoga_gb, org_order_no)
 >     ...
 
-- 번호로 지정된 시장과 섹터 확인
+- 순수한 API 기능만을 사용하고 싶은 경우
+
+> ```python
+> from kiwoom import API
+>
+> # Overriding
+> class Bot(API):
+>     pass
+> ```
+
+- 시장과 섹터의 약속된 지정 번호와 이름 확인
 
 > ```python
 > import kiwoom
 >
+> # 단, 주기적 업데이트 필요!
 > print(kiwoom.config.markets)  # {'0': 'KOSPI', '3': 'ELW', ... }
 > print(kiwoom.config.sectors)  # {'001': '종합(KOSPI)', '002': '대형주', ... }
 > ```
@@ -183,13 +196,15 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 
 #### Prerequisite
 
-1. 키움 Open API+ 모듈 및 KOA Studio
+##### 1. 키움 Open API+ 사용 신청 (Step1), 모듈 다운로드 (Step2), KOA Studio 다운로드 (Step3)
 
-     키움 웹사이트 (https://www1.kiwoom.com/nkw.templateFrameSet.do?m=m1408000000)
+- 키움 웹사이트 (https://www1.kiwoom.com/nkw.templateFrameSet.do?m=m1408000000)
 
-2. 32-bit Python 3.7 이상 Windows 환경
+##### 2. 32-bit Python 3.7 이상 Windows 환경 세팅
 
-- Anaconda 64-bit 활용 시 유의사항
+- 키움 Open API+ 활용 시 필수조건
+
+- Anaconda 64-bit 에서 32-bit 가상환경 생성 시 유의사항
 
      네이버 블로그 참고 페이지 (https://m.blog.naver.com/haanoon/221814660104)
 
@@ -204,11 +219,19 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 > conda install python=3.7  # Python 3.7 설치
 > ```
 
-- 아래 코드로 반드시 '32Bit'인지 확인
+- 아래 코드로 '32Bit'인지 반드시 확인 후 설치
 
 > ```python
 > import platform; print(platform.architecture())
 > ```
+
+##### 3. KOA Studio를 활용해 간단한 조회 후 데이터 수신 확인
+
+- 키움에서 Open API+ 모듈을 받아도 처음 실행 시 여러가지 오류 발생
+
+- 먼저 KOA Studio를 통해 오류 확인 및 해결 후 파이썬 모듈 설치
+
+- 버전 업데이트, 계좌비밀번호 저장 및 AUTO 기능 등을 확인
 
 #### Install from pip
 
@@ -229,6 +252,8 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 
 ## Finally
 
-- 프로젝트 개발자는 키움증권과 아무런 관련이 없는 일반 개인이 제작했습니다.
+- 본 프로젝트 개발자는 키움증권과 아무런 관련이 없는 일반 개인이 제작했습니다.
 
 - 발생한 어떠한 손실에 대하여 어떻게 발생하였든지 개발자는 이에 대해 아무런 책임이 없음을 알립니다.
+
+- 버그, 기능요청, 문의사항 등은 Github 게시판 및 E-mail을 통해 남겨주세요.
