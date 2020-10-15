@@ -7,7 +7,6 @@ Python wrapper of Kiwoom Open API+
 
 - PyQt5를 이용해 직접 개발하고자 하는 분들을 위한 모듈로 부가적인 기능은 최대한 배제
 
-
 ## Main Features
 
 #### 1. Open API+ 함수 호출 간소화
@@ -192,6 +191,10 @@ Python wrapper of Kiwoom Open API+
 > api.histories(sector='금융업', period='tick', start='20201001', merge=True)
 > ```
 
+## Tutorial
+
+- [튜토리얼 및 샘플 코드][tutorial]
+
 ## Installation
 
 #### Prerequisite
@@ -258,6 +261,7 @@ Python wrapper of Kiwoom Open API+
 
 - 버그, 기능요청, 문의사항 등은 [Github 이슈 게시판][issue] 및 [E-mail][email]을 통해 남겨주세요.
 
+[tutorial]: https://github.com/breadum/kiwoom/tree/main/tutorials
 [mit]: https://github.com/breadum/kiwoom/blob/main/LICENSE
 [issue]: https://github.com/breadum/kiwoom/issues
 [email]: https://github.com/breadum
