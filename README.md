@@ -155,16 +155,6 @@ Python wrapper of Kiwoom Open API+
 >         return super().send_order(rq_name, scr_no, acc_no, ord_type, code, qty, price, hoga_gb, org_order_no)
 >     ...
 
-- 순수한 API 기능만을 사용하고 싶은 경우
-
-> ```python
-> from kiwoom import API
->
-> # Overriding
-> class Bot(API):
->     pass
-> ```
-
 - 시장과 섹터의 약속된 지정 번호와 이름 확인
 
 > ```python
@@ -173,6 +163,16 @@ Python wrapper of Kiwoom Open API+
 > # 단, 주기적 업데이트 필요!
 > print(kiwoom.config.markets)  # {'0': 'KOSPI', '3': 'ELW', ... }
 > print(kiwoom.config.sectors)  # {'001': '종합(KOSPI)', '002': '대형주', ... }
+> ```
+
+- 순수한 API 기능만을 사용하고 싶은 경우 지원
+
+> ```python
+> from kiwoom import API
+>
+> # Overriding
+> class Bot(API):
+>     pass
 > ```
 
 - API 이용 과정 로깅 기능 제공 (지원예정)
@@ -188,8 +188,8 @@ Python wrapper of Kiwoom Open API+
 - 주가, 지수, 섹터, 국내선옵 Historical Market Data 다운로드 (지원예정)
 
 > ```python
-> api.history(market='KOSPI', period='tick', start='20201001', merge=True)
-> api.history(sector='금융업', period='tick', start='20201001', merge=True)
+> api.histories(market='KOSPI', period='tick', start='20201001', merge=True)
+> api.histories(sector='금융업', period='tick', start='20201001', merge=True)
 > ```
 
 ## Installation
@@ -252,8 +252,11 @@ Python wrapper of Kiwoom Open API+
 
 ## Finally
 
-- 본 프로젝트 개발자는 키움증권과 아무런 관련이 없는 일반 개인이 제작했습니다.
+- 본 프로젝트의 개발자는 키움증권과 아무런 관련이 없는 개인이 제작했습니다.
 
 - 발생한 어떠한 손실에 대하여 어떻게 발생하였든지 개발자는 이에 대해 아무런 책임이 없음을 알립니다.
 
-- 버그, 기능요청, 문의사항 등은 Github 게시판 및 E-mail을 통해 남겨주세요.
+- 버그, 기능요청, 문의사항 등은 [Github 이슈 게시판][issue] 및 [E-mail][email]을 통해 남겨주세요.
+
+[issue]: https://github.com/breadum/kiwoom/issues
+[email]: https://github.com/breadum
