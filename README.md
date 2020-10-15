@@ -29,7 +29,7 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 > OnReceiveTrCondition(BSTR sScrNo, BSTR strCodeList, BSTR strConditionName, int nIndex, int nNext)
 > 
 > # After
-> on_receive_tr_condition(scr_no, code_list, cond_name, index, next)
+> on_receive_tr_condition(scr_no, code_list, condition_name, index, next)
 > ```
 
 #### 2. 통신을 위한 체계적인 코드 작성 지원
@@ -81,7 +81,7 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 >         pass
 > ```
 
-- 간단한 실행 스크립트 예시
+- 간단한 실행 스크립트 예시 (여러가지 방식 가능)
 
 > ```python 
 > from PyQt5.QtWidgets import QApplication
@@ -97,8 +97,10 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 >     api = Kiwoom()
 >     signal, slot = Signal(api), Slot(api)
 >
+>     """
 >     # Kiwoom.connect() 함수를 이용해 signal과 slot을 서로 매핑
->     # 자세한 내용은 >> help(Kiwoom.connect) 참조
+>     # 자세한 내용은 >> help(Kiwoom.connect) 필히 참조
+>     """
 >     api.connect(signal.balance, slot.balance)
 > 
 >     # 버전처리 및 로그인 
@@ -128,20 +130,53 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 > api.login()
 > ```
 
-- loop / unloop 함수를 통해 간단히 코드 실행 / 대기 제어 (QEventLoop)
+- loop / unloop 함수를 통해 간단히 코드 실행 / 대기 제어
 
 > ```python
 > from kiwoom import *
 >
+> # QEventLoop 활용
 > api = Kiwoom()
 > api.loop()
 > api.unloop()
+> ```
+
+- 요청 후 처리 결과를 제공하는 함수에 한해 Exception 자동 발생
+
+> ```python
+> class Kiwoom:
+>     ...
+>     # 만일 send_order() 실행 후 정상처리 되지 않았다면 @catch_error 에서 Exception 자동 발생
+>     # ex) An exception occured from send_order,  "-308 : OP_ERR_ORD_OVERFLOW (주문전송과부하)"
+>     @catch_error
+>     def send_order(self, rq_name, scr_no, acc_no, ord_type, code, qty, price, hoga_gb, org_order_no):
+>         return super().send_order(rq_name, scr_no, acc_no, ord_type, code, qty, price, hoga_gb, org_order_no)
+>     ...
+
+- 번호로 지정된 시장과 섹터 확인
+
+> ```python
+> import kiwoom
+>
+> print(kiwoom.config.markets)  # {'0': 'KOSPI', '3': 'ELW', ... }
+> print(kiwoom.config.sectors)  # {'001': '종합(KOSPI)', '002': '대형주', ... }
+> ```
+
+- API 이용 과정 로깅 기능 제공 (지원예정)
+
+> ```python
+> from kiwoom import *
+> 
+> api = Kiwoom()
+> api.logging(True, path='log/20201015')
+> api.logging(False)
 > ```
 
 - 주가, 지수, 섹터, 국내선옵 Historical Market Data 다운로드 (지원예정)
 
 > ```python
 > api.history(market='KOSPI', period='tick', start='20201001', merge=True)
+> api.history(sector='금융업', period='tick', start='20201001', merge=True)
 > ```
 
 ## Installation
@@ -150,25 +185,50 @@ Python wrapper of Kiwoom Open API+ (키움증권)
 
 1. 키움 Open API+ 모듈 및 KOA Studio
 
-     https://www1.kiwoom.com/nkw.templateFrameSet.do?m=m1408000000
+     키움 웹사이트 (https://www1.kiwoom.com/nkw.templateFrameSet.do?m=m1408000000)
 
-2. 32-bit Python 3.7 이상의 Windows 환경
+2. 32-bit Python 3.7 이상 Windows 환경
 
-> ```python
-> import platform 
+- Anaconda 64-bit 활용 시 유의사항
+
+     네이버 블로그 참고 페이지 (https://m.blog.naver.com/haanoon/221814660104)
+
+> ```bash
+> # 실제로 잘 작동하지 않는 방식
+> set CONDA_FORCE_32BIT=1  
 >
-> print(platform.architecture())
+> # 권장하는 방식 
+> conda create -n your_awesome_bot  # 가상환경 생성
+> conda activate your_awesome_bot  # 가상환경 실행
+> conda config --env --set subdir win-32  # 현위치에서 32bit 설정
+> conda install python=3.7  # Python 3.7 설치
 > ```
 
-#### From pip
+- 아래 코드로 반드시 '32Bit'인지 확인
+
+> ```python
+> import platform; print(platform.architecture())
+> ```
+
+#### Install from pip
 
 > ```bash
 > pip install kiwoom
 > ```
 
-#### From source
+#### Install from source
 
 > ```bash
 > # After git clone and cd into the dir
 > python3 setup.py install
 > ```
+
+## License
+
+- MIT
+
+## Finally
+
+- 프로젝트 개발자는 키움증권과 아무런 관련이 없는 일반 개인이 제작했습니다.
+
+- 발생한 어떠한 손실에 대하여 어떻게 발생하였든지 개발자는 이에 대해 아무런 책임이 없음을 알립니다.

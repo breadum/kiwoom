@@ -261,7 +261,7 @@ class Kiwoom(API):
         pass
 
     @Connector()
-    def on_receive_tr_condition(self, scr_no, code_list, cond_name, index, next):
+    def on_receive_tr_condition(self, scr_no, code_list, condition_name, index, next):
         pass
 
     @Connector()
