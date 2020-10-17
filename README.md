@@ -90,28 +90,38 @@ Python wrapper of Kiwoom Open API+
 >
 > import sys
 >
+> 
+> class Bot:
+>     def __init__(self):
+>         api = Kiwoom()
+>         self.signal = Signal(self.api)
+>         self.slot = Slot(self.api)
+>
+>         # Kiwoom.connect() 함수를 이용해 signal과 slot을 서로 매핑
+>         # 자세한 내용은 >> help(Kiwoom.connect) 필히 참조
+>         self.api.connect(signal=self.signal.balance, slot=self.slot.balance)
+>
+>     def run(self):
+>         # 버전처리 및 로그인 
+>         self.api.login()
+>
+>         # 계좌평가잔고내역 요청
+>         signal.balance()
+>
+>         # 전송된 데이터 확인
+>         print(slot.data)
+>
+>     
 > if __name__ == '__main__':
+>
 >     # 통신을 위해 QApplication 활용
 >     app = QApplication(sys.argv)
 >
 >     # 인스턴스 생성
->     api = Kiwoom()
->     signal, slot = Signal(api), Slot(api)
->
->     """
->     # Kiwoom.connect() 함수를 이용해 signal과 slot을 서로 매핑
->     # 자세한 내용은 >> help(Kiwoom.connect) 필히 참조
->     """
->     api.connect(signal.balance, slot.balance)
-> 
->     # 버전처리 및 로그인 
->     api.login()
->
->     # 계좌평가잔고내역 요청
->     signal.balance()
->     
->     # 전송된 데이터 확인
->     print(slot.data)
+>     bot = Bot()
+>    
+>     # 봇 작동시작
+>     bot.run() 
 >
 >     # 데이터 수신을 위해 스크립트 종료 방지
 >     app.exec()
@@ -142,13 +152,13 @@ Python wrapper of Kiwoom Open API+
 > api.unloop()
 > ```
 
-- 요청 후 처리 결과를 제공하는 함수에 한해 Exception 자동 발생
+- 요청 후 처리 결과를 제공하는 함수에 한해 에러 메세지 자동 발생
 
 > ```python
 > class Kiwoom:
 >     ...
->     # 만일 send_order() 실행 후 정상처리 되지 않았다면 @catch_error 에서 Exception 자동 발생
->     # ex) An exception occured from send_order,  "-308 : OP_ERR_ORD_OVERFLOW (주문전송과부하)"
+>     # 만일 send_order() 실행 후 정상처리 되지 않았다면 @catch_error 에서 에러 메세지 자동 발생
+>     # ex) An error occured from send_order,  "-308 : OP_ERR_ORD_OVERFLOW (주문전송과부하)"
 >     @catch_error
 >     def send_order(self, rq_name, scr_no, acc_no, ord_type, code, qty, price, hoga_gb, org_order_no):
 >         return super().send_order(rq_name, scr_no, acc_no, ord_type, code, qty, price, hoga_gb, org_order_no)

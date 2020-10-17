@@ -1,7 +1,7 @@
 from functools import wraps
 
 
-err = {
+error = {
     0: ('OP_ERR_NONE', '정상처리'),
     -10: ('OP_ERR_FAIL', '실패'),
     -100: ('OP_ERR_LOGIN', '사용자정보교환실패'),
@@ -36,7 +36,12 @@ err = {
 
 
 def err_msg(ecode):
-    etype, msg = err[ecode]
+    """
+    서버에서 지정된 에러코드와 코드에 해당하는 메세지를 반환하는 함수
+    :param ecode: 에러코드 (지정된 코드는 config.error.error.keys() 참고)
+    :return: '에러코드 : 에러타입 (에러메세지)'
+    """
+    etype, msg = error[ecode]
     return f'{ecode} : {etype} ({msg})'
 
 
@@ -45,5 +50,6 @@ def catch_error(fn):
     def wrapper(*args, **kwargs):
         out = fn(*args, **kwargs)
         if out != 0:  # 0: ('OP_ERR_NONE', '정상처리')
-            raise Exception(f'An exception occurred from {fn.__name__}.\n  - {err_msg(out)}')
+            print(f'An error occurred from {fn.__name__}.\n  - {err_msg(out)}')
+        return out
     return wrapper

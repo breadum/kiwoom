@@ -2,10 +2,10 @@ from setuptools import setup, find_packages
 
 
 # Project Information
-VERSION = "1.0"
+VERSION = "0.0.1"
 DISTNAME = "kiwoom"
 DESCRIPTION = "Python API of Kiwoom OPEN API+"
-LONG_DESCRIPTION = open('README.md').read()
+LONG_DESCRIPTION = open("README.md", encoding="utf-8").read()
 PROJECT_URLS = {
     # TODO "Documentation": "",
     "Source Code": "https://github.com/breadum/kiwoom",
@@ -41,9 +41,9 @@ def setup_package():
 
     setup(
         name=DISTNAME,
+        version=VERSION,
         author=AUTHOR,
         author_email=EMAIL,
-        version=VERSION,
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
         packages=find_packages(),
