@@ -93,7 +93,8 @@ Python wrapper of Kiwoom Open API+
 > 
 > class Bot:
 >     def __init__(self):
->         api = Kiwoom()
+>         # 인스턴스 생성
+>         self.api = Kiwoom()
 >         self.signal = Signal(self.api)
 >         self.slot = Slot(self.api)
 >

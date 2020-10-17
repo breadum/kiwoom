@@ -53,6 +53,11 @@ class Signal:
         }
 
     def balance(self, prev_next='0'):
+        """
+
+        :param prev_next:
+        :return:
+        """
         # 계좌평가잔고내역요청 TR
         tr_code = 'opw00018'
 
@@ -99,6 +104,15 @@ class Slot:
         self.api.unloop()
 
     def balance(self, scr_no, rq_name, tr_code, record_name, prev_next):
+        """
+
+        :param scr_no:
+        :param rq_name:
+        :param tr_code:
+        :param record_name:
+        :param prev_next:
+        :return:
+        """
         print('Slot.balance(scr_no, rq_name, tr_code, record_name, prev_next) 호출')
 
         # f

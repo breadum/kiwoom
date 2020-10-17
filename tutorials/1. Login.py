@@ -17,7 +17,7 @@ import sys
 class Signal:
     def __init__(self, api):
         """
-        :param api = Kiwoom() 여러 클래스에서 공통으로 사용할 Kiwoom 인스턴스
+        :param api : Kiwoom() 인스턴스
         """
         self.api = api
 
@@ -60,7 +60,7 @@ class Signal:
 class Slot:
     def __init__(self, api):
         """
-        :param api = Kiwoom() 여러 클래스에서 공통으로 사용할 Kiwoom 인스턴스
+        :param api : Kiwoom() 인스턴스
         """
         self.api = api
 
@@ -68,6 +68,7 @@ class Slot:
         """
         개발가이드 > 로그인 버전처리 > 관련함수 > OnEventConnect 참조
         comm_connect 실행 시 on_event_connect 함수가 호출될 때 이 함수가 호출되도록 한다.
+        >> self.api.connect(slot=self.slot.login, event='on_event_connect')  # 102번째 줄 참고
         """
         print('Slot.login(err_code) 호출')
 

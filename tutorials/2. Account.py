@@ -7,26 +7,15 @@ import sys
 # 서버에 데이터를 요청하는 클래스
 class Signal:
     def __init__(self, api):
-        """
-        :param api = Kiwoom() 여러 클래스에서 공통으로 사용할 Kiwoom 인스턴스
-        """
         self.api = api
 
     def login(self):
-        """
-        개발가이드 > 로그인 버전처리 > 관련함수 > CommConnect 참조
-        comm_connect 실행 시 on_connect_event 함수가 호출된다.
-        """
         # 서버에 접속 요청
         self.api.comm_connect()
         # [필수] 로그인 될 때까지 대기
         self.api.loop()
 
     def is_connected(self):
-        """
-        개발가이드 > 로그인 버전처리 > 관련함수 > GetConnectState 참조
-        :return: 연결상태 확인 후 연결되어 있다면 True, 그렇지 않다면 False
-        """
         # 0 (연결안됨), 1 (연결됨)
         state = self.api.get_connect_state()
 
@@ -64,16 +53,9 @@ class Signal:
 # 요청했던 데이터를 받는 클래스
 class Slot:
     def __init__(self, api):
-        """
-        :param api = Kiwoom() 여러 클래스에서 공통으로 사용할 Kiwoom 인스턴스
-        """
         self.api = api
 
     def login(self, err_code):
-        """
-        개발가이드 > 로그인 버전처리 > 관련함수 > OnEventConnect 참조
-        comm_connect 실행 시 on_event_connect 함수가 호출될 때 이 함수가 호출되도록 한다.
-        """
         # err_code와 그에 해당하는 메세지
         emsg = config.error.err_msg(err_code)
         # 로그인 성공/실패 출력
