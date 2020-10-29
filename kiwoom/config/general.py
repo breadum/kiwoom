@@ -1,14 +1,21 @@
 # Event Slots
-event_handlers = [
+events = [
     'on_event_connect',
     'on_receive_msg',
-    'on_receive_tr_data'
+    'on_receive_tr_data',
     'on_receive_real_data',
     'on_receive_chejan_data',
-    'on_receive_condition_ver'
+    'on_receive_condition_ver',
     'on_receive_tr_condition',
     'on_receive_real_condition'
 ]
+
+
+def is_valid_event(event):
+    if event not in events:
+        print(f"{event} is not a valid event.\nSelect one of {events}.")
+        return False
+    return True
 
 
 # 시장

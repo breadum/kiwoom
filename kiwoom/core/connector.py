@@ -14,68 +14,62 @@ from inspect import (
 class Connector:
     """
     Decorator class
+    This class helps mapping events to specific slots. If event is called,
+    then wrapper function automatically calls slots with the same args.
     """
     warn = True
 
-    def __init__(self, key=None):
-        self.key = key
+    def __init__(self, *args, **kwargs):
+        pass
 
     def __call__(self, ehandler):
+        """
+        Decorator for connecting event to the right slot
+          # Usage
+          >> @Connector()
+          >> def event_handler(*args):
+
+        :param ehandler: event handler of empty method in Kiwoom class
+        :return: a wrapped function that can execute connected slot with given args
+        """
         @wraps(ehandler)  # keep docstring of event handler
-        def wrapper(*args):
-            """
-            Decorator for connecting event handler to the right slots
-              >> @Connector()
-              >> def event_handler(*args):
+        def wrapper(api, *args):
+            # To execute the default event handler in case of overriding
+            ehandler(api, *args)
 
-            :param ehandler: event handler of empty method in Kiwoom class
-            :return: wrapped function that executes slot with given args
-            """
+            # Variables
+            event = getattr(ehandler, '__name__')
+            hook = api.get_connect_hook(event)
 
-            # To execute the default event handler
-            ehandler(*args)
-
-            api = args[0]  # instance of Kiwoom class
-            if self.key is not None:
-                key = getfullargspec(ehandler).args.index(self.key)
-                try:
-                    slot = api.slot(self.key)
-                    slot(*args[1:])
-                except KeyError:
+            # To find connected slot
+            try:
+                # If hook is set on the event, then key becomes arg that corresponds to the hook
+                # ex) if hook is rq_name for on_receive_tr_data, then key becomes an arg passed into rq_name
+                key = args[getfullargspec(ehandler).args.index(hook) - 1] if hook else None
+                # To retrieve the right slot
+                slot = api.slot(event, key)
+            except KeyError:
+                if Connector.warn:
                     msg = dedent(
-                        f"""\n
-                        Event handler {ehandler.__name__} is not connected to any slot with key '{key}'.
-                        Please try to connect signal and slot first by using kiwoom.connect() method.
-                        
-                          >> api.connect(signal, slot, key)  # api = Kiwoom()
+                        f"""
+                        kiwoom.{event}({', '.join(map(str, args[1:]))}) has been called.
+    
+                        But the event handler, '{event}', is not connected to any slot.
+                        Please try to connect event and slot by using kiwoom.connect() method.
+                          >> api.connect('{event}', slot=slot_method)
+    
+                        This warning message can disappear by the following.
+                          >> from kiwoom import Connector 
+                          >> Connector.mute(True)  # class method
                         """
                     )
-                    raise RuntimeError(msg)
+                    print(msg)
+                return wrapper
 
-            else:
-                key = ehandler.__name__
-                try:
-                    slot = api.slot(key)
-                    slot(*args[1:])
-                except KeyError:
-                    if Connector.warn:
-                        msg = dedent(
-                            f"""
-                            kiwoom.{key}({', '.join(map(str, args[1:]))}) has been called.
-
-                            But the event handler, '{ehandler.__name__}', is not connected to any slot.
-                            Please try to connect slot and event by using kiwoom.connect() method.
-                            
-                              >> api.connect(slot=slot_method, event='{key}')  # api = pykiwoom.Kiwoom()
-
-                            This warning message can disappear by the following.
-
-                              >> pykiwoom.Connector.mute(True)  # class method
-                            """
-                        )
-                        print(msg)
-
+            # To execute the connected slot
+            slot(*args)
         return wrapper
+
 
     @classmethod
     def mute(cls, bool):
@@ -83,6 +77,11 @@ class Connector:
 
     @staticmethod
     def connectable(fn):
+        """
+        if
+        :param fn: method to connect
+        :return:
+        """
         # None
         if fn is None:
             return False

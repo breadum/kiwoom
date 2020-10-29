@@ -5,7 +5,7 @@ Python wrapper of Kiwoom Open API+
 
 - 키움증권에서 제공하는 Open API+ 인터페이스의 간단한 Python Wrapper 모듈
 
-- PyQt5를 이용해 직접 개발하고자 하는 분들을 위한 모듈로 부가적인 기능은 최대한 배제
+- PyQt5를 이용해 직접 개발하고자 하는 사람을 위한 모듈로 부가적인 기능은 최대한 배제
 
 ## Main Features
 
@@ -47,7 +47,7 @@ Python wrapper of Kiwoom Open API+
 >         ...
 >         # '계좌평가잔고내역'을 받기 위해 서버로 rq_name='balance'로 요청 전송
 >         self.api.comm_rq_data(rq_name='balance', tr_code='opw00018', prev_next='0', scr_no='0000')
->         self.api.loop()  # 데이터를 다 받을 때까지 대기
+>         self.api.loop()  # 이벤트가 호출 될 때까지 대기
 >         ...
 > ```
 > ```python
@@ -73,12 +73,12 @@ Python wrapper of Kiwoom Open API+
 > ```
 > ```python
 > # 구현되어있는 메인 클래스
-> class Kiwoom:
+> class Kiwoom(API):
 >     ...
 >     # rq_name = 'balance'라면, @Connector가 매핑된 함수를 자동 호출
->     # >> slot.balance(scr_no, rq_name, tr_code, record_name, prev_next)
->     @Connector(key='rq_name')
->     def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next):
+>     # >> slot.balance(scr_no, rq_name, tr_code, record_name, prev_next, *args)
+>     @Connector()
+>     def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next, *args):
 >         pass
 > ```
 
@@ -99,7 +99,7 @@ Python wrapper of Kiwoom Open API+
 >         self.slot = Slot(self.api)
 >
 >         # Kiwoom.connect() 함수를 이용해 signal과 slot을 서로 매핑
->         # 자세한 내용은 >> help(Kiwoom.connect) 필히 참조
+>         # 자세한 내용은 >> help(Kiwoom.connect) 또는 튜토리얼 참조
 >         self.api.connect(signal=self.signal.balance, slot=self.slot.balance)
 >
 >     def run(self):
@@ -153,10 +153,10 @@ Python wrapper of Kiwoom Open API+
 > api.unloop()
 > ```
 
-- 요청 후 처리 결과를 제공하는 함수에 한해 에러 메세지 자동 발생
+- 요청 후 처리 결과를 반환하는 함수에 한해 에러 메세지 자동 발생
 
 > ```python
-> class Kiwoom:
+> class Kiwoom(API):
 >     ...
 >     # 만일 send_order() 실행 후 정상처리 되지 않았다면 @catch_error 에서 에러 메세지 자동 발생
 >     # ex) An error occured from send_order,  "-308 : OP_ERR_ORD_OVERFLOW (주문전송과부하)"
@@ -165,7 +165,7 @@ Python wrapper of Kiwoom Open API+
 >         return super().send_order(rq_name, scr_no, acc_no, ord_type, code, qty, price, hoga_gb, org_order_no)
 >     ...
 
-- 시장과 섹터의 약속된 지정 번호와 이름 확인
+- 시장과 섹터의 지정 번호와 이름 확인
 
 > ```python
 > import kiwoom
@@ -239,13 +239,15 @@ Python wrapper of Kiwoom Open API+
 > import platform; print(platform.architecture())
 > ```
 
-##### 3. KOA Studio를 활용해 간단한 조회 후 데이터 수신 확인
+##### 3. KOA Studio를 활용해 간단한 데이터 조회로 정상작동 여부 확인 필수
 
 - 키움에서 Open API+ 모듈을 받아도 처음 실행 시 여러가지 오류 발생
 
+     키움 OpenAPI 등록, 타인계좌 사용불가, AhnLab Safe Transaction 설치 등등  
+
 - 먼저 KOA Studio를 통해 오류 확인 및 해결 후 파이썬 모듈 설치
 
-- 버전 업데이트, 계좌비밀번호 저장 및 AUTO 기능 등을 확인
+- 키움 OpenAPI 등록, 모의투자 신청, 버전처리, 계좌비밀번호 저장(AUTO) 등을 확인
 
 #### Install from pip
 
@@ -257,6 +259,7 @@ Python wrapper of Kiwoom Open API+
 
 > ```bash
 > # After git clone and cd into the dir
+> git clone https://github.com/breadum/kiwoom.git && cd kiwoom
 > python3 setup.py install
 > ```
 
@@ -268,7 +271,7 @@ Python wrapper of Kiwoom Open API+
 
 - 본 프로젝트의 개발자는 키움증권과 아무런 관련이 없습니다.
 
-- 상당히 엉망인 키움 Open API를 활용하여 직접 시스템을 개발할 때 도움이 되고자하는 마음으로 제작했습니다.
+- 키움 Open API를 활용하여 직접 시스템을 개발할 때 도움 되도록 하는 목적으로 개발했습니다.
 
 - 발생한 어떠한 손실에 대하여 어떻게 발생하였든지 개발자는 이에 대해 아무런 책임이 없음을 알립니다.
 

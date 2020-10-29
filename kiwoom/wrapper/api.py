@@ -845,7 +845,7 @@ class API(QAxWidget):
         """
         pass
 
-    def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next):
+    def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next, *args):
         """
         # 개발가이드 > 조회와 실시간데이터처리, 주문과 잔고처리
 
@@ -865,6 +865,8 @@ class API(QAxWidget):
 
         조회요청 응답을 받거나 조회데이터를 수신했을때 호출됩니다.
         조회데이터는 이 이벤트내부에서 GetCommData()함수를 이용해서 얻어올 수 있습니다.
+
+        # 사용하지 않는 nDataLength, sErrorCode, sMessage, sSplmMsg은 묶어서 *args로 처리함
         """
         pass
 
@@ -936,7 +938,7 @@ class API(QAxWidget):
         """
         pass
 
-    def on_receive_tr_condition(self, scr_no, code_list, cond_name, index, next):
+    def on_receive_tr_condition(self, scr_no, code_list, condition_name, index, next):
         """
         # 개발가이드 > 조건검색
 
@@ -973,7 +975,7 @@ class API(QAxWidget):
         """
         pass
 
-    def on_receive_real_condition(self, code, type, cond_name, cond_index):
+    def on_receive_real_condition(self, code, type, condition_name, condition_index):
         """
         # 개발가이드 > 조건검색
 

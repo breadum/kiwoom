@@ -35,14 +35,14 @@ error = {
 }
 
 
-def err_msg(ecode):
+def msg(ecode):
     """
     서버에서 지정된 에러코드와 코드에 해당하는 메세지를 반환하는 함수
     :param ecode: 에러코드 (지정된 코드는 config.error.error.keys() 참고)
     :return: '에러코드 : 에러타입 (에러메세지)'
     """
     etype, msg = error[ecode]
-    return f'{ecode} : {etype} ({msg})'
+    return f'Error - Code: {ecode}, Type: {etype}, Msg: {msg}'
 
 
 def catch_error(fn):
@@ -50,6 +50,6 @@ def catch_error(fn):
     def wrapper(*args, **kwargs):
         out = fn(*args, **kwargs)
         if out != 0:  # 0: ('OP_ERR_NONE', '정상처리')
-            print(f'An error occurred from {fn.__name__}.\n  - {err_msg(out)}')
+            print(f'An error occurred from {fn.__name__}.\n  * {msg(out)}')
         return out
     return wrapper

@@ -1,6 +1,7 @@
 from kiwoom.config import error
 from kiwoom.config.general import (
-    event_handlers,
+    events,
+    is_valid_event,
     markets,
     market_gubun,
     sectors

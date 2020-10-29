@@ -1,8 +1,11 @@
 from kiwoom.wrapper.api import API
-from kiwoom.config.general import event_handlers
-from kiwoom.config.error import err_msg, catch_error
+from kiwoom.config import events, is_valid_event
+from kiwoom.config.error import msg, catch_error
 from kiwoom.core.connector import Connector
 
+from textwrap import dedent
+from inspect import getfullargspec
+from collections import defaultdict
 from PyQt5.QtCore import QEventLoop
 from PyQt5.QtCore import pyqtRemoveInputHook
 
@@ -13,32 +16,42 @@ class Kiwoom(API):
     def __init__(self):
         super().__init__()
         self.msg = True
-        self.qloop = QEventLoop()
+        self._qloop = QEventLoop()
 
         # To connect signals and slots
-        self._events = dict()
-        self._signals = dict()
-        self._slots = dict()
+        # >> dic[event][key] returns signal/slot method
+        self._signals = defaultdict(dict)
+        self._slots = defaultdict(dict)
+        self._hooks = dict()
 
         # To solve conflict between PyQt and input()
-        pyqtRemoveInputHook()
+        # pyqtRemoveInputHook()
 
         # To solve the issue that IDE hides error traceback
         def except_hook(cls, exception, traceback):
             sys.__excepthook__(cls, exception, traceback)
         sys.excepthook = except_hook
 
-        # To connect default slots to the most basic two event handlers
-        self.connect(slot=self.__on_event_connect_slot, event='on_event_connect')
-        self.connect(slot=self.__on_receive_msg_slot, event='on_receive_msg')
+        # To set hooks for each event
+        self.set_connect_hook('on_receive_tr_data', arg='rq_name')
+        self.set_connect_hook('on_receive_tr_condition', arg='condition_name')
+        self.set_connect_hook('on_receive_real_condition', arg='condition_name')
+
+        # To connect default slots to basic two event handlers
+        self.connect('on_event_connect', slot=self.__on_event_connect_slot)
+        self.connect('on_receive_msg', slot=self.__on_receive_msg_slot)
 
     def loop(self):
-        if not self.qloop.isRunning():
-            self.qloop.exec()
+        if not self._qloop.isRunning():
+            self._qloop.exec()
 
     def unloop(self):
-        if self.qloop.isRunning():
-            self.qloop.exit()
+        if self._qloop.isRunning():
+            self._qloop.exit()
+
+    def login(self):
+        self.comm_connect()
+        self.loop()
 
     def message(self, bool):
         """
@@ -46,195 +59,113 @@ class Kiwoom(API):
         """
         self.msg = bool
 
-    def connect(self, signal=None, slot=None, event=None, key=None):
+    def signal(self, event, key=None):
+        """
+        :param event: string of event
+        :param key: string of key (method name by default)
+        :return: signal method
+        """
+        if self.get_connect_hook(event) is None:
+            return self._signals[event]
+        return self._signals[event][key]
+
+    def slot(self, event, key=None):
+        """
+        :param event: string of event
+        :param key: string of key (method name by default)
+        :return: slot method
+        """
+        if self.get_connect_hook(event) is None:
+            return self._slots[event]
+        return self._slots[event][key]
+
+    def connect(self, event, signal=None, slot=None, key=None):
         """
         :param signal: a method that requests to the server
         :param slot: a method that reacts the server's response
         :param event: string of event handler name
         :param key: string to be used for rq_name from on_receive_tr_data
 
+        Recommended : Function name will be same
+
         A method that maps events to slots.
         self._slots[event] = slot
 
         Decorator @Connector uses this information.
-
-        Possible Combinations:
-        1) slot, event
-            Connects slot to one of pre-defined 8 events  # print(kiwoom.event_handlers)
-            ex) self.connect(slot=slot.message, event='on_receive_msg')
-                >> Please refer to the sample code below
-                >> Note that default slots for on_event_connect, on_receive_msg are already set.
-
-                # Slot
-                def message(scr_no, rq_name, tr_code, msg):
-                    logger.log(scr_no, rq_name, tr_code, msg)
-
-                # Kiwoom - Already implemented in library
-                @Connector()
-                def on_receive_msg(self, scr_no, rq_name, tr_code, msg):
-                    # NOTICE HERE
-                    #   if on_receive_msg is called, then Connector automatically
-                    #   forwards args to slot.message(scr_no, rq_name, tr_code, msg)
-                    pass
-
-        2) signal, slot, event=on_receive_tr_data
-            Connects signal and slot by its method name as a key for the event, on_receive_tr_data only.
-            When on_receive_tr_data is called, connector automatically calls the given slot.
-            prev_next is '2', i.e. more data is available, Kiwoom.signal(slot.__name__) will return
-
-
-            ex) self.connect(signal.balance, slot.balance)
-                >> Please refer to the sample code below
-
-                # Execution script example
-                api = Kiwoom()
-                signal, slot = Signal(api), Slot(api)
-                signal.balance()  # send request for balance data
-                print(slot.data)  # check received data from server
-
-                # Code definition
-                class Signal:
-                    def __init__(self, api):
-                        self.api = api
-
-                    def balance(self, prev_next='0'):
-                        tr_code = 'opw00018':  # 계좌평가잔고내역요청
-                        inputs = {
-                            '계좌번호': 'xxxxxxxx',
-                            '비밀번호': 'xxxx',
-                            '비밀번호입력매체구분': '00',
-                            '조회구분': '1'
-                        }
-                        for key, val in inputs.items():
-                            self.api.set_input_value(key, val)
-
-                        # NOTICE HERE : rq_name='balance'
-                        self.api.comm_rq_data(rq_name='balance', tr_code, prev_next, scr_no='xxxx')
-                        self.api.loop()  # prevent executing further before completion of downloading
-
-                class Slot:
-                    def __init__(self, api):
-                        self.api = api
-                        self.data = defaultdict(list)
-                        self.is_downloading = False
-
-                    def balance(self, scr_no, rq_name, tr_code, record_name, prev_next):
-                        # To initiate downloading and saving data
-                        if not self.is_downloading:
-                            self.data = defaultdict(list)
-                            self.is_downloading = True
-
-                        # To fetch multi data and save
-                        cnt = self.api.get_repeat_cnt(tr_code, rq_name)
-                        for i in range(cnt):
-                            for key in ['종목번호', '종목명', '평가손익', ...]:
-                                self.data[key].append(
-                                    str.strip(  # or int(), float()
-                                        self.api.get_comm_data(tr_code, rq_name, i, key)
-                                    )
-                                )
-
-                        # NOTICE HERE : key='balance'
-                        if prev_next == '2':
-                            fn = self.api.signal('balance')  # or self.api.signal(rq_name)
-                            fn(prev_next)  # call signal function again to receive remaining data
-
-                        else:
-                            # To fetch single data
-                            for key in ['총평가손익금액', '총수익률(%)']:
-                                self.data[key].append(
-                                    float(self.api.get_comm_data(tr_code, rq_name, 0, key))
-                                )
-
-                            # Downloading completed
-                            self.is_downloading = False
-                            self.api.unloop()
-
-                class Kiwoom:  # already implemented in library
-                    ...
-                    @Connector(key='rq_name')  # already implemented in library
-                    def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next):
-                        # NOTICE HERE
-                        #   if 'balance' is given to 'rq_name', Connector(key='rq_name') automatically
-                        #   forwards args to slot.balance(scr_no, 'balance', tr_code, record_name, prev_next)
-                        pass
-
-        2) signal, slot, key
-            Connects signal and slot by given key
-            ex) self.connect(signal.balance, slot.balance, 'xxxx')
-                >> Please refer to the sample code below
-                >> Note that usage for this combination highly depends on implementor
-                >> Below is just a sample and not a recommended way for usage
-
-                # Signal - Almost same with the above code but rq_name
-                def balance(prev_next='0'):
-                    ...
-                    self.api.comm_rq_data(rq_name='xxxx', tr_code, prev_next, scr_no='xxxx')
-                    self.api.loop()
-
-                # Slot - Almost same with the above code but rq_name
-                def balance(self, scr_no, rq_name, tr_code, record_name, prev_next):  # Slot
-                    ...
-                    if prev_next == '2':
-                        fn = self.api.signal('xxxx')  # or self.api.signal(rq_name)
-                        fn(prev_next)  # call signal function again to receive remaining data
-                    ...
-
-                # Kiwoom - Already implemented in library
-                @Connector(key='rq_name')
-                def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next):
-                    # NOTICE HERE
-                    #   if 'xxxx' is given to 'rq_name', Connector(key='rq_name') automatically
-                    #   forwards args to slot.balance(scr_no, 'xxxx', tr_code, record_name, prev_next)
-                    pass
-
-
         """
         valid = False
         connectable = Connector.connectable
 
-        # Connect signal and slot with/without key
-        if connectable(signal):
-            if connectable(slot):
-                valid = True
-                if key is None:
-                    self._signals[getattr(slot, '__name__')] = signal
-                    self._slots[getattr(signal, '__name__')] = slot
-                else:
-                    self._signals[key] = signal
-                    self._slots[key] = slot
+        if not is_valid_event(event):
+            return
 
-        # Connect slot and event
-        elif connectable(slot):
-            if event is not None:
-                if event not in event_handlers:
-                    raise KeyError(f"{event} is not a valid event handler.\nSelect one of {event_handlers}.")
+        # Directly connect slot to the event
+        if self.get_connect_hook(event) is None:
+            # Key can't be used here
+            if key is not None:
+                pass
+
+            elif connectable(signal):
+                if connectable(slot):
+                    valid = True
+                    self._signals[event] = signal
+                    self._slots[event] = slot
+
+            elif connectable(slot):
                 valid = True
                 self._slots[event] = slot
+
+        # Connect slot to the event when
+        else:
+            if connectable(signal):
+                if connectable(slot):
+                    valid = True
+                    # Key other than method's name
+                    if key is not None:
+                        self._signals[event][key] = signal
+                        self._slots[event][key] = slot
+                    # Default key is method's name
+                    else:
+                        self._signals[event][getattr(signal, '__name__')] = signal
+                        self._slots[event][getattr(slot, '__name__')] = slot
+
+            elif connectable(slot):
+                valid = True
+                if key is not None:
+                    self._slots[event][key] = slot
+                else:
+                    self._slots[event][getattr(slot, '__name__')] = slot
 
         # Nothing is connected
         if not valid:
             raise RuntimeError(f"Unsupported combination of inputs. Please read below.\n\n{self.connect.__doc__}")
 
-    def signal(self, key):
+    def get_connect_hook(self, event):
         """
-
-        :param key:
+        :param event:
+        :param arg:
         :return:
         """
-        return self._signals[key]
+        if event not in self._hooks:
+            return None
+        return self._hooks[event]
 
-    def slot(self, key):
-        """
+    def set_connect_hook(self, event, arg):
+        if not is_valid_event(event):
+            return
+        # To check given arg is valid
+        args = self.api_arg_spec(event)
+        if arg not in args:
+            raise KeyError(f"{arg} is not valid.\nSelect one of {args}.")
+        # Set connect hook
+        self._hooks[event] = arg
 
-        :param key:
-        :return:
-        """
-        return self._slots[key]
+    def remove_connect_hook(self, event):
+        del self._hooks[event]
 
-    def login(self):
-        self.comm_connect()
-        self.loop()
+    def api_arg_spec(self, fn):
+        args = getfullargspec(getattr(API, fn)).args
+        return args
 
     """
     Event Handlers (8)
@@ -255,28 +186,28 @@ class Kiwoom(API):
     def on_receive_msg(self, scr_no, rq_name, tr_code, msg):
         pass
 
-    @Connector(key='rq_name')
-    def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next):
+    @Connector()
+    def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next, *args):
         pass
 
-    @Connector()
+    # @Connector
     def on_receive_real_data(self, code, real_type, real_data):
         pass
 
-    @Connector()
+    # @Connector
     def on_receive_chejan_data(self, gubun, item_cnt, fid_list):
         pass
 
-    @Connector()
+    # @Connector
     def on_receive_condition_ver(self, ret, msg):
         pass
 
-    @Connector()
+    # @Connector
     def on_receive_tr_condition(self, scr_no, code_list, condition_name, index, next):
         pass
 
-    @Connector()
-    def on_receive_real_condition(self, code, type, cond_name, cond_index):
+    # @Connector
+    def on_receive_real_condition(self, code, type, condition_name, condition_index):
         pass
 
     """
@@ -334,7 +265,7 @@ class Kiwoom(API):
 
     # Default event slot for on_event_connect
     def __on_event_connect_slot(self, err_code):
-        print(f'\n로그인 {err_msg(err_code)}')
+        print(f'\n로그인 {msg(err_code)}')
         print(f'\n* 시스템 점검\n  - 월 ~ 토 : 05:05 ~ 05:10\n  - 일 : 04:00 ~ 04:30\n')
         self.unloop()
 
