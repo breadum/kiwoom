@@ -1,8 +1,20 @@
-from kiwoom.config.error import catch_error
 from PyQt5.QAxContainer import QAxWidget
 
 
+"""
+Pure API module  
+"""
+
+
 class API(QAxWidget):
+    """
+    Python Wrapper Class of Kiwoom Open API+
+
+    This class is just a pure python wrapper for the api. All methods should be found
+    on KOA Studio manual. Implementation is based on PyQt5 to utilize Open API+. No
+    additional method is defined in this class. Extra helpful method is defined at
+    Kiwoom class which inherits this class to support implementors.
+    """
     def __init__(self):
         # QAxWidget init
         super().__init__()

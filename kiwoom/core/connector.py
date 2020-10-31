@@ -13,10 +13,40 @@ from inspect import (
 
 class Connector:
     """
-    Decorator class
-    This class helps mapping events to specific slots. If event is called,
-    then wrapper function automatically calls slots with the same args.
+    Decorator class for mapping empty events to user implementing slots.
+
+    This class helps mapping events to specific slots. 'Kiwoom' instance
+    contains mapping information which had been set from two methods.
+
+    1) Kiwoom.connect(event, signal, slot)
+    2) Kiwoom.set_connect_hook(event, param)
+
+    This decorator does not contain those mapping information but only
+    uses the one defined in instance. This is because decorator should
+    work on various contexts. The first parameter of wrapper function
+    in __call__ method, i.e. api, is 'self' argument for Kiwoom object.
+
+    This class has three main methods.
+    1) Connector.__call__(event)
+      - act as a decorator for pre-defined Kiwoom events
+      - below is the usage example
+
+        class Kiwoom(API):
+            ...
+            @Connector()
+            def on_event_connect(self, err_code):
+                pass
+            ...
+
+    2) Connector.mute(bool)  # static method
+      - warning message can be turned on/off.
+
+    3) Connector.connectable(fn)  # static method
+      - Check if given fn is a bounded method to an instance.
+      - If fn is not a bounded method, it should be static or lambda.
+      - Bounded method is important to handle continuous information
     """
+    # Class variable
     warn = True
 
     def __init__(self, *args, **kwargs):
@@ -24,13 +54,29 @@ class Connector:
 
     def __call__(self, ehandler):
         """
-        Decorator for connecting event to the right slot
-          # Usage
-          >> @Connector()
-          >> def event_handler(*args):
+        Decorator method to call slot method when event connected to slot has been called.
 
-        :param ehandler: event handler of empty method in Kiwoom class
-        :return: a wrapped function that can execute connected slot with given args
+        When event has been called, this decorator method is called with event method as arg.
+        Then wrapper function wraps the event and then the function is returned to be called.
+
+        Inside the wrapper, it takes all args from the event. The First arg is 'self' which is
+        an instance of Kiwoom class. The rest of args depends on which event has been called.
+
+        Firstly, execute event handler which is initially an empty method in the module. But
+        this process is needed when an empty method is overridden. Then, find the right slot
+        connected to the event. If found, execute it with the same args forwarded from event.
+        If not, just print a warning message. This message can be turned on/off.
+
+        Usage example
+        >>  class Kiwoom(API):
+        >>      ...
+        >>      @Connector()  # decorator
+        >>      def on_event_connect(self, err_code):
+        >>          pass  # empty event
+        >>      ...
+
+        :param ehandler: one of pre-defined event methods (config.events)
+        :return: wrapper function
         """
         @wraps(ehandler)  # keep docstring of event handler
         def wrapper(api, *args):
@@ -70,19 +116,34 @@ class Connector:
             slot(*args)
         return wrapper
 
-
     @classmethod
     def mute(cls, bool):
+        """
+        Static method to turn on/off printing message from on_receive_msg event.
+
+        Usage example
+        >> Connector.mute(True/False)
+
+        :param bool: True/False
+        """
         cls.warn = not bool
 
     @staticmethod
     def connectable(fn):
         """
-        if
-        :param fn: method to connect
-        :return:
+        Static function that checks given fn is callable and bounded method.
+
+        When event is called, a slot mapped to the event is to be called by decorator.
+        If fn is not a static function nor lambda function, fn needs 'self' argument to
+        work correctly. This is why fn should be bounded method to instance object.
+        Bounded method contains 'self' argument by itself. This method is used in
+        Kiwoom.connect(event, signal, slot) to check validity before making connections.
+        When given fn is not valid to connect, this function raises TypeError.
+
+        :param fn: method, function or None
+        :return: bool
         """
-        # None
+        # None by default False
         if fn is None:
             return False
 
@@ -115,7 +176,7 @@ class Connector:
 
                     # Class function should be bound to an instance
                     if not hasattr(fn, '__self__'):
-                        raise ValueError(dedent(
+                        raise TypeError(dedent(
                             f"""
                                 Given '{fname}' must be instance method, not function.
                                 Try to make an instance first as followings.
@@ -133,7 +194,7 @@ class Connector:
 
             # Non-static call should be bound to an instance
             if not hasattr(fn, '__self__'):
-                raise ValueError(dedent(
+                raise TypeError(dedent(
                     f"""
                     Given '{getattr(fn, '__qualname__')} must be bound to instance.
                     Try to make an instance first as followings.
@@ -146,6 +207,6 @@ class Connector:
         # Not a valid argument
         else:
             from kiwoom.core.kiwoom import Kiwoom  # Dynamic import to avoid circular import
-            raise ValueError(
+            raise TypeError(
                 f"Unsupported type, {type(fn)}. Please try with valid args.\n\n{Kiwoom.connect.__doc__}."
             )  # False

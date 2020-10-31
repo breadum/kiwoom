@@ -1,18 +1,20 @@
 from kiwoom.wrapper.api import API
-from kiwoom.config import events, is_valid_event
+from kiwoom.config import is_valid_event
 from kiwoom.config.error import msg, catch_error
 from kiwoom.core.connector import Connector
 
-from textwrap import dedent
 from inspect import getfullargspec
 from collections import defaultdict
 from PyQt5.QtCore import QEventLoop
-from PyQt5.QtCore import pyqtRemoveInputHook
+# from PyQt5.QtCore import pyqtRemoveInputHook
 
 import sys
 
 
 class Kiwoom(API):
+    """
+
+    """
     def __init__(self):
         super().__init__()
         self.msg = True
@@ -81,17 +83,17 @@ class Kiwoom(API):
 
     def connect(self, event, signal=None, slot=None, key=None):
         """
-        :param signal: a method that requests to the server
-        :param slot: a method that reacts the server's response
-        :param event: string of event handler name
-        :param key: string to be used for rq_name from on_receive_tr_data
-
         Recommended : Function name will be same
 
         A method that maps events to slots.
         self._slots[event] = slot
 
         Decorator @Connector uses this information.
+
+        :param signal: a method that requests to the server
+        :param slot: a method that reacts the server's response
+        :param event: string of event handler name
+        :param key: string to be used for rq_name from on_receive_tr_data
         """
         valid = False
         connectable = Connector.connectable
@@ -150,15 +152,21 @@ class Kiwoom(API):
             return None
         return self._hooks[event]
 
-    def set_connect_hook(self, event, arg):
+    def set_connect_hook(self, event, param):
+        """
+
+        :param event:
+        :param param:
+        :return:
+        """
         if not is_valid_event(event):
             return
         # To check given arg is valid
         args = self.api_arg_spec(event)
-        if arg not in args:
-            raise KeyError(f"{arg} is not valid.\nSelect one of {args}.")
+        if param not in args:
+            raise KeyError(f"{param} is not valid.\nSelect one of {args}.")
         # Set connect hook
-        self._hooks[event] = arg
+        self._hooks[event] = param
 
     def remove_connect_hook(self, event):
         del self._hooks[event]
@@ -190,23 +198,23 @@ class Kiwoom(API):
     def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next, *args):
         pass
 
-    # @Connector
+    @Connector()
     def on_receive_real_data(self, code, real_type, real_data):
         pass
 
-    # @Connector
+    @Connector()
     def on_receive_chejan_data(self, gubun, item_cnt, fid_list):
         pass
 
-    # @Connector
+    @Connector()
     def on_receive_condition_ver(self, ret, msg):
         pass
 
-    # @Connector
+    @Connector()
     def on_receive_tr_condition(self, scr_no, code_list, condition_name, index, next):
         pass
 
-    # @Connector
+    @Connector()
     def on_receive_real_condition(self, code, type, condition_name, condition_index):
         pass
 
@@ -265,11 +273,23 @@ class Kiwoom(API):
 
     # Default event slot for on_event_connect
     def __on_event_connect_slot(self, err_code):
+        """
+        Default slot for 'on_event_connect'
+
+        When on_event_connect is called, this method automatically will be called.
+        """
         print(f'\n로그인 {msg(err_code)}')
         print(f'\n* 시스템 점검\n  - 월 ~ 토 : 05:05 ~ 05:10\n  - 일 : 04:00 ~ 04:30\n')
         self.unloop()
 
     # Default event slot for on_receive_msg_slot
     def __on_receive_msg_slot(self, scr_no, rq_name, tr_code, msg):
+        """
+        Default slot for 'on_receive_msg'
+
+        Whenever the server sends a message, this method prints depending on below.
+        >> Kiwoom.message(True)
+        >> Kiwoom.message(False)
+        """
         if self.msg:
             print(f'\n화면번호: {scr_no}, 요청이름: {rq_name}, TR코드: {tr_code} \n{msg}\n')

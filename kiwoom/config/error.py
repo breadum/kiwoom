@@ -37,15 +37,27 @@ error = {
 
 def msg(ecode):
     """
-    서버에서 지정된 에러코드와 코드에 해당하는 메세지를 반환하는 함수
-    :param ecode: 에러코드 (지정된 코드는 config.error.error.keys() 참고)
-    :return: '에러코드 : 에러타입 (에러메세지)'
+    Returns an error message that corresponds to given error code.
+    Defined errors will be found in config.error.error (dict)
+
+    :param ecode: int
+    :return: str
     """
     etype, msg = error[ecode]
     return f'Error - Code: {ecode}, Type: {etype}, Msg: {msg}'
 
 
 def catch_error(fn):
+    """
+    Decorator function that catches an error from the returns of some api methods.
+
+    If an api method that requests to the server returns the result of request as an error code,
+    this decorator function checks the error code. If error code is other than 0, this function
+    prints the error message corresponding to the error code. It does nothing, otherwise.
+
+    :param fn: api method
+    :return: wrapper function
+    """
     @wraps(fn)  # keep docstring of original function, fn.
     def wrapper(*args, **kwargs):
         out = fn(*args, **kwargs)

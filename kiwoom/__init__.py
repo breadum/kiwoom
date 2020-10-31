@@ -1,5 +1,5 @@
 # Namespace Control
-from kiwoom.wrapper.api import API
-from kiwoom.core.kiwoom import Kiwoom
-from kiwoom.core.connector import Connector
+from kiwoom.core import Connector
+from kiwoom.core import Kiwoom
+from kiwoom.wrapper import API
 from kiwoom.config import *
