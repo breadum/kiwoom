@@ -66,7 +66,7 @@ class Slot:
         # err_code에 해당하는 메세지
         emsg = config.error.msg(err_code)
         # 로그인 성공/실패 출력
-        print(f'로그인 {emsg}')
+        print(f'Login ({emsg})\n')
         # [필수] 대기중인 코드 실행 (23번째 줄)
         self.api.unloop()
 
@@ -87,7 +87,7 @@ class Bot:
         self.signal.login()
 
         # 접속 성공여부 확인
-        if self.api.get_connect_state() != 1:
+        if not self.signal.is_connected():
             raise RuntimeError(f"Server not connected.")
             # or you may exit script - import sys; sys.exit()
 
@@ -118,7 +118,8 @@ if __name__ == '__main__':
 
 """
 [실행결과]
-로그인 Error - Code: 0, Type: OP_ERR_NONE, Msg: 정상처리
+Login (Error - Code: 0, Type: OP_ERR_NONE, Msg: 정상처리)
+
 -- 계좌 정보 --
 계좌개수: 2
 계좌번호: ['xxxxxxxxxx', 'xxxxxxxxxx']

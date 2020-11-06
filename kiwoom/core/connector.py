@@ -75,8 +75,10 @@ class Connector:
         >>          pass  # empty event
         >>      ...
 
-        :param ehandler: one of pre-defined event methods (config.events)
-        :return: wrapper function
+        :param ehandler: method
+            One of pre-defined event handlers, see kiwoom.config.events.
+        :return: function
+            Wrapper function that executes a slot method connected to the event.
         """
         @wraps(ehandler)  # keep docstring of event handler
         def wrapper(api, *args):
@@ -119,12 +121,13 @@ class Connector:
     @classmethod
     def mute(cls, bool):
         """
-        Static method to turn on/off printing message from on_receive_msg event.
+        Class method to turn on/off printing warning message of no connected slot to an event.
 
         Usage example
         >> Connector.mute(True/False)
 
-        :param bool: True/False
+        :param bool: bool
+            If True, no warning message else warning.
         """
         cls.warn = not bool
 
@@ -141,7 +144,9 @@ class Connector:
         When given fn is not valid to connect, this function raises TypeError.
 
         :param fn: method, function or None
+            Any callables to be tested. None is exceptionally accepted.
         :return: bool
+            If a callable can be executed without any problem, returns True.
         """
         # None by default False
         if fn is None:

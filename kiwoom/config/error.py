@@ -41,7 +41,9 @@ def msg(ecode):
     Defined errors will be found in config.error.error (dict)
 
     :param ecode: int
+        One of error code defined at err dictionary.
     :return: str
+        One line error message combined with code, type, and explanation.
     """
     etype, msg = error[ecode]
     return f'Error - Code: {ecode}, Type: {etype}, Msg: {msg}'
@@ -55,8 +57,10 @@ def catch_error(fn):
     this decorator function checks the error code. If error code is other than 0, this function
     prints the error message corresponding to the error code. It does nothing, otherwise.
 
-    :param fn: api method
-    :return: wrapper function
+    :param fn: method
+        One of API methods that returns the error code as result.
+    :return: function
+        Function that wraps given fn and checks the output of fn.
     """
     @wraps(fn)  # keep docstring of original function, fn.
     def wrapper(*args, **kwargs):

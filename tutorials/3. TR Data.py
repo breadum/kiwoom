@@ -37,8 +37,8 @@ CommRqData로 원하는 TR 데이터를 요청할 때 입력 인자 중 rq_name�
 3. 위에서 해당 이벤트의 rq_name이 'balance'일 때 Slot을 연결해 두었기 때문에 Slot.balance(...) 함수가 동일한 입력값으로 호출됨
 
 참고) 이 때 Slot.balance(...) 함수가 호출되었는데 데이터가 남아있어 다시 Signal 함수 요청이 필요하다면
->> balance_signal = Kiwoom.signal('on_receive_tr_data', 'balance')  # 이벤트에 연결된 Signal 함수를 반환
->> balance_signal(..., prev_next='2')  # Signal 함수에 인자를 넣어 남은 데이터를 요청한다.
+>> fn = Kiwoom.signal('on_receive_tr_data', 'balance')  # 이벤트에 연결된 Signal 함수를 반환
+>> fn(..., prev_next='2')  # Signal 함수에 인자를 넣어 남은 데이터를 요청한다.
 
 기본적으로 다음과 같이 설정되어 있지만 예시를 위해 스크립트를 작성함.
 >> Kiwoom.set_connect_hook('on_receive_tr_data', arg='rq_name')
@@ -136,7 +136,7 @@ class Slot:
         # err_code에 해당하는 메세지
         emsg = config.error.msg(err_code)
         # 로그인 성공/실패 출력
-        print(f'Login ({emsg})')
+        print(f'Login ({emsg})\n')
         # [필수] 대기중인 코드 실행 (59번째 줄)
         self.api.unloop()
 
@@ -233,7 +233,7 @@ class Bot:
         self.signal.login()
 
         # 접속 성공여부 확인
-        if self.api.get_connect_state() != 1:
+        if not self.signal.is_connected():
             raise RuntimeError(f"Server not connected.")
             # or you may exit script - import sys; sys.exit()
 
@@ -277,6 +277,7 @@ if __name__ == '__main__':
 
 [실행결과]
 Login (Error - Code: 0, Type: OP_ERR_NONE, Msg: 정상처리)
+
 Signal.balance(scr_no, rq_name, tr_code, record_name, prev_next) 호출
     Slot.balance(scr_no, rq_name, tr_code, record_name, prev_next, *args) 호출
     Slot.balance(scr_no, rq_name, tr_code, record_name, prev_next, *args) 종료
