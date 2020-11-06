@@ -34,7 +34,7 @@ CLASSIFIERS = [
 def setup_package():
     kwargs = {
         "install_requires": [
-            'PyQt5 >= 5.15'
+            'PyQt5 == 5.12'
         ],
         "setup_requires": [],
         "keywords": ["Kiwoom", "Open API+", "키움", "영웅문"],
