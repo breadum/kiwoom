@@ -7,8 +7,8 @@ DISTNAME = "kiwoom"
 DESCRIPTION = "Python API of Kiwoom OPEN API+"
 LONG_DESCRIPTION = open("README.md", encoding="utf-8").read()
 PROJECT_URLS = {
-    # TODO "Documentation": "",
     "Source Code": "https://github.com/breadum/kiwoom",
+    "Tutorials": "https://github.com/breadum/kiwoom/tree/main/tutorials"
 }
 
 # Author Information
