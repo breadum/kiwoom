@@ -42,7 +42,7 @@ markets = {
 
 
 # 시장구분
-market_gubun = {
+market_gubuns = {
     '0': 'KOSPI',
     '1': 'KOSDAQ',
     '2': 'KOSPI200',
