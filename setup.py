@@ -7,7 +7,7 @@ DISTNAME = "kiwoom"
 DESCRIPTION = "Python API of Kiwoom OPEN API+"
 LONG_DESCRIPTION = open("README.md", encoding="utf-8").read()
 PROJECT_URLS = {
-    "Source Code": "https://github.com/breadum/kiwoom",
+    "Git": "https://github.com/breadum/kiwoom",
     "Tutorials": "https://github.com/breadum/kiwoom/tree/main/tutorials"
 }
 
@@ -36,6 +36,7 @@ def setup_package():
             'PyQt5 >= 5.15'
         ],
         "setup_requires": [],
+        "keywords": ["Kiwoom", "Open API+", "키움", "영웅문"],
         'zip_safe': False
     }
 
