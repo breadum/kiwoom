@@ -6,6 +6,7 @@ VERSION = "0.0.1"
 DISTNAME = "kiwoom"
 DESCRIPTION = "Python API of Kiwoom OPEN API+"
 LONG_DESCRIPTION = open("README.md", encoding="utf-8").read()
+LONG_DESCRIPTION_CONTENT_TYPE = 'text/markdown'
 PROJECT_URLS = {
     "Git": "https://github.com/breadum/kiwoom",
     "Tutorials": "https://github.com/breadum/kiwoom/tree/main/tutorials"
@@ -47,6 +48,7 @@ def setup_package():
         author_email=EMAIL,
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
+        long_description_content_type=LONG_DESCRIPTION_CONTENT_TYPE,
         packages=find_packages(),
         python_requires=">=3.7",
         license=LICENSE,
