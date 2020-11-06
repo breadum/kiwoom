@@ -42,7 +42,7 @@ class Kiwoom(API):
         Convention is that the name of signal and slot that deal with the related task
         is recommended to be the same, so that 'key' is set to be the method name of
         signal and slot by default. See examples on the tutorial link below.
-        https://github.com/breadum/kiwoom/blob/main/tutorials/3.%20TR%20Data.py
+        https://github.com/breadum/kiwoom/blob/main/tutorials/4.%20TR%20Data.py
 
         Kiwoom.get_connect_hook(), Kiwoom.remove_connect_hook() are also available.
 
@@ -222,7 +222,7 @@ class Kiwoom(API):
         a function.
 
         Please see tutorial example on the link below.
-        https://github.com/breadum/kiwoom/blob/main/tutorials/3.%20TR%20Data.py
+        https://github.com/breadum/kiwoom/blob/main/tutorials/4.%20TR%20Data.py
 
         :param event: str
             One of the pre-defined event names in string. See kiwoom.config.events.
@@ -301,7 +301,7 @@ class Kiwoom(API):
         Convention is that the name of signal and slot that deal with the related task
         is recommended to be the same, so that 'key' is set to be the method name of
         signal and slot by default. See examples on the tutorial link below.
-        https://github.com/breadum/kiwoom/blob/main/tutorials/3.%20TR%20Data.py
+        https://github.com/breadum/kiwoom/blob/main/tutorials/4.%20TR%20Data.py
 
         :param event: str
             One of the pre-defined event names in string. See kiwoom.config.events.
