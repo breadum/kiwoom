@@ -3,37 +3,47 @@ Python wrapper of Kiwoom Open API+
 
 ## Library Structure
 
-- 키움증권에서 제공하는 Open API+ 인터페이스의 간단한 Python Wrapper 모듈
+#### Class Kiwoom 
 
-- PyQt5를 이용해 직접 개발하고자 하는 사람을 위한 모듈로 부가적인 기능은 최대한 배제
+> 키움 Open API+  활용을 위한 메인 클래스  
 
-## Main Features
+   - API methods
+   
+         KOA Studio 개발가이드 확인
+   
+   - loop ()  /  unloop ()
+         
+         다음 코드 실행 대기/해제를 위한 루프 기능
+      
+   - connect (event, signal, slot) 
+   
+         Event와 Signal, Slot 메서드를 연결해 이벤트 발생 시 자동 호출
+   
+   - set_connect_hook / remove_connect_hook 
+   
+         한 가지 이벤트에 여러가지 Slot을 연결할 때 
+   
+   
+   
+#### Class API
 
-#### 1. Open API+ 함수 호출 간소화
+> 부가 기능이 없는 키움 Open API+
 
-- 반복되는 dynamicCall 제거 
+   - Kiwoom Open API methods
+   
+#### Package config
 
-> ```python
-> # Before
-> self.dynamicCall("CommRqData(QString, QString, Int, QString)", rq_name, tr_code, prev_next, scr_no)
-> 
-> # After
-> self.comm_rq_data(rq_name, tr_code, prev_next, scr_no)
-> ```
+> 여러가지 설정들이 저장된 패키지 
+   
+   - events : 이벤트 핸들러
+   
+   - markets : 시장
+   
+   - sectors : 섹터
+   
+   - market_gubun : 시장구분
 
-- 함수명과 변수명을 Python 방식으로 변경
+## Tutorial Contents
 
-> ```python
-> # Before
-> OnReceiveTrCondition(BSTR sScrNo, BSTR strCodeList, BSTR strConditionName, int nIndex, int nNext)
-> 
-> # After
-> on_receive_tr_condition(scr_no, code_list, condition_name, index, next)
-> ```
-
-#### 2. 통신을 위한 체계적인 코드 작성 지원
-
-- 데이터를 요청하는 함수와 데이터를 받는 함수를 분리해서 작성 (Signal & Slot)
-
-- 작성 후 Kiwoom.connect() 함수로 서로 연결시켜 서버에서 응답 시 자동 호출 지원
-
+0. Baisc Structure
+1. 
