@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 # Project Information
-VERSION = "0.0.2"
+VERSION = "0.0.3"
 DISTNAME = "kiwoom"
 DESCRIPTION = "Python API of Kiwoom OPEN API+"
 LONG_DESCRIPTION = open("README.md", encoding="utf-8").read()
@@ -34,7 +34,7 @@ CLASSIFIERS = [
 def setup_package():
     kwargs = {
         "install_requires": [
-            'PyQt5 == 5.12'
+            'PyQt5 >= 5.12'
         ],
         "setup_requires": [],
         "keywords": ["Kiwoom", "Open API+", "키움", "영웅문"],
