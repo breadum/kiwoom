@@ -182,7 +182,7 @@ class Slot:
 
         # 만일, 데이터가 더 있다면 signal 함수 한번 더 호출 (종목 수 25개 이상인 경우)
         if prev_next == '2':
-            fn = self.api.signal('balance')  # or self.api.signal(rq_name)
+            fn = self.api.signal('on_receive_tr_data', 'balance')  # or ~.signal(~, rq_name)
             fn(prev_next)  # call signal function again to receive remaining data
 
         # 요청 할 데이터가 더 없는 경우
