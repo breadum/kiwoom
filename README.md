@@ -62,7 +62,7 @@ Python wrapper of Kiwoom Open API+
 >         ...
 >         # 만일 데이터가 더 있을 경우 연결했던 Signal 함수 다시 호출
 >         if prev_next == '2':
->             fn = self.api.signal(rq_name)  # rq_name='balance'
+>             fn = self.api.signal('on_receive_tr_data', rq_name)  # rq_name='balance'
 >             fn(prev_next)  # signal.balance(prev_next='2')
 >
 >         # 데이터를 다 받았다면 unloop을 통해 대기중인 코드 실행
