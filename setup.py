@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 # Project Information
-VERSION = "0.0.5"
+VERSION = "0.0.6"
 DISTNAME = "kiwoom"
 DESCRIPTION = "Python API of Kiwoom OPEN API+"
 LONG_DESCRIPTION = open("README.md", encoding="utf-8").read()
@@ -24,6 +24,7 @@ CLASSIFIERS = [
     "Operating System :: Microsoft :: Windows",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
@@ -51,7 +52,7 @@ def setup_package():
         long_description_content_type=LONG_DESCRIPTION_CONTENT_TYPE,
         project_urls=PROJECT_URLS,
         packages=find_packages(),
-        python_requires=">=3.7",
+        python_requires=">=3.6",
         license=LICENSE,
         classifiers=CLASSIFIERS,
         **kwargs
