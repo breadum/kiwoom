@@ -1,7 +1,7 @@
 # Tutorials
-Python wrapper of Kiwoom Open API+
+Simple Python Wrapper for Kiwoom Open API+
 
-## Library Structure
+## Library Structure 
 
 #### Class Kiwoom 
 

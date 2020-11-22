@@ -1,5 +1,5 @@
 # Kiwoom Open API+
-Python wrapper of Kiwoom Open API+
+Simple Python Wrapper for Kiwoom Open API+
 
 ## What is it?
 
