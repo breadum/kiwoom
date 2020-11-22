@@ -215,8 +215,8 @@ class Bot:
         self.api.set_connect_hook('on_receive_tr_data', 'rq_name')
 
         # 2) 이벤트와 Signal, Slot 연결하기
-        # OnReceiveTrData 이벤트에 대하여 특정 rq_name에 대해 signal과 slot을 서로 연결
-        # key 값이 주어지지 않을 시, rq_name은 signal과 slot의 함수 이름으로 자동 설정
+        # OnReceiveTrData 이벤트에 대하여 1)에 의해 특정 rq_name 값에 따라 signal과 slot을 연결
+        # key 값이 주어지지 않을 시, rq_name은 signal과 slot의 함수 이름 'balance'로 자동 설정
         # help(Kiwoom.connect)
         self.api.connect('on_receive_tr_data', signal=self.signal.balance, slot=self.slot.balance)
 
