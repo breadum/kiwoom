@@ -205,28 +205,35 @@ class Bot:
         self.signal = Signal(self.api)
         self.slot = Slot(self.api)
 
-        # 0. 이벤트 호출될 때 사용되는 입력 변수 확인하기
-        # (1) help(Kiwoom.on_receive_tr_data)
-        # (2) self.api.api_arg_spec('on_receive_tr_data')
-        # >> ['self', 'scr_no', 'rq_name', 'tr_code', 'record_name', 'prev_next']
+        # 로그인 이벤트와 Signal, Slot 연결
+        self.api.connect('on_event_connect', signal=self.signal.login, slot=self.slot.login)
 
-        # 1. 이벤트와 Slot 연결 시 기준 인자(hook) 설정하기
-        # OnReceiveTrData 이벤트의 경우 많은 종류의 TR 데이터를 처리해야 하므로
-        # 각각의 TR 요청에 대해 처리할 수 있도록 여러개의 Slot을 연결할 필요가 있다.
-        # 이때 사용자 입력으로 주어지는 값(hook)에 따라 정해진 Slot이 호출될 수 있도록 한다.
-        # 아래 예시에서는 rq_name에 주어지는 값에 따라 정해진 Slot이 호출되도록 한다.
-        # help(Kiwoom.set_connect_hook)
+        # 1) 이벤트와 Slot 연결 시 기준 인자 설정하기
+        # 이벤트 OnReceiveTrData 발생 시 주어진 sRQName 인자값에 따라 slot을 호출하도록 설정
+        # 만일 이를 설정하지 않는다면, 하나의 이벤트에는 하나의 slot만 연결가능
+        # help(Kiwoom.set_connect_hook) & Kiwoom.api_arg_spec('on_receive_tr_data')
         self.api.set_connect_hook('on_receive_tr_data', 'rq_name')
 
-        # 2. 이벤트와 Signal, Slot 연결하기
-        # OnReceiveTrData 이벤트와 Signal, Slot이 연결되도록 한다.
-        # Signal, Slot 함수 이름이 같도록 구현하면 rq_name='balance'일 때 자동으로 연결된다.
-        # 만일 그렇지 않다면, key='balance'라는 키워드 인자를 추가해서 connect 함수를 호출한다.
+        # 2) 이벤트와 Signal, Slot 연결하기
+        # OnReceiveTrData 이벤트에 대하여 특정 rq_name에 대해 signal과 slot을 서로 연결
+        # key 값이 주어지지 않을 시, rq_name은 signal과 slot의 함수 이름으로 자동 설정
         # help(Kiwoom.connect)
         self.api.connect('on_receive_tr_data', signal=self.signal.balance, slot=self.slot.balance)
 
-        # 로그인 이벤트와 Signal, Slot 연결
-        self.api.connect('on_event_connect', signal=self.signal.login, slot=self.slot.login)
+        # 1)과 2) 연결 설정 후에는 다음과 같이 활용할 수 있다.
+        # on_receive_tr_data(..., rq_name='balance', ...) 이벤트 수신 시 slot.balance 자동 호출됨
+        # self.api.signal('on_receive_tr_event', 'balance') 호출 시 signal.balance 함수 반환
+        # self.api.slot('on_receive_tr_event', 'balance') 호출 시 slot.balance 함수 반환
+
+        # * 이벤트가 호출될 때 사용되는 입력 변수 확인하기
+        # (1) help(Kiwoom.on_receive_tr_data)
+        # (2) Kiwoom.api_arg_spec('on_receive_tr_data')
+        # >> ['self', 'scr_no', 'rq_name', 'tr_code', 'record_name', 'prev_next']
+
+        # 참고 가이드
+        # 1) print(config.events)  # 이벤트 목록
+        # 2) print(Kiwoom.api_arg_spec('on_receive_tr_data'))  # 함수인자 목록
+        # 3) help(Kiwoom.connect) and help(Kiwoom.set_connect_hook)  # Doc String
 
     def run(self):
         # 로그인 요청

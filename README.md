@@ -21,7 +21,7 @@ Python wrapper of Kiwoom Open API+
 > self.comm_rq_data(rq_name, tr_code, prev_next, scr_no)
 > ```
 
-- 함수명과 변수명을 Python 방식으로 변경
+- 함수명과 변수명을 깔끔하게 Python 방식으로 통일
 
 > ```python
 > # Before
@@ -31,108 +31,7 @@ Python wrapper of Kiwoom Open API+
 > on_receive_tr_condition(scr_no, code_list, condition_name, index, next)
 > ```
 
-#### 2. 통신을 위한 체계적인 코드 작성 지원
-
-- 데이터를 요청하는 함수와 데이터를 받는 함수를 분리해서 작성 (Signal & Slot)
-
-- 작성 후 Kiwoom.connect() 함수로 서로 연결시켜 서버에서 응답 시 자동 호출 지원
-
-> ```python
-> # 서버에 데이터를 요청하는 클래스 (사용자 작성)
-> class Signal: 
->     def __init__(self, api):
->         self.api = api
->     
->     def balance(self, prev_next='0'):
->         ...
->         # '계좌평가잔고내역'을 받기 위해 서버로 rq_name='balance'로 요청 전송
->         self.api.comm_rq_data(rq_name='balance', tr_code='opw00018', prev_next='0', scr_no='0000')
->         self.api.loop()  # 이벤트가 호출 될 때까지 대기
->         ...
-> ```
-> ```python
-> # 서버에서 데이터를 받는 클래스 (사용자 작성)
-> class Slot:
->     def __init__(self, api):
->         self.api = api
->         self.data = defaultdict(list)
->         self.is_downloading = False
->
->     def balance(self, scr_no, rq_name, tr_code, record_name, prev_next):
->         ...
->         # 만일 데이터가 더 있을 경우 연결했던 Signal 함수 다시 호출
->         if prev_next == '2':
->             fn = self.api.signal('on_receive_tr_data', rq_name)  # rq_name='balance'
->             fn(prev_next)  # signal.balance(prev_next='2')
->
->         # 데이터를 다 받았다면 unloop을 통해 대기중인 코드 실행
->         else:
->             ...
->             self.is_downloading = False
->             self.api.unloop()
-> ```
-> ```python
-> # 구현되어있는 메인 클래스
-> class Kiwoom(API):
->     ...
->     # rq_name = 'balance'라면, @Connector가 매핑된 함수를 자동 호출
->     # >> slot.balance(scr_no, rq_name, tr_code, record_name, prev_next, *args)
->     @Connector()
->     def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next, *args):
->         pass
-> ```
-
-- 간단한 실행 스크립트 예시 (여러가지 방식 가능)
-
-> ```python 
-> from PyQt5.QtWidgets import QApplication
-> from kiwoom import *
->
-> import sys
->
-> 
-> class Bot:
->     def __init__(self):
->         # 인스턴스 생성
->         self.api = Kiwoom()
->         self.signal = Signal(self.api)
->         self.slot = Slot(self.api)
->
->         # Kiwoom.connect() 함수를 이용해 signal과 slot을 서로 매핑
->         # 자세한 내용은 >> help(Kiwoom.connect) 또는 튜토리얼 참조
->         self.api.connect(signal=self.signal.balance, slot=self.slot.balance)
->
->     def run(self):
->         # 버전처리 및 로그인 
->         self.api.login()
->
->         # 계좌평가잔고내역 요청
->         signal.balance()
->
->         # 전송된 데이터 확인
->         print(slot.data)
->
->     
-> if __name__ == '__main__':
->
->     # 통신을 위해 QApplication 활용
->     app = QApplication(sys.argv)
->
->     # 인스턴스 생성
->     bot = Bot()
->    
->     # 봇 작동시작
->     bot.run() 
->
->     # 데이터 수신을 위해 스크립트 종료 방지
->     app.exec()
-> ```
-
-#### 3. 디버깅을 위한 에러 출력
-
-- PyQt5 모듈을 사용하는 경우 Pycharm과 같은 IDE 사용 시 에러 메세지가 발생하지 않는 문제 해결
-
-#### 4. 간단한 기능 지원
+#### 2. 간단한 기능 지원
 
 - 로그인
 
@@ -153,9 +52,10 @@ Python wrapper of Kiwoom Open API+
 > api.unloop()
 > ```
 
-- 요청 후 처리 결과를 반환하는 함수에 한해 에러 메세지 자동 발생
+- 요청 후 처리 결과를 반환하는 함수에 한해 에러 발생 시 메세지 자동 발생
 
 > ```python
+> # 구현되어있는 메인 클래스
 > class Kiwoom(API):
 >     ...
 >     # 만일 send_order() 실행 후 정상처리 되지 않았다면 @catch_error 에서 에러 메세지 자동 발생
@@ -165,7 +65,7 @@ Python wrapper of Kiwoom Open API+
 >         return super().send_order(rq_name, scr_no, acc_no, ord_type, code, qty, price, hoga_gb, org_order_no)
 >     ...
 
-- 시장과 섹터의 지정 번호와 이름 확인
+- 시장과 섹터 지정 번호 확인
 
 > ```python
 > import kiwoom
@@ -201,6 +101,134 @@ Python wrapper of Kiwoom Open API+
 > api.histories(market='KOSPI', period='tick', start='20201001', merge=True)
 > api.histories(sector='금융업', period='tick', start='20201001', merge=True)
 > ```
+
+#### 3. 통신을 위한 체계적인 코드 작성 지원
+
+- 데이터를 요청하는 함수와 데이터를 받는 함수를 분리해서 작성 (Signal & Slot)
+
+- 작성 후 Kiwoom.connect() 함수로 서로 연결시켜 서버에서 응답 시 자동 호출 지원
+
+> ```python
+> from kiwoom import *
+>
+> # 서버에 데이터를 요청하는 클래스 (사용자 작성)
+> class Signal:  
+>
+>     # 주어진 api는 Kiwoom() 인스턴스
+>     def __init__(self, api):
+>         self.api = api
+>     
+>     def balance(self, prev_next='0'):
+>         ...
+>         # '계좌평가잔고내역'을 받기 위해 서버로 rq_name='balance'로 요청 전송
+>         self.api.comm_rq_data(rq_name='balance', tr_code='opw00018', prev_next='0', scr_no='0000')
+>         self.api.loop()  # 이벤트가 호출 될 때까지 대기
+>         ...
+> ```
+> ```python
+> from kiwoom import *
+> 
+> # 서버에서 데이터를 받는 클래스 (사용자 작성)
+> class Slot:
+>
+>     # 주어진 api는 Kiwoom() 인스턴스
+>     def __init__(self, api):
+>         self.api = api
+>         self.data = dict()
+>         self.is_downloading = False
+>
+>     def balance(self, scr_no, rq_name, tr_code, record_name, prev_next):
+>         ...
+>         # 만일 데이터가 더 있을 경우 연결했던 Signal 함수 다시 호출
+>         if prev_next == '2':
+>             fn = self.api.signal('on_receive_tr_data', rq_name)  # rq_name='balance'
+>             fn(prev_next)  # signal.balance(prev_next='2')
+>
+>         # 데이터를 다 받았다면 unloop을 통해 대기중인 코드 실행
+>         else:
+>             ...
+>             self.is_downloading = False
+>             self.api.unloop()
+> ```
+> ```python
+> # 구현되어있는 메인 클래스
+> class Kiwoom(API):
+>     ...
+>     # rq_name = 'balance'라면, @Connector가 매핑된 함수를 자동 호출
+>     # >> slot.balance(scr_no, rq_name, tr_code, record_name, prev_next, *args)
+>     @Connector()
+>     def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next, *args):
+>         pass
+> ```
+
+- 간단한 실행 스크립트 예시 (여러가지 방식 가능)
+
+> ```python 
+> from PyQt5.QtWidgets import QApplication
+> from kiwoom import *
+> import sys
+> 
+> class Bot:
+>     def __init__(self):
+>         # 인스턴스 생성
+>         self.api = Kiwoom()
+>         self.signal = Signal(self.api)
+>         self.slot = Slot(self.api)
+>
+>         # 1) Kiwoom.set_connect_hook(event, param)
+>         # 이벤트 OnReceiveTrData 발생 시 주어진 sRQName 인자값에 따라 slot을 호출하도록 설정
+>         # 만일 설정하지 않는다면, 하나의 이벤트에는 하나의 slot만 연결가능
+>         self.api.set_connect_hook('on_receive_tr_data', 'rq_name')
+>
+>         # 2) Kiwoom.connect(event, signal, slot, key=None)
+>         # OnReceiveTrData 이벤트에 대하여 특정 rq_name에 대해 signal과 slot을 서로 연결
+>         # key 값이 주어지지 않을 시, rq_name은 signal과 slot의 함수 이름으로 자동 설정
+>         self.api.connect(
+>             event='on_receive_tr_data',
+>             signal=self.signal.balance, 
+>             slot=self.slot.balance,
+>         )
+> 
+>         # 1)과 2) 연결 설정 후에는 다음과 같이 활용할 수 있다.
+>         # on_receive_tr_data(..., rq_name='balance', ...) 이벤트 수신 시 slot.balance 자동 호출됨
+>         # self.api.signal('on_receive_tr_event', 'balance') 호출 시 signal.balance 함수 반환
+>         # self.api.slot('on_receive_tr_event', 'balance') 호출 시 slot.balance 함수 반환 
+>
+>         # 참고 가이드          
+>         # 1) print(config.events)  # 이벤트 목록
+>         # 2) print(Kiwoom.api_arg_spec('on_receive_tr_data'))  # 함수인자 목록
+>         # 3) help(Kiwoom.connect) and help(Kiwoom.set_connect_hook)  # Doc String
+>         # 4) Github 튜토리얼 (https://github.com/breadum/kiwoom/tree/main/tutorials)
+>
+>     def run(self):
+>         # 버전처리 및 로그인 
+>         self.api.login()
+>
+>         # 계좌평가잔고내역 요청
+>         signal.balance()
+>
+>         # 전송된 데이터 확인
+>         print(slot.data)
+>
+>     
+> if __name__ == '__main__':
+>
+>     # 통신을 위해 QApplication 활용
+>     app = QApplication(sys.argv)
+>
+>     # 인스턴스 생성
+>     bot = Bot()
+>    
+>     # 봇 작동시작
+>     bot.run() 
+>
+>     # 데이터 통신을 위해 스크립트 종료 방지
+>     app.exec()
+> ```
+
+#### 4. 디버깅을 위한 에러 출력
+
+- PyQt5 모듈을 사용하는 경우 Pycharm과 같은 IDE 사용 시 에러 메세지가 발생하지 않는 문제 해결
 
 ## Tutorial
 
@@ -271,7 +299,7 @@ Python wrapper of Kiwoom Open API+
 
 - 본 프로젝트의 개발자는 키움증권과 아무런 관련이 없습니다.
 
-- 키움 Open API를 활용하여 직접 시스템을 개발할 때 도움 되도록 하는 목적으로 개발했습니다.
+- 엉망인 키움 Open API를 활용하여 시스템을 직접 개발할 때 도움이 되고자 개발했습니다.
 
 - 발생한 어떠한 손실에 대하여 어떻게 발생하였든지 개발자는 이에 대해 아무런 책임이 없음을 알립니다.
 

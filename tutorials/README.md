@@ -3,7 +3,7 @@ Python wrapper of Kiwoom Open API+
 
 ## Library Structure
 
-### Class Kiwoom 
+#### Class Kiwoom 
 
 > 키움 Open API+  활용을 위한 메인 클래스  
 
@@ -21,15 +21,15 @@ Python wrapper of Kiwoom Open API+
    
    - set_connect_hook(event, param) & remove_connect_hook(event) 
    
-         한 가지 이벤트에 여러가지 Slot을 연결할 때 이벤트가 호출 될 때 특정 입력값을 기준으로 연결되도록 설정 
+         한 가지 이벤트에 여러가지 Slot을 연결할 때, 이벤트에 입력되는 특정 인자값을 기준으로 연결되도록 설정 
    
-### Class API
+#### Class API
 
 > 부가 기능이 없는 키움 Open API+
 
    - API methods
    
-### Package config
+#### Package config
 
 > 여러가지 설정들이 저장된 패키지로 Print 함수를 통해 확인 가능 
    

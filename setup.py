@@ -49,6 +49,7 @@ def setup_package():
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
         long_description_content_type=LONG_DESCRIPTION_CONTENT_TYPE,
+        project_urls=PROJECT_URLS,
         packages=find_packages(),
         python_requires=">=3.7",
         license=LICENSE,

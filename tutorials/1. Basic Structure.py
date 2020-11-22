@@ -55,7 +55,7 @@ class Bot:
         # ex) Signal, Slot, Event 연결
         # 1) 로그인 시 아래 이벤트가 호출된다. (KOA Studio 개발가이드 참조)
         event = 'on_event_connect'
-        # 2) 이벤트 호출 시 slot.login(*args, **kwargs) 함수가 자동호출 되도록 설정
+        # 2) 해당 이벤트 호출 시 slot.login(*args, **kwargs) 함수가 자동호출 되도록 설정
         self.api.connect(event, signal=self.signal.login, slot=self.slot.login)
 
     # 봇 작동시작
