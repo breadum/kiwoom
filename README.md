@@ -3,7 +3,7 @@ Simple Python Wrapper for Kiwoom Open API+
 
 ## What is it?
 
-- 키움증권에서 제공하는 Open API+ 인터페이스의 간단한 Python Wrapper 모듈
+- 키움증권에서 제공하는 Open API+ 인터페이스 사용을 위한 간단한 Python Wrapper 모듈
 
 - PyQt5를 이용해 직접 개발하고자 하는 사람을 위한 모듈로 부가적인 기능은 최대한 배제
 
