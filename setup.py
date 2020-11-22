@@ -4,9 +4,11 @@ from setuptools import setup, find_packages
 # Project Information
 VERSION = "0.0.6"
 DISTNAME = "kiwoom"
-DESCRIPTION = "Python API of Kiwoom OPEN API+"
+DESCRIPTION = "Simple Python Wrapper for Kiwoom OPEN API+"
 LONG_DESCRIPTION = open("README.md", encoding="utf-8").read()
 LONG_DESCRIPTION_CONTENT_TYPE = 'text/markdown'
+URL = "https://github.com/breadum/kiwoom"
+DOWNLOAD_URL = "https://pypi.org/project/kiwoom"
 PROJECT_URLS = {
     "Git": "https://github.com/breadum/kiwoom",
     "Tutorials": "https://github.com/breadum/kiwoom/tree/main/tutorials"
@@ -50,6 +52,8 @@ def setup_package():
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
         long_description_content_type=LONG_DESCRIPTION_CONTENT_TYPE,
+        url=URL,
+        download_url=DOWNLOAD_URL,
         project_urls=PROJECT_URLS,
         packages=find_packages(),
         python_requires=">=3.6",
