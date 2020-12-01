@@ -1,12 +1,11 @@
 from kiwoom.wrapper.api import API
-from kiwoom.config import is_valid_event
-from kiwoom.config.error import msg, catch_error
+from kiwoom.config.error import catch_error
+from kiwoom.core.signal import Signal
+from kiwoom.core.slot import Slot
 from kiwoom.core.connector import Connector
 
 from inspect import getfullargspec
-from collections import defaultdict
 from PyQt5.QtCore import QEventLoop
-# from PyQt5.QtCore import pyqtRemoveInputHook
 
 import sys
 
@@ -41,7 +40,7 @@ class Kiwoom(API):
 
         Convention is that the name of signal and slot that deal with the related task
         is recommended to be the same, so that 'key' is set to be the method name of
-        signal and slot by default. See examples on the tutorial link below.
+        signal and slot by default. See examples on the tutorials link below.
         https://github.com/breadum/kiwoom/blob/main/tutorials/4.%20TR%20Data.py
 
         Kiwoom.get_connect_hook(), Kiwoom.remove_connect_hook() are also available.
@@ -62,25 +61,23 @@ class Kiwoom(API):
         Decorator class that forwards args received from called event into connected slot.
         This class wraps all pre-defined events, and automatically calls connected slots.
     """
+    # Class variable just for convenience
+    map = Connector.map
+
     def __init__(self):
         super().__init__()
         self.msg = True
         self._qloop = QEventLoop()
 
-        # To connect signals and slots
-        # >> If no hook is set, dic[event] returns signal/slot.
-        # >> If hook is set, dic[event][key] returns signal/slot.
-        self._signals = dict()
-        self._slots = dict()
-        self._hooks = dict()
-
-        # To solve conflict between PyQt and input()
-        # pyqtRemoveInputHook()
-
         # To solve the issue that IDE hides error traceback
         def except_hook(cls, exception, traceback):
             sys.__excepthook__(cls, exception, traceback)
         sys.excepthook = except_hook
+
+        # To connect signals and slots
+        self._connector = Connector()
+        self._signal = Signal(self)
+        self._slot = Slot(self)
 
         # To set hooks for each event
         self.set_connect_hook('on_receive_tr_data', param='rq_name')
@@ -88,8 +85,8 @@ class Kiwoom(API):
         self.set_connect_hook('on_receive_real_condition', param='condition_name')
 
         # To connect default slots to basic two events
-        self.connect('on_event_connect', slot=self.__on_event_connect_slot)
-        self.connect('on_receive_msg', slot=self.__on_receive_msg_slot)
+        self.connect('on_event_connect', slot=self._slot.on_event_connect)
+        self.connect('on_receive_msg', slot=self._slot.on_receive_msg)
 
     def loop(self):
         """
@@ -155,11 +152,7 @@ class Kiwoom(API):
         :return: method
             Signal method connected to the given event. If wrong event, returns None.
         """
-        if not is_valid_event(event):
-            return None
-        if self.get_connect_hook(event) is None:
-            return self._signals[event]
-        return self._signals[event][key]
+        return self._connector.signal(event, key)
 
     def slot(self, event, key=None):
         """
@@ -186,11 +179,7 @@ class Kiwoom(API):
         :return: method or None
             Slot method connected to the given event. If wrong event, returns None.
         """
-        if not is_valid_event(event):
-            return None
-        if self.get_connect_hook(event) is None:
-            return self._slots[event]
-        return self._slots[event][key]
+        return self._connector.slot(event, key)
 
     def connect(self, event, signal=None, slot=None, key=None):
         """
@@ -221,7 +210,7 @@ class Kiwoom(API):
         methods, therefore method must be bounded to an instance unless given method is
         a function.
 
-        Please see tutorial example on the link below.
+        Please see tutorials example on the link below.
         https://github.com/breadum/kiwoom/blob/main/tutorials/4.%20TR%20Data.py
 
         :param event: str
@@ -236,54 +225,7 @@ class Kiwoom(API):
             If key is given other than method name, the connected signal can be
             retrieved by Kiwoom.siganl(event, key) and slot by Kiwoom.slot(event, key)
         """
-        valid = False
-        connectable = Connector.connectable
-
-        if not is_valid_event(event):
-            return
-
-        # Directly connect slot to the event
-        if self.get_connect_hook(event) is None:
-            # Key can't be used here
-            if key is not None:
-                raise RuntimeError(
-                    "Key can't be used. Remove key argument or Try to set_connect_hook() first."
-                )
-
-            elif connectable(signal):
-                if connectable(slot):
-                    valid = True
-                    self._signals[event] = signal
-                    self._slots[event] = slot
-
-            elif connectable(slot):
-                valid = True
-                self._slots[event] = slot
-
-        # Connect slot to the event when
-        else:
-            if connectable(signal):
-                if connectable(slot):
-                    valid = True
-                    # Key other than method's name
-                    if key is not None:
-                        self._signals[event][key] = signal
-                        self._slots[event][key] = slot
-                    # Default key is method's name
-                    else:
-                        self._signals[event][getattr(signal, '__name__')] = signal
-                        self._slots[event][getattr(slot, '__name__')] = slot
-
-            elif connectable(slot):
-                valid = True
-                if key is not None:
-                    self._slots[event][key] = slot
-                else:
-                    self._slots[event][getattr(slot, '__name__')] = slot
-
-        # Nothing is connected
-        if not valid:
-            raise RuntimeError(f"Unsupported combination of inputs. Please read below.\n\n{self.connect.__doc__}")
+        self._connector.connect(event, signal=signal, slot=slot, key=key)
 
     def set_connect_hook(self, event, param):
         """
@@ -298,9 +240,9 @@ class Kiwoom(API):
         If hook is set to the given parameter, argument passed into the parameter when
         the event is called, is going to be a key to connect event, signal and slot.
 
-        Convention is that the name of signal and slot that deal with the related task
-        is recommended to be the same, so that 'key' is set to be the method name of
-        signal and slot by default. See examples on the tutorial link below.
+        The Convention is that the names of signal and slot that deal with the related task
+        are recommended to be the same, so that 'key' is set to be the method name of
+        signal and slot by default. See examples on the tutorials link below.
         https://github.com/breadum/kiwoom/blob/main/tutorials/4.%20TR%20Data.py
 
         :param event: str
@@ -309,17 +251,7 @@ class Kiwoom(API):
             Parameter name defined in given event. To see all parameters to event,
             use Kiwoom.api_arg_spec(event) method or help(...) built-in function.
         """
-        if not is_valid_event(event):
-            return
-        # To check given arg is valid
-        args = self.api_arg_spec(event)
-        if param not in args:
-            raise KeyError(f"{param} is not valid.\nSelect one of {args}.")
-        # To set connect hook for event
-        self._hooks[event] = param
-        # Initialize structure to get signal/slot method by dic[event][key]
-        self._signals[event] = dict()
-        self._slots[event] = dict()
+        self._connector.set_connect_hook(event, param)
 
     def get_connect_hook(self, event):
         """
@@ -331,11 +263,7 @@ class Kiwoom(API):
             If exists, returns hook in string else None. If not a valid event is given,
             this returns None.
         """
-        if not is_valid_event(event):
-            return None
-        if event not in self._hooks:
-            return None
-        return self._hooks[event]
+        return self._connector.get_connect_hook(event)
 
     def remove_connect_hook(self, event):
         """
@@ -348,11 +276,10 @@ class Kiwoom(API):
         :param event: str
             One of the pre-defined event names in string. See kiwoom.config.events.
         """
-        del self._hooks[event]
-        del self._signals[event]
-        del self._slots[event]
+        self._connector.remove_connect_hook(event)
 
-    def api_arg_spec(self, fn):
+    @staticmethod
+    def api_arg_spec(fn):
         """
         Returns a string list of parameters to given API function
 
@@ -375,35 +302,35 @@ class Kiwoom(API):
         on_receive_tr_condition
         on_receive_real_condition
     """
-    @Connector()
+    @map
     def on_event_connect(self, err_code):
         pass
 
-    @Connector()
+    @map
     def on_receive_msg(self, scr_no, rq_name, tr_code, msg):
         pass
 
-    @Connector()
+    @map
     def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next, *args):
         pass
 
-    @Connector()
+    @map
     def on_receive_real_data(self, code, real_type, real_data):
         pass
 
-    @Connector()
+    @map
     def on_receive_chejan_data(self, gubun, item_cnt, fid_list):
         pass
 
-    @Connector()
+    @map
     def on_receive_condition_ver(self, ret, msg):
         pass
 
-    @Connector()
+    @map
     def on_receive_tr_condition(self, scr_no, code_list, condition_name, index, next):
         pass
 
-    @Connector()
+    @map
     def on_receive_real_condition(self, code, type, condition_name, condition_index):
         pass
 
@@ -459,31 +386,3 @@ class Kiwoom(API):
     @catch_error
     def set_real_reg(self, scr_no, code_list, fid_list, opt_type):
         return super().set_real_reg(scr_no, code_list, fid_list, opt_type)
-
-    """
-    Default slots to the most basic two events.
-        on_event_connect
-        on_receive_msg
-    """
-    # Default event slot for on_event_connect
-    def __on_event_connect_slot(self, err_code):
-        """
-        Default slot for 'on_event_connect'
-
-        When on_event_connect is called, this method automatically will be called.
-        """
-        print(f'\n로그인 {msg(err_code)}')
-        print(f'\n* 시스템 점검\n  - 월 ~ 토 : 05:05 ~ 05:10\n  - 일 : 04:00 ~ 04:30\n')
-        self.unloop()
-
-    # Default event slot for on_receive_msg_slot
-    def __on_receive_msg_slot(self, scr_no, rq_name, tr_code, msg):
-        """
-        Default slot for 'on_receive_msg'
-
-        Whenever the server sends a message, this method prints depending on below.
-        >> Kiwoom.message(True)
-        >> Kiwoom.message(False)
-        """
-        if self.msg:
-            print(f'\n화면번호: {scr_no}, 요청이름: {rq_name}, TR코드: {tr_code} \n{msg}\n')

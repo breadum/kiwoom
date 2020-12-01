@@ -152,11 +152,11 @@ Simple Python Wrapper for Kiwoom Open API+
 > ```
 > ```python
 > # 구현되어있는 메인 클래스
-> class Kiwoom(API):
+> class Kiwoom(API):ㄴ
 >     ...
->     # rq_name = 'balance'라면, @Connector가 매핑된 함수를 자동 호출
+>     # rq_name = 'balance'라면, @map 데코레이터가 매핑된 함수를 자동 호출
 >     # >> slot.balance(scr_no, rq_name, tr_code, record_name, prev_next, *args)
->     @Connector()
+>     @map
 >     def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next, *args):
 >         pass
 > ```
@@ -232,7 +232,7 @@ Simple Python Wrapper for Kiwoom Open API+
 
 ## Tutorial
 
-- [튜토리얼 및 샘플 코드][tutorial]
+- [튜토리얼 및 모듈구조][tutorial]
 
    [1. 뼈대코드][tut1]
    

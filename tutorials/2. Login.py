@@ -22,8 +22,13 @@ class Signal:
 
     def login(self):
         """
-        개발가이드 > 로그인 버전처리 > 관련함수 > CommConnect 참조
+        로그인 요청함수
+
+        * Note
         comm_connect 실행 시 on_connect_event 함수가 호출된다.
+
+        * KOA Studio 참고 가이드
+        개발가이드 > 로그인 버전처리 > 관련함수 > CommConnect 참조
         """
         print('\tSignal.login() 호출')
 
@@ -40,7 +45,14 @@ class Signal:
 
     def is_connected(self):
         """
+        로그인 상태확인 요청함수
+
+        * Note
+        GetConnectState 반환 값이 '0'이면 연결안됨, '1'이면 연결됨.
+
+        * KOA Studio 참고 가이드
         개발가이드 > 로그인 버전처리 > 관련함수 > GetConnectState 참조
+
         :return: 연결상태 확인 후 연결되어 있다면 True, 그렇지 않다면 False
         """
         # 현재 접속상태 표시 API 가이드
@@ -62,9 +74,14 @@ class Slot:
 
     def login(self, err_code):
         """
-        개발가이드 > 로그인 버전처리 > 관련함수 > OnEventConnect 참조
+        Signal.login() 함수로 인해 OnEventConnect 이벤트 발생 시 로그인 메세지 처리함수
+
+        * Note
         comm_connect 실행 결과로 on_event_connect 이벤트 함수가 호출될 때 이 함수가 호출되도록 한다.
-        >> self.api.connect(slot=self.slot.login, event='on_event_connect')  # 98번째 줄 참고
+        >> self.api.connect(slot=self.slot.login, event='on_event_connect')  # 122 번째 줄 참고
+
+        * KOA Studio 참고 가이드
+        개발가이드 > 로그인 버전처리 > 관련함수 > OnEventConnect 참조
         """
         print('\t\tSlot.login(err_code) 호출')
 
@@ -80,7 +97,7 @@ class Slot:
         # 로그인 성공/실패 출력
         print(f'\t\tLogin ({emsg})')
 
-        # [필수] 이벤트를 기다리며 대기중이었던 코드 실행 (37번째 줄)
+        # [필수] 이벤트를 기다리며 대기중이었던 코드 실행 (42번째 줄)
         self.api.unloop()
 
         print('\t\tSlot.login(err_code) 종료')
@@ -89,20 +106,37 @@ class Slot:
 # Signal과 Slot을 활용하는 클래스
 class Bot:
     def __init__(self):
+        """
+        Bot 인스턴스 초기화 함수
+
+        1) Kiwoom 인스턴스 생성 후 Signal과 Slot 생성 시 입력값으로 넣어준다.
+        2) OnEventConnect 발생 시 Slot.login 함수가 호출되도록 연동해준다.
+        """
         self.api = Kiwoom()
         self.signal = Signal(self.api)
         self.slot = Slot(self.api)
 
-        # 이벤트 발생 시 함수 자동호출을 위한 연결함수 가이드
+        # Signal 클래스에서 comm_connect 요청 후 서버에서 응답이 오면 on_event_connect가 호출된다.
+        # Kiwoom.on_event_connect(...)가 호출되면 slot.login(...)이 호출될 수 있도록 연결해 준다.
         # help(Kiwoom.connect)
         self.api.connect('on_event_connect', signal=self.signal.login, slot=self.slot.login)
 
     def run(self):
+        """
+        작성했던 코드 실행함수
+
+        1) 로그인
+        2) 로그인 상태 확인
+        """
         print('Bot.run() 호출')
+
+        # 로그인 요청
         self.signal.login()
 
+        # 접속 성공여부 확인
         if not self.signal.is_connected():
-            raise RuntimeError(f'Server is not connected.')
+            raise RuntimeError(f'Server NOT connected.')
+            # or you may exit script - import sys; sys.exit()
 
         # ... to be continued
         print('Bot.run() 종료')
@@ -110,6 +144,9 @@ class Bot:
 
 # 실행 스크립트
 if __name__ == '__main__':
+    """
+    >> python3 2.Login.py 명령을 통해 실행하거나 IDE를 통해 직접 실행해볼 수 있다. 
+    """
 
     # 통신을 위해 QApplication 이용
     app = QApplication(sys.argv)

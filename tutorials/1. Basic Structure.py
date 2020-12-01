@@ -48,6 +48,12 @@ class Slot:
 # Signal과 Slot을 활용하는 클래스
 class Bot:
     def __init__(self):
+        """
+        Bot 인스턴스 초기화 함수
+
+        1) Kiwoom 인스턴스 생성 후 Signal과 Slot 생성 시 입력값으로 넣어준다.
+        2) OnEventConnect 발생 시 Slot.login 함수가 호출되도록 연동해준다.
+        """
         self.api = Kiwoom()
         self.signal = Signal(self.api)
         self.slot = Slot(self.api)
@@ -60,11 +66,17 @@ class Bot:
 
     # 봇 작동시작
     def run(self):
+        """
+        작성했던 코드 실행함수
+        """
         self.signal.login()
 
 
 # 실행 스크립트
 if __name__ == '__main__':
+    """
+    >> python3 1.Basic Structure.py 명령을 통해 실행하거나 IDE를 통해 직접 실행해볼 수 있다. 
+    """
 
     # 통신을 위해 QApplication 이용
     app = QApplication(sys.argv)
@@ -77,3 +89,9 @@ if __name__ == '__main__':
 
     # 통신 유지를 위해 스크립트 종료 방지
     app.exec()
+
+
+"""
+[실행결과]
+코드를 작성하지 않아 별도의 실행결과 없음
+"""
