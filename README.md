@@ -11,16 +11,6 @@ Simple Python Wrapper for Kiwoom Open API+
 
 #### 1. Open API+ 함수 호출 간소화
 
-- 반복되는 dynamicCall 제거 
-
-> ```python
-> # Before
-> self.dynamicCall("CommRqData(QString, QString, Int, QString)", rq_name, tr_code, prev_next, scr_no)
-> 
-> # After
-> self.comm_rq_data(rq_name, tr_code, prev_next, scr_no)
-> ```
-
 - 함수명과 변수명을 깔끔하게 Python 방식으로 통일
 
 > ```python
@@ -29,6 +19,16 @@ Simple Python Wrapper for Kiwoom Open API+
 > 
 > # After
 > on_receive_tr_condition(scr_no, code_list, condition_name, index, next)
+> ```
+
+- 반복되는 dynamicCall 제거 
+
+> ```python
+> # Before
+> self.dynamicCall("CommRqData(QString, QString, Int, QString)", rq_name, tr_code, prev_next, scr_no)
+> 
+> # After
+> self.comm_rq_data(rq_name, tr_code, prev_next, scr_no)
 > ```
 
 #### 2. 간단한 기능 지원
