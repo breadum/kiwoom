@@ -152,7 +152,7 @@ Simple Python Wrapper for Kiwoom Open API+
 > ```
 > ```python
 > # 구현되어있는 메인 클래스
-> class Kiwoom(API):ㄴ
+> class Kiwoom(API):
 >     ...
 >     # rq_name = 'balance'라면, @map 데코레이터가 매핑된 함수를 자동 호출
 >     # >> slot.balance(scr_no, rq_name, tr_code, record_name, prev_next, *args)
