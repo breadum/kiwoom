@@ -307,7 +307,7 @@ class Bot:
         self.api.connect('on_event_connect', signal=self.signal.login, slot=self.slot.login)
 
         # 1) 이벤트와 Slot 연결 시 기준 인자 설정하기
-        # 이벤트 OnReceiveTrData 발생 시 주어진 sRQName 인자값에 따라 slot을 호출하도록 설정
+        # 이벤트 OnReceiveTrData 발생 시 주어진 rq_name 인자값에 따라 slot을 호출하도록 설정
         # 만일 이를 설정하지 않는다면, 하나의 이벤트에는 하나의 slot만 연결가능
         # > help(Kiwoom.set_connect_hook) & Kiwoom.api_arg_spec('on_receive_tr_data')
         self.api.set_connect_hook('on_receive_tr_data', 'rq_name')

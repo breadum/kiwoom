@@ -176,7 +176,7 @@ Simple Python Wrapper for Kiwoom Open API+
 >         self.slot = Slot(self.api)
 >
 >         # 1) Kiwoom.set_connect_hook(event, param)
->         # 이벤트 OnReceiveTrData 발생 시 주어진 sRQName 인자값에 따라 slot을 호출하도록 설정
+>         # 이벤트 OnReceiveTrData 발생 시 주어진 rq_name 인자값에 따라 slot을 호출하도록 설정
 >         # 만일 설정하지 않는다면, 하나의 이벤트에는 하나의 slot만 연결가능
 >         self.api.set_connect_hook('on_receive_tr_data', 'rq_name')
 >
