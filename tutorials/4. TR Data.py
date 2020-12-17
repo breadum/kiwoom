@@ -406,10 +406,9 @@ Signal.deposit() 호출
 	Slot.deposit(scr_no, rq_name, tr_code, record_name, prev_next, *args) 종료
 Signal.deposit() 종료
 Signal.balance(prev_next) 호출
-	Slot.balance(scr_no, rq_name, tr_code, record_name, prev_next, *args) 호출
-	Slot.balance(scr_no, rq_name, tr_code, record_name, prev_next, *args) 종료
-Signal.balance(prev_next) 종료
-
+	Slot.balance(scr_no, rq_name, tr_code, record_name, prev_next, *args) 호출p
+	Slot.balance(scr_no, rq_name, tr_code, record_name, prev_nextp
+ppppp
 -- 예수금확인 --
 예수금 : 497,717,210원
 
