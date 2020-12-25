@@ -1,15 +1,209 @@
+from kiwoom.config import history, encoding
 from kiwoom.config.error import msg
+from kiwoom.config.types import multi
+from kiwoom.data.preprocess import string
+from kiwoom.utils import name
+from kiwoom.utils.manager import Downloader
+
+from collections import defaultdict
+from os import getcwd, makedirs
+from os.path import join, exists
+from textwrap import dedent
+from warnings import warn
+
+import pandas as pd
 
 
 class Slot:
-    def __init__(self, api):
+    def __init__(self, api=None, share=None):
         self.api = api
+        self.share = share
 
-    def history(self):
-        pass
+    def init(self, **kwargs):
+        """
+        Set attributes at once
 
-    def histories(self):
-        pass
+        :param kwargs:
+            asdf
+        """
+        for key, val in kwargs.items():
+            setattr(self, key, val)
+
+    @Downloader.handler
+    def history(self, scr_no, rq_name, tr_code, _, prev_next, *args):
+        kwargs = self.share.get_args(name())
+        period = history.get_period(tr_code)
+
+        rec = history.get_record_name_for_code(tr_code)  # record_name = '종목코드' | '업종코드'
+        code = string(self.api.get_comm_data(tr_code, rq_name, 0, rec))
+
+        # Handle trading suspended stock
+        if not code:  # if code = '', 거래정지
+            code = kwargs['code']
+
+        # Check if wrong data received
+        if code != kwargs['code']:
+            raise RuntimeError(f"Requested {kwargs['code']}, but the server still sends {code}.")
+
+        # Fetch multi data
+        data = defaultdict(list)
+        cnt = self.api.get_repeat_cnt(tr_code, rq_name)
+        for i in range(cnt):
+            for key, fn in history.preper(tr_code, multi):
+                data[key].append(fn(self.api.get_comm_data(tr_code, rq_name, i, key)))
+
+        for key in data.keys():
+            self.share.update_history(code, key, data[key])
+
+        # If data is more than needed, then stop downloading.
+        if 'start' in kwargs:
+            col = history.get_datetime_column(period)
+            # To check whether it's an empty data.
+            if len(data[col]) != 0:
+                last = pd.Timestamp(data[col][-1]).date()
+                # Note that data is ordered from newest to oldest
+                if last < pd.Timestamp(kwargs['start']).date():
+                    prev_next = ''
+
+        # Continue to download
+        if prev_next == '2':
+            # Call signal method again, but with prev_next='2'
+            signal = self.api.signal('on_receive_tr_data', name())
+            signal(code, period=period, prev_next=prev_next)
+
+        # Download done
+        else:
+            # Sort to chronological order
+            df = pd.DataFrame(self.share.get_history(code))[::-1]
+
+            # To make df have datetime index
+            col = history.get_datetime_column(period)
+            fmt = history.get_datetime_format(period)
+
+            if col == '체결시간':  # for the inconvertibles (888888, 999999)
+                df[col].replace(regex=history.exceptional_datetime_replacer, inplace=True)
+
+            df[col] = pd.to_datetime(df[col], format=fmt)
+            df.set_index(col, inplace=True)
+
+            # To get rid of data preceding 'start'
+            if 'start' in kwargs:
+                df = df.loc[kwargs['start']:]
+            # To get rid of data following 'end'
+            if 'end' in kwargs:
+                df = df.loc[:kwargs['end']]
+
+            # The server sent mixed data
+            if not df.index.is_monotonic_increasing:
+                raise RuntimeError(f'Downloaded data is not monotonic increasing. Error at Slot.history(code={code}).')
+
+            # Save data to csv file
+            self.history_to_csv(df, code, kwargs['path'], kwargs['merge'], kwargs['warning'])
+
+            # Once common variables are used, delete it
+            self.share.remove_args(name())
+            self.share.remove_history(code)
+
+            # Mark successfully downloaded
+            self.share.update_single(name(), 'success', True)
+
+            self.api.disconnect_real_data(scr_no)
+            self.api.unloop()
+
+    def history_to_csv(self, df, file, path=None, merge=False, warning=True):
+        """
+        Save historical data of given code at path in .csv format.
+        Once the data is saved, it will be removed from the memory.
+        When merge is True, data will be merged with existing file.
+        Data will be overwritten by default, otherwise.
+        :param df    : dataframe of historical data
+        :param file  : filename
+        :param path  : data path if '' or None, then currend dir will be set
+        :param merge : if same file exist, merge with existing data
+        :param warn  : turn on the warning message
+        """
+        # In case, path is '' or None
+        if not path:
+            path = getcwd()
+
+        if not exists(path):
+            makedirs(path)
+
+        file = file if file.endswith('.csv') else file + '.csv'
+        file = join(path, file)
+
+        if merge:
+            # No file to merge with
+            if not exists(file):
+                pass
+
+            # Nothing to be done
+            elif df.empty:
+                return
+
+            # To merge with existing data
+            else:
+                col = df.index.name
+                if col not in ['일자', '체결시간']:
+                    raise ValueError(f"No column matches '일자' or '체결시간'. Merge can't be done.")
+                db = pd.read_csv(
+                    file,
+                    index_col=[col],
+                    parse_dates=[col],
+                    encoding=encoding
+                )
+                db.dropna(axis='index', inplace=True)
+
+                if not db.empty:
+                    # To check db has more past data, at least the same
+                    assert (db.index[0] <= df.index[0]), \
+                        f"Existing file starts from {db.index[0]}, while given data from {df.index[0]}."
+
+                    # To check db is chronologically ordered
+                    assert db.index.is_monotonic_increasing, \
+                        f"The existing file, {file}, is not sorted in chronological order."
+
+                    try:
+                        start = db.index.get_loc(df.index[0])
+                        # To handle multiple same timestamps
+                        if isinstance(start, slice):
+                            start = start.start
+
+                        db = db.iloc[:start]
+                        df = pd.concat([db, df], axis=0, join='outer', copy=False)
+
+                    except KeyError:
+                        err_msg = dedent(
+                            f"""
+                            Data, '{file}', is forced to be merged but it may not be time-continuous.
+                             - The End of the Existing Data : {db.index[-1]}
+                             - The Start of Downloaded Data : {df.index[0]}
+                            """
+                        )
+                        # Note that tick data may change depending on downloading time
+                        # Kiwoom server may calibrate data after market close (in my opinion)
+                        if col == '체결시간':  # tick, min
+                            start_date = df.index[0].date()
+                            if warning:
+                                # The case data may not be time-continuous
+                                if db.loc[db.index == start_date].empty:
+                                    warn(err_msg)
+                            # To slice DB before the date when downloaded data starts from
+                            db = db[:start_date]
+
+                        # The case data may not be time-continuous
+                        else:  # col == '일자'  # day, week, month, year
+                            if warning:
+                                warn(err_msg)
+
+                        # Just concatenate if no overlapping period.
+                        df = pd.concat([db, df], axis=0, join='outer', copy=False)
+
+        if not df.index.is_monotonic_increasing:
+            raise RuntimeError(f'Files to write, {file}, is not monotonic increasing. Error at Slot.history_to_csv().')
+
+        df.to_csv(file, encoding=encoding)
+
 
     """
     Default slots to the most basic two events.
@@ -25,7 +219,7 @@ class Slot:
         """
         print(f'\n로그인 {msg(err_code)}')
         print(f'\n* 시스템 점검\n  - 월 ~ 토 : 05:05 ~ 05:10\n  - 일 : 04:00 ~ 04:30\n')
-        self.unloop()
+        self.api.unloop()
 
     # Default event slot for on_receive_msg_slot
     def on_receive_msg(self, scr_no, rq_name, tr_code, msg):

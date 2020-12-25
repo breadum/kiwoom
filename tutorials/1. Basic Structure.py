@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QApplication
-from kiwoom import *
+from kiwoom import Signal, Slot, Bot
 
 import sys
 
@@ -26,9 +26,10 @@ API와 사용자 정의 함수들을 연결해 활용할 수 있게 해주는 �
 
 
 # 서버에 데이터를 요청하는 클래스
-class Signal:
+class MySignal(Signal):
     def __init__(self, api):
-        self.api = api  # Kiwoom 인스턴스
+        # api = Kiwoom 인스턴스
+        super().__init__(api=api)
 
     # ex) 로그인을 요청하는 함수
     def login(self):
@@ -36,9 +37,10 @@ class Signal:
 
 
 # 요청했던 데이터를 받는 클래스
-class Slot:
+class MySlot(Slot):
     def __init__(self, api):
-        self.api = api  # Kiwoom 인스턴스
+        # Kiwoom 인스턴스
+        super().__init__(api=api)
 
     # ex) 서버로 부터 로그인 응답을 받았을 때 처리하는 함수
     def login(self):
@@ -46,7 +48,7 @@ class Slot:
 
 
 # Signal과 Slot을 활용하는 클래스
-class Bot:
+class Bot(MySignal):
     def __init__(self):
         """
         Bot 인스턴스 초기화 함수

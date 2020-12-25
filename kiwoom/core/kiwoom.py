@@ -76,8 +76,6 @@ class Kiwoom(API):
 
         # To connect signals and slots
         self._connector = Connector()
-        self._signal = Signal(self)
-        self._slot = Slot(self)
 
         # To set hooks for each event
         self.set_connect_hook('on_receive_tr_data', param='rq_name')
@@ -85,8 +83,8 @@ class Kiwoom(API):
         self.set_connect_hook('on_receive_real_condition', param='condition_name')
 
         # To connect default slots to basic two events
-        self.connect('on_event_connect', slot=self._slot.on_event_connect)
-        self.connect('on_receive_msg', slot=self._slot.on_receive_msg)
+        # self.connect('on_event_connect', slot=self._slot.on_event_connect)
+        # self.connect('on_receive_msg', slot=self._slot.on_receive_msg)
 
     def loop(self):
         """

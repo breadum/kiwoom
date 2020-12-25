@@ -1,7 +1,8 @@
 from functools import wraps
 
 
-error = {
+# Dictionary for error information
+err = {
     0: ('OP_ERR_NONE', '정상처리'),
     -10: ('OP_ERR_FAIL', '실패'),
     -100: ('OP_ERR_LOGIN', '사용자정보교환실패'),
@@ -35,17 +36,26 @@ error = {
 }
 
 
+# Exit code when process terminates
+class ExitCode:
+    success = 0
+    failure = -1
+
+
 def msg(ecode):
     """
     Returns an error message that corresponds to given error code.
-    Defined errors will be found in config.error.error (dict)
+
+    Defined errors will be found in config.error.err (dict)
 
     :param ecode: int
         One of error code defined at err dictionary.
     :return: str
         One line error message combined with code, type, and explanation.
     """
-    etype, msg = error[ecode]
+    etype, msg = err[ecode]
+    if ecode == 0:
+        return f'{msg}'
     return f'Error - Code: {ecode}, Type: {etype}, Msg: {msg}'
 
 

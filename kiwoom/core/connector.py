@@ -1,5 +1,4 @@
 from kiwoom.config import is_valid_event
-
 from functools import wraps
 from textwrap import dedent
 from types import LambdaType
@@ -62,9 +61,9 @@ class Connector:
         """
         Returns signal methods connected to the event.
 
-        If signal and slot are connected to specific event by Kiwoom.connect() method,
+        If signal and slot are connected to a specific event by Kiwoom.connect() method,
         then this method returns the connected signal method. If signal is not connected,
-        or wrong key is given, this raises a KeyError.
+        or wrong key is given, raise a KeyError.
 
         'key' is needed when hook is set by Kiwoom.set_connect_hook(). 'key' is set to
         be the name of signal method by default unless another string is set on purpose
@@ -121,48 +120,48 @@ class Connector:
 
     def connect(self, event, signal=None, slot=None, key=None):
         """
-                Connects signals and slots to one of pre-defined events.
+        Connects signals and slots to one of pre-defined events.
 
-                Information saved in this method is used by decorator @Connector() which wraps
-                the events and automatically calls the right slot connected to the events. In
-                addition to the decorator, Kiwoom.signal(event, key) and Kiwoom.slot(event, key)
-                returns the one connected to the event.
+        Information saved in this method is used by decorator @Connector() which wraps
+        the events and automatically calls the right slot connected to the events. In
+        addition to the decorator, Kiwoom.signal(event, key) and Kiwoom.slot(event, key)
+        returns the one connected to the event.
 
-                1) If no hook is set on the event, then the connected signal/slot can be retrieved
-                   by Kiwoom.signal(event) and Kiwoom.slot(event). There is no need to use key.
+        1) If no hook is set on the event, then the connected signal/slot can be retrieved
+           by Kiwoom.signal(event) and Kiwoom.slot(event). There is no need to use key.
 
-                2) If hook is set by Kiwoom.set_connect_hook() on the event, in which case there
-                   needs multiple slots to connect on one event, then connection requires a key
-                   which is to be the name of signal/slot methods by default.
+        2) If hook is set by Kiwoom.set_connect_hook() on the event, in which case there
+           needs multiple slots to connect on one event, then connection requires a key
+           which is to be the name of signal/slot methods by default.
 
-                   The convention to utilizing this module recommends to define the name of related
-                   signal and slot to be the same. Then it becomes easier to manage and develop codes.
+           The convention to utilizing this module recommends to define the name of related
+           signal and slot to be the same. Then it becomes easier to manage and develop codes.
 
-                   Use 'key' arg only when there is a special need. The connected signal/slot can be
-                   retrieved by Kiwoom.signal(event, key='name') and Kiwoom.slot(event, key='name').
-                   Here 'name' can be a method name or special 'key' used in this method.
+           Use 'key' arg only when there is a special need. The connected signal/slot can be
+           retrieved by Kiwoom.signal(event, key='name') and Kiwoom.slot(event, key='name').
+           Here 'name' can be a method name or special 'key' used in this method.
 
-                This method checks whether or not given signal/slot can be called without any
-                problem. If given method is not bounded to an instance, method should be static
-                or lambda function. This is because normally 'self' argument is needed to call
-                methods, therefore method must be bounded to an instance unless given method is
-                a function.
+        This method checks whether or not given signal/slot can be called without any
+        problem. If given method is not bounded to an instance, method should be static
+        or lambda function. This is because normally 'self' argument is needed to call
+        methods, therefore method must be bounded to an instance unless given method is
+        a function.
 
-                Please see tutorials example on the link below.
-                https://github.com/breadum/kiwoom/blob/main/tutorials/4.%20TR%20Data.py
+        Please see tutorials example on the link below.
+        https://github.com/breadum/kiwoom/blob/main/tutorials/4.%20TR%20Data.py
 
-                :param event: str
-                    One of the pre-defined event names in string. See kiwoom.config.events.
-                :param signal: method, optional
-                    A method that requests to the server
-                :param slot: method, optional
-                    A method that reacts the server's response
-                :param key: str, optional
-                    Key is needed only if hook is set by Kiwoom.set_connect_hook() method.
-                    Key is set to be name of the given signal and/or slot method by default.
-                    If key is given other than method name, the connected signal can be
-                    retrieved by Kiwoom.siganl(event, key) and slot by Kiwoom.slot(event, key)
-                """
+        :param event: str
+            One of the pre-defined event names in string. See kiwoom.config.events.
+        :param signal: method, optional
+            A method that requests to the server
+        :param slot: method, optional
+            A method that reacts the server's response
+        :param key: str, optional
+            Key is needed only if hook is set by Kiwoom.set_connect_hook() method.
+            Key is set to be name of the given signal and/or slot method by default.
+            If key is given other than method name, the connected signal can be
+            retrieved by Kiwoom.siganl(event, key) and slot by Kiwoom.slot(event, key)
+        """
         valid = False
         connectable = Connector.connectable
 
