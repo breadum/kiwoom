@@ -346,7 +346,7 @@ class Kiwoom(API):
 
     @catch_error
     def comm_kw_rq_data(self, arr_code, next, code_cnt, type_flag, rq_name, scr_no):
-        return super().comm_rq_data(arr_code, next, code_cnt, type_flag, rq_name, scr_no)
+        return super().comm_kw_rq_data(arr_code, next, code_cnt, type_flag, rq_name, scr_no)
 
     @catch_error
     def send_order(self, rq_name, scr_no, acc_no, ord_type, code, qty, price, hoga_gb, org_order_no):
