@@ -1,10 +1,8 @@
 from kiwoom.wrapper.api import API
 from kiwoom.config.error import catch_error
-from kiwoom.core.signal import Signal
-from kiwoom.core.slot import Slot
 from kiwoom.core.connector import Connector
 
-from inspect import getfullargspec
+from inspect import signature
 from PyQt5.QtCore import QEventLoop
 
 import sys
@@ -276,6 +274,16 @@ class Kiwoom(API):
         """
         self._connector.remove_connect_hook(event)
 
+    def get_hook_index(self, event):
+        """
+        Returns index of hook in method arguments.
+
+        :param event: str
+            One of the pre-defined event names in string. See kiwoom.config.events.
+        :return: int
+        """
+        return self._connector.get_hook_index(event)
+
     @staticmethod
     def api_arg_spec(fn):
         """
@@ -286,8 +294,7 @@ class Kiwoom(API):
         :return: list
             Parameters of given API function in list of strings.
         """
-        args = getfullargspec(getattr(API, fn)).args
-        return args
+        return signature(getattr(API, fn)).parameters
 
     """
     Event Handlers (8)
@@ -309,7 +316,7 @@ class Kiwoom(API):
         pass
 
     @map
-    def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next, *args):
+    def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next):
         pass
 
     @map

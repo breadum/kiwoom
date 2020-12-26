@@ -1,5 +1,7 @@
 from PyQt5.QAxContainer import QAxWidget
+from kiwoom.core.connector import Connector
 
+map = Connector.map
 
 """
 Pure API module  
@@ -404,7 +406,7 @@ class API(QAxWidget):
         """
         fn = "SendOrderCredit(QString, QString, QString, Int, QString, Int, Int, QString, QString, QString, QString)"
         args = (rq_name, scr_no, acc_no, order_type, code, qty, price, hoga_gb, credit_gb, loan_date, org_order_no)
-        return self.call(fn, args)
+        return self.call(fn, *args)
         
     def get_chejan_data(self, fid):
         """
@@ -467,7 +469,7 @@ class API(QAxWidget):
         ------------------------------------------------------------------------------------------------------
         """
         if self.call("SendCondition(QString, QString, Int, Int)", scr_no, cond_name, index, search) == 0:
-            raise Exception(f'SendCondition() failed.\n{help(self.send_condition)}')
+            raise Exception(f'SendCondition() failed.\n{self.send_condition.__doc__}')
     
     def send_condition_stop(self, scr_no, cond_name, index):
         """
@@ -857,7 +859,7 @@ class API(QAxWidget):
         """
         pass
 
-    def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next, *args):
+    def on_receive_tr_data(self, scr_no, rq_name, tr_code, record_name, prev_next):  # , *args):
         """
         # 개발가이드 > 조회와 실시간데이터처리, 주문과 잔고처리
 

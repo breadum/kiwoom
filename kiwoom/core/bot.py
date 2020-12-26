@@ -1,6 +1,9 @@
+from kiwoom import Kiwoom
 from kiwoom import config
 from kiwoom.config import history
 from kiwoom.config.error import ExitCode
+from kiwoom.config.screen import Screen
+from kiwoom.data.share import Share
 from kiwoom.utils import clock, effective_args, name
 from kiwoom.utils.manager import timer, Downloader
 
@@ -11,14 +14,6 @@ from os import getcwd
 from os.path import join, getsize
 from pandas import read_csv, DateOffset, Timestamp
 
-
-self.api = Kiwoom()
-self.scr = Screen()
-self.share = Share()
-
-# Signal and Slot instance
-self.signal = signal if signal else Signal(self.api)
-self.slot = slot if slot else Slot(self.api)
 
 # Initiate instance with variables
 self.signal.init(api=self.api, scr=self.scr, share=self.share)
@@ -35,11 +30,18 @@ except AttributeError:
 self.api.set_connect_hook('on_receive_tr_data', 'rq_name')
 self.api.connect('on_receive_tr_data', self.signal.history, self.slot.history)
 
-class Signal:
-    def __init__(self, api=None, scr=None, share=None):
-        self.api = api
-        self.scr = scr
-        self.share = share
+class Bot:
+    def __init__(self, slot=None):
+        self.api = Kiwoom()
+        self.scr = Screen()
+        self.share = Share()
+
+        # Connect
+        if slot is not None:
+            if issubclass(type(slot), slot):
+                self.server = slot
+
+
 
     def init(self, **kwargs):
         """
@@ -249,7 +251,7 @@ class Signal:
             partially download from the whole items in specific market.
             slice can be one of (from, to), (from, None) or (None, to)
         :param code: str
-            unique code of stock or sector
+            unique code of stock or sector to start downloading from.
         :param merge: bool
             whether to merge data with existing file or to overwrite it
         :param warning: bool
@@ -258,7 +260,7 @@ class Signal:
         :return: int or tuple
             if successfully download all, returns 0 (= ExitCode.success)
             if download failed by local errors, returns -1 (= ExitCode.failure)
-
+            if download stopped due to server reboot, returns slice that can be used in the next run
         """
         if not path:
             path = getcwd()
@@ -351,7 +353,7 @@ class Signal:
 
     def exit(self, rcode):
         """
-        Close all windows open adn exit the application that runs this bot
+        Close all windows open and exit the application that runs this bot
 
         :param rcode: int
             return code when exiting the program

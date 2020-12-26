@@ -14,7 +14,7 @@ from warnings import warn
 import pandas as pd
 
 
-class Slot:
+class Server:
     def __init__(self, api=None, share=None):
         self.api = api
         self.share = share
@@ -203,7 +203,6 @@ class Slot:
             raise RuntimeError(f'Files to write, {file}, is not monotonic increasing. Error at Slot.history_to_csv().')
 
         df.to_csv(file, encoding=encoding)
-
 
     """
     Default slots to the most basic two events.

@@ -3,7 +3,7 @@ from pandas import to_datetime
 from kiwoom.config import types, markets, market_gubuns, sectors
 from kiwoom.config.types import single, multi
 from kiwoom.utils import list_wrapper
-from kiwoom.data.preprocess import number, string, remove_sign
+from kiwoom.data.prep import number, string, remove_sign
 
 
 """

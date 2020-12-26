@@ -1,7 +1,7 @@
 from kiwoom.config.const import events
 
 
-def is_valid_event(event):
+def valid_event(event):
     """
     Returns True if event is valid, else False.
 

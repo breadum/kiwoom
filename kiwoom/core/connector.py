@@ -1,4 +1,4 @@
-from kiwoom.config import is_valid_event
+from kiwoom.config import events, valid_event
 from functools import wraps
 from textwrap import dedent
 from types import LambdaType
@@ -8,7 +8,8 @@ from inspect import (
     ismethod,
     isfunction,
     isclass,
-    ismodule
+    ismodule,
+    signature,
 )
 
 
@@ -49,6 +50,16 @@ class Connector:
     """
     # Class variable
     warn = True
+    nargs = {
+        'on_event_connect': 1,
+        'on_receive_msg': 4,
+        'on_receive_tr_data': 5,
+        'on_receive_real_data': 3,
+        'on_receive_chejan_data': 3,
+        'on_receive_condition_ver': 2,
+        'on_receive_tr_condition': 5,
+        'on_receive_real_condition': 4
+    }
 
     def __init__(self):
         # If no hook is set, dic[event] returns signal/slot.
@@ -56,6 +67,7 @@ class Connector:
         self._hooks = dict()
         self._signals = dict()
         self._slots = dict()
+        self._indices = dict()
 
     def signal(self, event, key=None):
         """
@@ -81,9 +93,9 @@ class Connector:
         :return: method
             Signal method connected to the given event. If wrong event, returns None.
         """
-        if not is_valid_event(event):
+        if not valid_event(event):
             return None
-        if self.get_connect_hook(event) is None:
+        if not self.connect_hook(event):
             return self._signals[event]
         return self._signals[event][key]
 
@@ -112,9 +124,9 @@ class Connector:
         :return: method or None
             Slot method connected to the given event. If wrong event, returns None.
         """
-        if not is_valid_event(event):
+        if not valid_event(event):
             return None
-        if self.get_connect_hook(event) is None:
+        if not self.connect_hook(event):
             return self._slots[event]
         return self._slots[event][key]
 
@@ -165,11 +177,11 @@ class Connector:
         valid = False
         connectable = Connector.connectable
 
-        if not is_valid_event(event):
+        if not valid_event(event):
             return
 
         # Directly connect slot to the event
-        if self.get_connect_hook(event) is None:
+        if not self.connect_hook(event):
             # Key can't be used here
             if key is not None:
                 raise RuntimeError(
@@ -211,6 +223,18 @@ class Connector:
         if not valid:
             raise RuntimeError(f"Unsupported combination of inputs. Please read below.\n\n{self.connect.__doc__}")
 
+    def connect_hook(self, event):
+        """
+        Returns whether a hook is set for given event.
+
+        :param event: str
+            One of the pre-defined event names in string. See kiwoom.config.events.
+        :return: bool
+        """
+        if event in self._hooks:
+            return True
+        return False
+
     def set_connect_hook(self, event, param):
         """
         Set parameter defined in event as a hook to find the right slot when event is called.
@@ -235,15 +259,19 @@ class Connector:
             Parameter name defined in given event. To see all parameters to event,
             use Kiwoom.api_arg_spec(event) method or help(...) built-in function.
         """
-        if not is_valid_event(event):
+        if not valid_event(event):
             return
+
         # To check given arg is valid
         from kiwoom import Kiwoom  # lazy import
         args = Kiwoom.api_arg_spec(event)
         if param not in args:
             raise KeyError(f"{param} is not valid.\nSelect one of {args}.")
-        # To set connect hook for event
+
+        # To set connect hook and its index in args
         self._hooks[event] = param
+        self._indices[event] = list(args.keys()).index(param) - 1  # except 'self'
+
         # Initialize structure to get signal/slot method by dic[event][key]
         self._signals[event] = dict()
         self._slots[event] = dict()
@@ -258,8 +286,6 @@ class Connector:
             If exists, returns hook in string else None. If not a valid event is given,
             this returns None.
         """
-        if not is_valid_event(event):
-            return None
         if event not in self._hooks:
             return None
         return self._hooks[event]
@@ -278,6 +304,18 @@ class Connector:
         del self._hooks[event]
         del self._signals[event]
         del self._slots[event]
+        del self._indices[event]
+
+    def get_hook_index(self, event):
+        """
+        Returns index of hook in method arguments
+
+        :param event: str
+        :return: int
+        """
+        if event in self._indices:
+            return self._indices[event]
+        return None
 
     @staticmethod
     def map(ehandler):
@@ -310,25 +348,28 @@ class Connector:
         """
         @wraps(ehandler)  # keep docstring of event handler
         def wrapper(api, *args):
-            # To execute the default event handler in case of overriding
-            ehandler(api, *args)
-
             # Variables
             event = getattr(ehandler, '__name__')
+            idx = api.get_hook_index(event)
             hook = api.get_connect_hook(event)
+            args = args[:Connector.nargs[event]]
+
+            # To execute the default event handler in case of overriding
+            ehandler(api, *args)
 
             # To find connected slot
             try:
                 # If hook is set on the event, then key becomes arg that corresponds to the hook
                 # ex) if hook is rq_name for on_receive_tr_data, then key becomes arg passed into rq_name
-                key = args[getfullargspec(ehandler).args.index(hook) - 1] if hook else None
+                key = args[idx] if hook else None
                 # To retrieve the right slot
                 slot = api.slot(event, key)
+
             except KeyError:
                 if Connector.warn:
                     msg = dedent(
                         f"""
-                        kiwoom.{event}({', '.join(map(str, args[1:]))}) has been called.
+                        kiwoom.{event}({', '.join(map(str, args))}) has been called.
     
                         But the event handler, '{event}', is not connected to any slot.
                         Please try to connect event and slot by using kiwoom.connect() method.
@@ -340,10 +381,13 @@ class Connector:
                         """
                     )
                     print(msg)
-                return wrapper
+                # To prevent executing slot that does not exist, just return
+                return
 
-            # To execute the connected slot
+            # Execute the connected slot
             slot(*args)
+
+        # Return wrapper function to decorate
         return wrapper
 
     @classmethod
