@@ -195,7 +195,7 @@ class Slot:
         # [필수] 대기중인 코드 실행
         self.api.unloop()
 
-    def deposit(self, _, rq_name, tr_code, __, ___, *args):
+    def deposit(self, _, rq_name, tr_code, __, ___): # , *args):
         """
         Signal.deposit() 함수로 인해 OnReceiveTrData 이벤트 발생 시 예수금 데이터 처리함수
 
@@ -218,7 +218,7 @@ class Slot:
         self.api.unloop()
         print('\tSlot.deposit(scr_no, rq_name, tr_code, record_name, prev_next, *args) 종료')
 
-    def balance(self, scr_no, rq_name, tr_code, record_name, prev_next, *args):
+    def balance(self, scr_no, rq_name, tr_code, record_name, prev_next):  #, *args):
         """
         Signal.balance() 함수로 인해 OnReceiveTrData 이벤트 발생 시 계좌평가잔고내역 데이터 처리함수
 
@@ -301,7 +301,7 @@ class Bot:
         """
         self.api = Kiwoom()
         self.signal = Signal(self.api)
-        self.slot = Slot(self.api)
+        self.slot = Server(self.api)
 
         # 로그인 이벤트와 Signal, Slot 연결
         self.api.connect('on_event_connect', signal=self.signal.login, slot=self.slot.login)
@@ -406,9 +406,10 @@ Signal.deposit() 호출
 	Slot.deposit(scr_no, rq_name, tr_code, record_name, prev_next, *args) 종료
 Signal.deposit() 종료
 Signal.balance(prev_next) 호출
-	Slot.balance(scr_no, rq_name, tr_code, record_name, prev_next, *args) 호출p
-	Slot.balance(scr_no, rq_name, tr_code, record_name, prev_nextp
-ppppp
+	Slot.balance(scr_no, rq_name, tr_code, record_name, prev_next, *args) 호출
+	Slot.balance(scr_no, rq_name, tr_code, record_name, prev_next, *args) 종료
+Signal.balance(prev_next) 종료
+
 -- 예수금확인 --
 예수금 : 497,717,210원
 

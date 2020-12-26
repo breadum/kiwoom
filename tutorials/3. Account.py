@@ -101,7 +101,7 @@ class Bot:
         """
         self.api = Kiwoom()
         self.signal = Signal(self.api)
-        self.slot = Slot(self.api)
+        self.slot = Server(self.api)
 
         # 이벤트 발생 시 함수 자동호출을 위한 연결함수
         self.api.connect('on_event_connect', signal=self.signal.login, slot=self.slot.login)

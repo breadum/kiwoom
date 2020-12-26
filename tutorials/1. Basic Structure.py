@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QApplication
-from kiwoom import Signal, Slot, Bot
+from kiwoom import Signal, Server, Bot
 
 import sys
 
@@ -37,7 +37,7 @@ class MySignal(Signal):
 
 
 # 요청했던 데이터를 받는 클래스
-class MySlot(Slot):
+class MySlot(Server):
     def __init__(self, api):
         # Kiwoom 인스턴스
         super().__init__(api=api)
@@ -58,7 +58,7 @@ class Bot(MySignal):
         """
         self.api = Kiwoom()
         self.signal = Signal(self.api)
-        self.slot = Slot(self.api)
+        self.slot = Server(self.api)
 
         # ex) Signal, Slot, Event 연결
         # 1) 로그인 시 아래 이벤트가 호출된다. (KOA Studio 개발가이드 참조)

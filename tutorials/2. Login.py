@@ -114,7 +114,7 @@ class Bot:
         """
         self.api = Kiwoom()
         self.signal = Signal(self.api)
-        self.slot = Slot(self.api)
+        self.slot = Server(self.api)
 
         # Signal 클래스에서 comm_connect 요청 후 서버에서 응답이 오면 on_event_connect가 호출된다.
         # Kiwoom.on_event_connect(...)가 호출되면 slot.login(...)이 호출될 수 있도록 연결해 준다.
