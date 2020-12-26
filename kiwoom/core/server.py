@@ -1,7 +1,7 @@
 from kiwoom.config import history, encoding
 from kiwoom.config.error import msg
 from kiwoom.config.types import multi
-from kiwoom.data.preprocess import string
+from kiwoom.data.prep import string
 from kiwoom.utils import name
 from kiwoom.utils.manager import Downloader
 
@@ -30,7 +30,7 @@ class Slot:
             setattr(self, key, val)
 
     @Downloader.handler
-    def history(self, scr_no, rq_name, tr_code, _, prev_next, *args):
+    def history(self, scr_no, rq_name, tr_code, _, prev_next):
         kwargs = self.share.get_args(name())
         period = history.get_period(tr_code)
 
