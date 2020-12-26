@@ -172,7 +172,7 @@ class API(QAxWidget):
         """
         fn = "CommKwRqData(QString, Bool, Int, Int, QString, QString)"
         args = (arr_code, next, code_cnt, type_flag, rq_name, scr_no)
-        return self.call(fn, args)
+        return self.call(fn, *args)
     
     def get_comm_data(self, tr_code, rq_name, index, item_name):
         """
@@ -322,7 +322,7 @@ class API(QAxWidget):
         """
         fn = "SendOrder(QString, QString, QString, Int, QString, Int, Int, QString, QString)"
         args = (rq_name, scr_no, acc_no, ord_type, code, qty, price, hoga_gb, org_order_no)
-        return self.call(fn, args)
+        return self.call(fn, *args)
         
     def send_order_fo(self, rq_name, scr_no, acc_no, code, ord_kind, sl_by_tp, ord_tp, qty, price, org_ord_no):
         """
@@ -355,7 +355,7 @@ class API(QAxWidget):
         """
         fn = "SendOrderFO(QString, QString, QString, Int, QString, Int, Int, QString, QString)"
         args = (rq_name, scr_no, acc_no, code, ord_kind, sl_by_tp, ord_tp, qty, price, org_ord_no)
-        return self.call(fn, args)
+        return self.call(fn, *args)
 
     def send_order_credit(self, rq_name, scr_no, acc_no, order_type, code, qty, 
                           price, hoga_gb, credit_gb, loan_date, org_order_no):
@@ -404,7 +404,7 @@ class API(QAxWidget):
         """
         fn = "SendOrderCredit(QString, QString, QString, Int, QString, Int, Int, QString, QString, QString, QString)"
         args = (rq_name, scr_no, acc_no, order_type, code, qty, price, hoga_gb, credit_gb, loan_date, org_order_no)
-        return self.call(fn, args)
+        return self.call(fn, *args)
         
     def get_chejan_data(self, fid):
         """
@@ -467,7 +467,7 @@ class API(QAxWidget):
         ------------------------------------------------------------------------------------------------------
         """
         if self.call("SendCondition(QString, QString, Int, Int)", scr_no, cond_name, index, search) == 0:
-            raise Exception(f'SendCondition() failed.\n{help(self.send_condition)}')
+            raise Exception(f'SendCondition() failed.\n{self.send_condition.__doc__}')
     
     def send_condition_stop(self, scr_no, cond_name, index):
         """
