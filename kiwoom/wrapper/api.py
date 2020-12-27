@@ -173,8 +173,8 @@ class API(QAxWidget):
         이 TR은 CommKwRqData()함수 전용으로 임의로 사용하시면 에러가 발생합니다.
         """
         fn = "CommKwRqData(QString, Bool, Int, Int, QString, QString)"
-        args = (arr_code, next, code_cnt, type_flag, rq_name, scr_no)
-        return self.call(fn, *args)
+        args = [arr_code, next, code_cnt, type_flag, rq_name, scr_no]
+        return self.call(fn, args)
     
     def get_comm_data(self, tr_code, rq_name, index, item_name):
         """
@@ -323,8 +323,8 @@ class API(QAxWidget):
         81 : 장후시간외종가
         """
         fn = "SendOrder(QString, QString, QString, Int, QString, Int, Int, QString, QString)"
-        args = (rq_name, scr_no, acc_no, ord_type, code, qty, price, hoga_gb, org_order_no)
-        return self.call(fn, *args)
+        args = [rq_name, scr_no, acc_no, ord_type, code, qty, price, hoga_gb, org_order_no]
+        return self.call(fn, args)
         
     def send_order_fo(self, rq_name, scr_no, acc_no, code, ord_kind, sl_by_tp, ord_tp, qty, price, org_ord_no):
         """
@@ -356,8 +356,8 @@ class API(QAxWidget):
         A : 최유리지정가(FOK)
         """
         fn = "SendOrderFO(QString, QString, QString, Int, QString, Int, Int, QString, QString)"
-        args = (rq_name, scr_no, acc_no, code, ord_kind, sl_by_tp, ord_tp, qty, price, org_ord_no)
-        return self.call(fn, *args)
+        args = [rq_name, scr_no, acc_no, code, ord_kind, sl_by_tp, ord_tp, qty, price, org_ord_no]
+        return self.call(fn, args)
 
     def send_order_credit(self, rq_name, scr_no, acc_no, order_type, code, qty, 
                           price, hoga_gb, credit_gb, loan_date, org_order_no):
@@ -405,8 +405,8 @@ class API(QAxWidget):
         대출일은 YYYYMMDD형식이며 신용매도 - 자기융자 일때는 종목별 대출일을 입력하고 신용매도 - 융자합이면 "99991231"을 입력합니다.
         """
         fn = "SendOrderCredit(QString, QString, QString, Int, QString, Int, Int, QString, QString, QString, QString)"
-        args = (rq_name, scr_no, acc_no, order_type, code, qty, price, hoga_gb, credit_gb, loan_date, org_order_no)
-        return self.call(fn, *args)
+        args = [rq_name, scr_no, acc_no, order_type, code, qty, price, hoga_gb, credit_gb, loan_date, org_order_no]
+        return self.call(fn, args)
         
     def get_chejan_data(self, fid):
         """
