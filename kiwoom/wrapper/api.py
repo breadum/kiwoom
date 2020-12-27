@@ -353,7 +353,7 @@ class API(QAxWidget):
         9 : 최유리지정가(IOC)
         A : 최유리지정가(FOK)
         """
-        fn = "SendOrder(QString, QString, QString, Int, QString, Int, Int, QString, QString)"
+        fn = "SendOrderFO(QString, QString, QString, Int, QString, Int, Int, QString, QString)"
         args = [rq_name, scr_no, acc_no, code, ord_kind, sl_by_tp, ord_tp, qty, price, org_ord_no]
         return self.call(fn, args)
 
@@ -467,7 +467,7 @@ class API(QAxWidget):
         ------------------------------------------------------------------------------------------------------
         """
         if self.call("SendCondition(QString, QString, Int, Int)", scr_no, cond_name, index, search) == 0:
-            raise Exception(f'SendCondition() failed.\n{help(self.send_condition)}')
+            raise Exception(f'SendCondition() failed.\n{self.send_condition.__doc__}')
     
     def send_condition_stop(self, scr_no, cond_name, index):
         """

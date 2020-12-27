@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 # Project Information
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 DISTNAME = "kiwoom"
 DESCRIPTION = "Simple Python Wrapper for Kiwoom OPEN API+"
 LONG_DESCRIPTION = open("README.md", encoding="utf-8").read()
