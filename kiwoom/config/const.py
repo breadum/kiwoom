@@ -17,6 +17,8 @@ events = [
     'on_receive_real_condition'
 ]
 
+# 기간
+periods = ['tick', 'min', 'day', 'week', 'month', 'year']
 
 # 시장
 markets = {

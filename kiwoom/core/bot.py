@@ -1,5 +1,5 @@
-from kiwoom import Kiwoom
-from kiwoom import config
+from kiwoom.core.kiwoom import Kiwoom
+from kiwoom.core.server import Server
 from kiwoom.config import history
 from kiwoom.config.error import ExitCode
 from kiwoom.config.screen import Screen
@@ -15,44 +15,22 @@ from os.path import join, getsize
 from pandas import read_csv, DateOffset, Timestamp
 
 
-# Initiate instance with variables
-self.signal.init(api=self.api, scr=self.scr, share=self.share)
-self.slot.init(api=self.api, scr=self.scr, share=self.share)
-
-# Default setting for basic events
-try:
-    self.api.connect('on_event_connect', signal=self.signal.login, slot=self.slot.on_event_connect)
-    self.api.connect('on_receive_msg', slot=self.slot.on_receive_msg)
-except AttributeError:
-    pass
-
-# Default setting for on_receive_tr_data event
-self.api.set_connect_hook('on_receive_tr_data', 'rq_name')
-self.api.connect('on_receive_tr_data', self.signal.history, self.slot.history)
-
 class Bot:
-    def __init__(self, slot=None):
+    def __init__(self, server=None):
         self.api = Kiwoom()
         self.scr = Screen()
         self.share = Share()
 
-        # Connect
-        if slot is not None:
-            if issubclass(type(slot), slot):
-                self.server = slot
+        # Connect server as a slot
+        self.server = server if issubclass(type(server), Server) else Server()
+        self.default_connect(server)
+        self.server.init(api=self.api, share=self.share)
 
-
-
-    def init(self, **kwargs):
-        """
-        Set attributes by key = val in kwargs
-
-        Dynamically assign attributes for this class as self.key = val
-        :param kwargs: str=any
-            key=val, key1=val1, ...
-        """
-        for key, val in kwargs.items():
-            setattr(self, key, val)
+    def default_connect(self, server):
+        self.api.set_connect_hook('on_receive_tr_data', 'rq_name')
+        self.api.connect('on_receive_tr_data', signal=self.history, slot=self.server.history)
+        self.api.connect('on_event_connect', signal=self.login, slot=self.server.login)
+        self.api.connect('on_receive_msg', slot=self.server.on_receive_msg)
 
     @timer
     def login(self):

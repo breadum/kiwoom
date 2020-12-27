@@ -1,3 +1,8 @@
-from kiwoom.config.const import *
-from kiwoom.config.general import *
-from kiwoom.config import error, history, screen, types
+from .const import *
+from .general import *
+from . import (
+    error,
+    history,
+    screen,
+    types
+)

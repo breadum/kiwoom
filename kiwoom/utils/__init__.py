@@ -1,1 +1,1 @@
-from kiwoom.utils.general import *
+from .general import *

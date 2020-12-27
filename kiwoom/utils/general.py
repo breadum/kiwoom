@@ -2,6 +2,7 @@ from sys import _getframe
 from numpy import ndarray
 from pandas import Series
 from datetime import datetime
+from pandas import Timestamp
 
 
 # Global Variables
@@ -25,6 +26,14 @@ def clock():
     """
     now = datetime.now()
     return f'{now.hour}:{now.minute:02}'
+
+
+def date(raw):
+    """
+    :param str:
+    :return: datetime.date
+    """
+    return Timestamp(raw).date()
 
 
 def list_wrapper(item):

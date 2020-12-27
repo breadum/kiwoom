@@ -39,27 +39,27 @@ class Downloader:
         # Define a wrapper
         def wrapper(*args, **kwargs):
             # Extract bot instance
-            signal = args[0]
+            bot = args[0]
             Downloader.nrq = 0
 
             # If not connected, exit program.
-            if not signal.connected():
+            if not bot.connected():
                 return sys.exit(0)
 
             # Slot function to be called AFTER 10 min
             def watcher():
                 # Number of request to server
-                nrq = signal.share.get_single('histories', 'nrq')
+                nrq = bot.share.get_single('histories', 'nrq')
 
                 # If disconnected or froze by some issue, exit program
-                if not signal.connected() or nrq == Downloader.nrq:
+                if not bot.connected() or nrq == Downloader.nrq:
                     # Close all pop-up windows from Kiwoom
                     app = QApplication.instance()
                     app.closeAllWindows()
 
                     # Set reboot param and unloop
-                    signal.share.update_single('history', 'reboot', True)
-                    signal.api.unloop()
+                    bot.share.update_single('history', 'reboot', True)
+                    bot.api.unloop()
 
                     # Exit script after 60 seconds
                     print(f'Downloader stopped at {clock()}. Exit script.')
@@ -69,7 +69,7 @@ class Downloader:
                 Downloader.nrq = nrq
 
             # Set timer for every 10 minutes
-            timer = QTimer(signal.api)
+            timer = QTimer(bot.api)
             timer.start(10 * 60 * 1000)
             timer.timeout.connect(watcher)
 
@@ -79,7 +79,7 @@ class Downloader:
         # Returns defined wrapper
         return wrapper
 
-    # Decorates Slot.history()
+    # Decorates Server.history()
     @staticmethod
     def handler(fn):
         # To keep docstring of fn

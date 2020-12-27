@@ -34,6 +34,11 @@ exceptional_datetime_replacer = {
     '999999$': '180000'  # 시간외 종료에 이루어진 거래 (18:00:00)
 }
 
+# 장 종료시간이 변경된 예외
+exceptional_dates = {
+    # 'YYYYMMDD': delay(hour)
+    '20201203': 1  # 수능일 1시간 지연
+}
 
 """
 Configuration for downloading historical data.

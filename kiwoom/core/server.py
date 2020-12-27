@@ -2,7 +2,7 @@ from kiwoom.config import history, encoding
 from kiwoom.config.error import msg
 from kiwoom.config.types import multi
 from kiwoom.data.prep import string
-from kiwoom.utils import name
+from kiwoom.utils import name, date
 from kiwoom.utils.manager import Downloader
 
 from collections import defaultdict
@@ -15,20 +15,45 @@ import pandas as pd
 
 
 class Server:
-    def __init__(self, api=None, share=None):
+    def __init__(self):
+        self.api = None
+        self.share = None
+
+    def init(self, api, share):
         self.api = api
         self.share = share
 
-    def init(self, **kwargs):
+    """
+    Default slots to the most basic two events.
+        on_event_connect
+        on_receive_msg
+    """
+    # Default event slot for on_event_connect
+    def login(self, err_code):
         """
-        Set attributes at once
+        Default slot for 'on_event_connect'
 
-        :param kwargs:
-            asdf
+        When Kiwoom.on_event_connect(...) is called, this method automatically will be called.
         """
-        for key, val in kwargs.items():
-            setattr(self, key, val)
+        print(f'\n로그인 {msg(err_code)}')
+        print(f'\n* 시스템 점검\n  - 월 ~ 토 : 05:05 ~ 05:10\n  - 일 : 04:00 ~ 04:30\n')
+        self.api.unloop()
 
+    # Default event slot for on_receive_msg_slot
+    def on_receive_msg(self, scr_no, rq_name, tr_code, msg):
+        """
+        Default slot for 'on_receive_msg'
+
+        Whenever the server sends a message, this method prints depending on below.
+        >> Kiwoom.message(True)
+        >> Kiwoom.message(False)
+        """
+        if self.api.msg:
+            print(f'\n화면번호: {scr_no}, 요청이름: {rq_name}, TR코드: {tr_code} \n{msg}\n')
+
+    """
+    Basic methods
+    """
     @Downloader.handler
     def history(self, scr_no, rq_name, tr_code, _, prev_next):
         kwargs = self.share.get_args(name())
@@ -80,10 +105,45 @@ class Server:
             col = history.get_datetime_column(period)
             fmt = history.get_datetime_format(period)
 
-            if col == '체결시간':  # for the inconvertibles (888888, 999999)
-                df[col].replace(regex=history.exceptional_datetime_replacer, inplace=True)
+            # To handle exceptional time and dates
+            if col == '체결시간':
+                if len(df[col]) > 0:
+                    # Find index of dates that delayed market opening time and inconvertibles in df
+                    indices = dict()
+                    exceptions = list()
+                    start, end = date(df[col].iat[0][:len('YYYYMMDD')]), date(df[col].iat[-1][:len('YYYYMMDD')])
+                    for ymd, delay in history.exceptional_dates.items():
+                        if start <= date(ymd) <= end:
+                            day = df[col].loc[df[col].str.match(ymd)]
+                            indices[ymd] = day.index
 
-            df[col] = pd.to_datetime(df[col], format=fmt)
+                            # To save original data
+                            for regex, datetime in history.exceptional_datetime_replacer.items():
+                                series = day.loc[day.str.contains(regex, regex=True)]
+                                series = series.replace(regex={regex: datetime})
+                                series = pd.to_datetime(series, format='%Y%m%d%H%M%S')
+                                exceptions.append(series)
+
+                    # Replace inconvertibles (888888, 999999) to (160000, 180000)
+                    df[col].replace(regex=history.exceptional_datetime_replacer, inplace=True)
+
+                    # To make column as pandas datetime series
+                    df[col] = pd.to_datetime(df[col], format=fmt)
+
+                    # Subtract delayed market time as if it pretends to start normally
+                    for ymd, idx in indices.items():
+                        delay = history.exceptional_dates[ymd]
+                        df.loc[idx, col] -= pd.DateOffset(hours=delay)
+
+                    # Replace subtracted exceptional times back to original
+                    for series in exceptions:
+                        df.loc[series.index, col] = series
+
+            # If no data available
+            else:
+                df[col] = pd.to_datetime(df[col], format=fmt)
+
+            # Make the column representing time as index
             df.set_index(col, inplace=True)
 
             # To get rid of data preceding 'start'
@@ -203,31 +263,3 @@ class Server:
             raise RuntimeError(f'Files to write, {file}, is not monotonic increasing. Error at Slot.history_to_csv().')
 
         df.to_csv(file, encoding=encoding)
-
-    """
-    Default slots to the most basic two events.
-        on_event_connect
-        on_receive_msg
-    """
-    # Default event slot for on_event_connect
-    def on_event_connect(self, err_code):
-        """
-        Default slot for 'on_event_connect'
-
-        When on_event_connect is called, this method automatically will be called.
-        """
-        print(f'\n로그인 {msg(err_code)}')
-        print(f'\n* 시스템 점검\n  - 월 ~ 토 : 05:05 ~ 05:10\n  - 일 : 04:00 ~ 04:30\n')
-        self.api.unloop()
-
-    # Default event slot for on_receive_msg_slot
-    def on_receive_msg(self, scr_no, rq_name, tr_code, msg):
-        """
-        Default slot for 'on_receive_msg'
-
-        Whenever the server sends a message, this method prints depending on below.
-        >> Kiwoom.message(True)
-        >> Kiwoom.message(False)
-        """
-        if self.api.msg:
-            print(f'\n화면번호: {scr_no}, 요청이름: {rq_name}, TR코드: {tr_code} \n{msg}\n')
