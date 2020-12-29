@@ -95,11 +95,11 @@ Simple Python Wrapper for Kiwoom Open API+
 > api.logging(False)
 > ```
 
-- 주가, 지수, 섹터, 국내선옵 Historical Market Data 다운로드 (지원예정)
+- 주가, 지수, 섹터, 국내선옵 Historical Market Data 다운로드
 
 > ```python
-> api.histories(market='KOSPI', period='tick', start='20201001', merge=True)
-> api.histories(sector='금융업', period='tick', start='20201001', merge=True)
+> api.histories(market='0', period='tick', start='20201001', merge=True)  # KOSPI
+> api.histories(sector='7', period='tick', start='20201001', merge=True)  # KRX100
 > ```
 
 #### 3. 통신을 위한 체계적인 코드 작성 지원
@@ -114,11 +114,11 @@ Simple Python Wrapper for Kiwoom Open API+
 > from kiwoom import *
 >
 > # 서버에 데이터를 요청하는 클래스 (사용자 작성)
-> class Signal:  
+> class Bot(Bot):  
 >
 >     # 주어진 api는 Kiwoom() 인스턴스
->     def __init__(self, api):
->         self.api = api
+>     def __init__(self, server):
+>         super().__init__(server)
 >     
 >     def balance(self, prev_next='0'):
 >         ...
@@ -130,26 +130,25 @@ Simple Python Wrapper for Kiwoom Open API+
 > ```python
 > from kiwoom import *
 > 
-> # 서버에서 데이터를 받는 클래스 (사용자 작성)
-> class Slot:
+> # 서버에서 데이터를 받아 처리하는 클래스 (사용자 작성)
+> class Server:
 >
 >     # 주어진 api는 Kiwoom() 인스턴스
 >     def __init__(self, api):
->         self.api = api
->         self.data = dict()
->         self.is_downloading = False
+>         super().__init__()
+>         self.downloading = False
 >
 >     def balance(self, scr_no, rq_name, tr_code, record_name, prev_next):
 >         ...
 >         # 만일 데이터가 더 있을 경우 연결했던 Signal 함수 다시 호출
 >         if prev_next == '2':
 >             fn = self.api.signal('on_receive_tr_data', rq_name)  # rq_name='balance'
->             fn(prev_next)  # signal.balance(prev_next='2')
+>             fn(prev_next)  # Bot.balance(prev_next='2')
 >
 >         # 데이터를 다 받았다면 unloop을 통해 대기중인 코드 실행
 >         else:
 >             ...
->             self.is_downloading = False
+>             self.downloading = False
 >             self.api.unloop()
 > ```
 > ```python
@@ -170,12 +169,9 @@ Simple Python Wrapper for Kiwoom Open API+
 > from kiwoom import *
 > import sys
 > 
-> class Bot:
->     def __init__(self):
->         # 인스턴스 생성
->         self.api = Kiwoom()
->         self.signal = Signal(self.api)
->         self.slot = Slot(self.api)
+> class Bot(Bot):
+>     def __init__(self, server):
+>         super().__init__(server)
 >
 >         # 1) Kiwoom.set_connect_hook(event, param)
 >         # 이벤트 OnReceiveTrData 발생 시 주어진 rq_name 인자값에 따라 slot을 호출하도록 설정
@@ -187,14 +183,14 @@ Simple Python Wrapper for Kiwoom Open API+
 >         # key 값이 주어지지 않을 시, rq_name은 signal과 slot의 함수 이름 'balance'로 자동 설정
 >         self.api.connect(
 >             event='on_receive_tr_data',
->             signal=self.signal.balance, 
->             slot=self.slot.balance,
+>             signal=self.balance, 
+>             slot=self.server.balance,
 >         )
 > 
 >         # 1)과 2) 연결 설정 후에는 다음과 같이 활용할 수 있다.
->         # on_receive_tr_data(..., rq_name='balance', ...) 이벤트 수신 시 slot.balance 자동 호출됨
->         # self.api.signal('on_receive_tr_event', 'balance') 호출 시 signal.balance 함수 반환
->         # self.api.slot('on_receive_tr_event', 'balance') 호출 시 slot.balance 함수 반환 
+>         # on_receive_tr_data(..., rq_name='balance', ...) 이벤트 수신 시 server.balance 자동 호출됨
+>         # self.api.signal('on_receive_tr_event', 'balance') 호출 시 bot.balance 함수 반환
+>         # self.api.slot('on_receive_tr_event', 'balance') 호출 시 server.balance 함수 반환 
 >
 >         # 참고 가이드          
 >         # 1) print(config.events)  # 이벤트 목록
@@ -204,13 +200,13 @@ Simple Python Wrapper for Kiwoom Open API+
 >
 >     def run(self):
 >         # 버전처리 및 로그인 
->         self.api.login()
+>         self.login()
 >
 >         # 계좌평가잔고내역 요청
->         signal.balance()
+>         self.balance()
 >
 >         # 전송된 데이터 확인
->         print(slot.data)
+>         print(server.data)
 >
 >     
 > if __name__ == '__main__':
@@ -240,9 +236,11 @@ Simple Python Wrapper for Kiwoom Open API+
    
    [2. 로그인][tut2]
    
-   [3. 계좌확인][tut3]
+   [3. 시장데이터][tut3]
    
-   [4. TR 데이터][tut4]
+   [4. 계좌확인][tut4]
+   
+   [5. TR 데이터][tut5]
 
 ## Installation
 
@@ -321,5 +319,6 @@ Simple Python Wrapper for Kiwoom Open API+
 [tutorial]: https://github.com/breadum/kiwoom/tree/main/tutorials
 [tut1]: https://github.com/breadum/kiwoom/blob/main/tutorials/1.%20Basic%20Structure.py
 [tut2]: https://github.com/breadum/kiwoom/blob/main/tutorials/2.%20Login.py
-[tut3]: https://github.com/breadum/kiwoom/blob/main/tutorials/3.%20Account.py
-[tut4]: https://github.com/breadum/kiwoom/blob/main/tutorials/4.%20TR%20Data.py
+[tut3]: https://github.com/breadum/kiwoom/blob/main/tutorials/3.%20Historical%20Data.py
+[tut4]: https://github.com/breadum/kiwoom/blob/main/tutorials/4.%20Account.py
+[tut5]: https://github.com/breadum/kiwoom/blob/main/tutorials/5.%20TR%20Data.py
