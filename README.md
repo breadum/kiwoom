@@ -111,7 +111,7 @@ Simple Python Wrapper for Kiwoom Open API+
 
 - 작성 후 Kiwoom.connect() 함수로 서로 연결시켜 서버에서 응답 시 자동 호출 지원
 
-- 자세한 내용 및 코드는 [튜토리얼][tutorial] 중 [4. TR 데이터][tut4] 항목을 통해 확인 가능
+- 자세한 내용 및 코드는 [튜토리얼][tutorial] 중 [5. TR 데이터][tut5] 항목을 통해 확인 가능
 
 > ```python
 > from kiwoom import *
