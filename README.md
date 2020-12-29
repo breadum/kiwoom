@@ -209,7 +209,7 @@ Simple Python Wrapper for Kiwoom Open API+
 >         self.balance()
 >
 >         # 전송된 데이터 확인
->         print(server.data)
+>         print(self.data)
 >
 >     
 > if __name__ == '__main__':
