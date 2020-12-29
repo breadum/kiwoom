@@ -88,6 +88,9 @@ Simple Python Wrapper for Kiwoom Open API+
 - 주가, 지수, 섹터, 국내선옵 Historical Market Data 다운로드
 
 > ```python
+> from kiwoom import *
+> 
+> api = Kiwoom()
 > api.histories(market='0', period='tick', start='20201001', merge=True)  # KOSPI
 > api.histories(sector='7', period='tick', start='20201001', merge=True)  # KRX100
 > ```
