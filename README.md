@@ -85,6 +85,13 @@ Simple Python Wrapper for Kiwoom Open API+
 >     pass
 > ```
 
+- 주가, 지수, 섹터, 국내선옵 Historical Market Data 다운로드
+
+> ```python
+> api.histories(market='0', period='tick', start='20201001', merge=True)  # KOSPI
+> api.histories(sector='7', period='tick', start='20201001', merge=True)  # KRX100
+> ```
+
 - API 이용 과정 로깅 기능 제공 (지원예정)
 
 > ```python
@@ -93,13 +100,6 @@ Simple Python Wrapper for Kiwoom Open API+
 > api = Kiwoom()
 > api.logging(True, path='log/20201015')
 > api.logging(False)
-> ```
-
-- 주가, 지수, 섹터, 국내선옵 Historical Market Data 다운로드
-
-> ```python
-> api.histories(market='0', period='tick', start='20201001', merge=True)  # KOSPI
-> api.histories(sector='7', period='tick', start='20201001', merge=True)  # KRX100
 > ```
 
 #### 3. 통신을 위한 체계적인 코드 작성 지원
