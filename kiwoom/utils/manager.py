@@ -1,6 +1,7 @@
+from kiwoom.utils import clock
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QTimer
-from kiwoom.utils import clock
+from traceback import format_exc
 from functools import wraps
 
 import sys
@@ -57,12 +58,12 @@ class Downloader:
                     app = QApplication.instance()
                     app.closeAllWindows()
 
-                    # Set reboot param and unloop
-                    bot.share.update_single('history', 'reboot', True)
+                    # Set restart param and unloop
+                    bot.share.update_single('history', 'restart', True)
                     bot.api.unloop()
 
                     # Exit script after 60 seconds
-                    print(f'Downloader stopped at {clock()}. Exit script.')
+                    print(f'\n[{clock()}] As downloader has frozen, exiting the program in 60 sec.')
                     return QTimer(app).singleShot(60, sys.exit)
 
                 # Update nrq
@@ -85,33 +86,24 @@ class Downloader:
         # To keep docstring of fn
         @wraps(fn)
         # Define wrapper function
-        def wrapper(*args, **kwargs):
-            slot = args[0]
-            code = slot.share.get_args('history', 'code')
+        def wrapper(*args):
+            server = args[0]
+            code = server.share.get_args('history', 'code')
 
-            """
-            # Check server reboot time
-            if not server_available():
-                # Print error message
-                print(f'Server reboots soon. Stop downloading at {code}.')
-                # Set reboot parameter True
-                slot.share.update_single('history', 'reboot', True)
-                # Return to Signal.history()
-                return slot.api.unloop()
-            """
-
-            # Execute Slot.history(*args)
+            # Execute Server.history(*args)
             try:
-                fn(*args, **kwargs)
+                fn(*args)
 
-            # Handle RuntimeError caused by not monotonic increasing data
-            except RuntimeError as err:
+            # Handle RuntimeError caused by two cases
+            # 1) not monotonic increasing data
+            # 2) received wrong data other than requested
+            except Exception:
                 # Print error message
-                print(f'\nAn error occurred at Slot.history(code={code}, ...).\n{err}\n')
+                print(f'\n[{clock()}] An error at Server.history{args[1:]} with code={code}.\n\n{format_exc()}')
                 # Reset variables
-                slot.share.remove_history(code)
+                server.share.remove_history(code)
                 # Return to Signal.history()
-                slot.api.unloop()
+                server.api.unloop()
 
         # Returns defined wrapper
         return wrapper

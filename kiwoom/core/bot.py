@@ -1,17 +1,20 @@
+from kiwoom import config
+from kiwoom.config import history
+from kiwoom.config.history import ExitCode
+from kiwoom.config.screen import Screen
 from kiwoom.core.kiwoom import Kiwoom
 from kiwoom.core.server import Server
-from kiwoom.config import history
-from kiwoom.config.error import ExitCode
-from kiwoom.config.screen import Screen
 from kiwoom.data.share import Share
-from kiwoom.utils import clock, effective_args, name
+from kiwoom.utils import clock, effective_args, name, unpack_args
 from kiwoom.utils.manager import timer, Downloader
 
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtTest import QTest
 from time import time
 from os import getcwd
-from os.path import join, getsize
+from os.path import join
+from textwrap import dedent
+from traceback import format_exc
 from pandas import read_csv, DateOffset, Timestamp
 
 
@@ -38,12 +41,17 @@ class Bot:
         self.api.loop()
 
     def connected(self):
+        """
+        Returns whether Bot is currently connected to server
+
+        :return: bool
+        """
         state = self.api.get_connect_state()
         if state == 1:
             return True
         return False
 
-    def code_list(self, market):
+    def stock_list(self, market):
         """
         Returns all stock codes in the given market
 
@@ -104,7 +112,7 @@ class Bot:
             this param is given by the response from the server. default is '0'
         """
         # Wait for default request limit, 3600 ms
-        QTest.qWait(config.request_limit_time)
+        QTest.qWait(history.request_limit_time)
 
         ctype = history.get_code_type(code)  # ctype = 'stock' | 'sector'
         tr_code = history.get_tr_code(period, ctype)
@@ -117,8 +125,10 @@ class Bot:
 
             # To share variables with Slot
             kwargs = effective_args(locals(), remove=['ctype', 'tr_code'])
-            self.share.update_single(name(), 'reboot', False)
+            self.share.update_single(name(), 'error', False)
+            self.share.update_single(name(), 'restart', False)
             self.share.update_single(name(), 'success', False)
+            self.share.update_single(name(), 'impossible', False)
 
             # To check format of input dates
             if 'start' in kwargs:
@@ -132,9 +142,6 @@ class Bot:
             if merge and period in ['tick', 'min']:
                 try:
                     file = join(path, code + '.csv')
-                    if getsize(file) / (1024 * 1024) > 100:  # if size > 100MB
-                        raise UserWarning(f'File {file} is too big to merge. Please split file.')
-
                     col = history.get_datetime_column(period)
                     df = read_csv(
                         file,
@@ -170,24 +177,28 @@ class Bot:
 
                 # If any exception other than UserWarning, just skip
                 except Exception as err:
-                    # If file is too big, raise UserWarning
-                    if type(err) == UserWarning:
-                        raise UserWarning(err)
                     pass
 
             # Done arg setting
             self.share.update_args(name(), kwargs)
 
+            # Print args
+            f = lambda key: f"'{kwargs[key]}'" if key in kwargs else None
+            print(f"{{code={f('code')}, start={f('start')}, end={f('end')}, period={f('period')}}}")
+
         # Check requesting status
         self.share.single['histories']['nrq'] += 1
-        if self.share.get_single('histories', 'nrq') >= config.request_limit_try:
-            self.share.update_single('history', 'reboot', True)
-            self.api.unloop()
-            return
+        if history.speeding:
+            if self.share.get_single('histories', 'nrq') >= history.request_limit_try:
+                # Set back to default configuration
+                if self.share.get_single('histories', 'cnt') == 0:
+                    self.share.update_single('history', 'impossible', True)
+                self.share.update_single('history', 'restart', True)
+                self.api.unloop()
+                return
 
         # Finally request data to server
-        kwargs = {'unit': unit, 'end': end, 'prev_next': prev_next}
-        for key, val in history.inputs(tr_code, code, **kwargs):
+        for key, val in history.inputs(tr_code, code, unit, end):
             self.api.set_input_value(key, val)
         scr_no = self.scr.alloc(tr_code, code)
         self.api.comm_rq_data(name(), tr_code, prev_next, scr_no)
@@ -238,22 +249,25 @@ class Bot:
         :return: int or tuple
             if successfully download all, returns 0 (= ExitCode.success)
             if download failed by local errors, returns -1 (= ExitCode.failure)
-            if download stopped due to server reboot, returns slice that can be used in the next run
+            if download restart is needed, returns slice that can be used in the next run
         """
         if not path:
             path = getcwd()
 
-        # Save status
+        # Initialize status
         self.share.update_single(name(), 'nrq', 0)  # number of request
         self.share.update_single(name(), 'cnt', 0)  # number of stocks
         self.share.update_args(name(), effective_args(locals()))
 
+        """
+            Validate given arguments
+        """
         # To decide what to download
         lst, ctype, mname = None, None, None
         if not any([market, sector]) or all([market, sector]):
             raise RuntimeError("Download target must be either of 'market' or 'sector'.")
         elif market is not None:
-            lst, ctype, mname = self.code_list(market), history.stock, history.markets[market]
+            lst, ctype, mname = self.stock_list(market), history.stock, history.markets[market]
         elif sector is not None:
             lst, ctype, mname = self.sector_list(sector), history.sector, history.market_gubuns[sector]
 
@@ -283,7 +297,11 @@ class Bot:
             # At least print 25% of progress if possible
             divisor = max(1, len(lst) // 4)
 
+        """
+            Start downloading
+        """
         # To Download
+        status = ''
         begin = time()
         print(f'Download Start for {len(lst)} {ctype}s in {mname}.')
         print(f' - Encoding : {config.encoding}\n - DataPath : {path}')
@@ -291,45 +309,74 @@ class Bot:
         for i, code in enumerate(lst):
             if i % divisor == 0:
                 pct = (i / len(lst)) * 100
-                print(f'Downloading ..\t{pct: .1f}% ({i} of {len(lst)})')
+                print(f'\nDownloading ..\t{pct: .1f}% ({i} of {len(lst)})')
 
             # Try downloading
             try:
                 self.history(code, period, unit=unit, start=start, end=end, path=path, merge=merge, warning=warning)
-            except Exception as err:
-                print(f'An error occurred at Signal.history(code={code}, ...).\n{err}')
+
+            # 1) Error with starting Bot.history() (at the first call)
+            except Exception:
+                args = unpack_args(self.share.get_args('history'))
+                print(f"\nAn error at Bot.history({args}).\n\n{format_exc()}")
                 return ExitCode.failure
 
-            # If reboot is needed, stop downloading
-            if self.share.get_single('history', 'reboot'):
-                print(f'Server does not response at {clock()}')
+            # 2) Error with continuing Bot history() (at least second call, by prev_next='2')
+            if self.share.get_single('history', 'error'):
+                # Note that error message will be printed by Server.history()
+                return ExitCode.failure
+
+            # 3) Error with reaching the request limit or error with server freezing
+            elif self.share.get_single('history', 'restart'):
+                # If it's impossible to download with the trick
+                if self.share.get_single('history', 'impossible'):
+                    print(f"\n[{clock()}] The {ctype} {code} can't be downloaded with speeding.")
+                    return ExitCode.impossible
                 break
 
-            # If an error occurred, try again
-            if not self.share.get_single('history', 'success'):
-                print(f'Downloading restarts from {code}.\n')
+            # 4) Error that Server.history() couldn't be finished.
+            elif not self.share.get_single('history', 'success'):
+                # Give one more last chance
+                print(f'\n[{clock()}] Try to restart downloading for {code}.\n')
                 self.history(code, period, unit=unit, start=start, end=end, path=path, merge=merge, warning=warning)
+
                 # If it fails again, stop downloading.
                 if not self.share.get_single('history', 'success'):
-                    print(f"Downloading stops. Restart with slice={(from_ + self.share.single[name()]['cnt'], to_)}")
+                    slice = (from_ + self.share.single[name()]['cnt'], to_)
+                    print(f"\n[{clock()}] Run Bot.histories() with slice={slice} or code='{code}' for the next time.")
                     return ExitCode.failure
 
-            # To count successfully downloaded codes
+            """
+                Download completed for one item in the list
+            """
+            # 5) Successfully downloaded with disciplined, but it's time for speeding again.
+            if history.disciplined:
+                self.share.single[name()]['cnt'] += 1
+                status = f"[{clock()}] The program needs to be restarted for speeding again."
+                break
+
+            # Finally successfully downloaded
             self.share.single[name()]['cnt'] += 1
 
+        """
+            Close downloading
+        """
         cnt = self.share.get_single(name(), 'cnt')
-        print(f'Downloading ..\t{100 * cnt / len(lst): .1f}% ({cnt} of {len(lst)})')
-        print(f'Download Done for {cnt} {ctype}s in {mname}.')
-        print(f'Download Time : {(time() - begin) / 60: .1f} minutes\n')
+        msg = dedent(
+            f"""
+            Download Done for {100 * cnt / len(lst): .1f}% ({cnt} of {len(lst)}) {ctype}s in {mname}.
+            Download Time : {(time() - begin) / 60: .1f} minutes (with {self.share.single[name()]['nrq']} requests)\n
+            """
+        ) + status
+        print(msg)
 
-        # If done, return success exit code
+        # If complete
         if cnt == len(lst):
             return ExitCode.success
-        # Else, return the remaining stocks as a slice
-        print(f'Please re-start from slice={(from_ + cnt, to_)}')
-        return (from_ + cnt, to_)
+        # Else return remaining items
+        return from_ + cnt, to_
 
-    def exit(self, rcode):
+    def exit(self, rcode=0):
         """
         Close all windows open and exit the application that runs this bot
 

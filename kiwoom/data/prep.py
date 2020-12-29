@@ -28,7 +28,7 @@ def number(x):
     try:
         return float(x)
     except ValueError:
-        raise TypeError(f"{x} of Type {type(x)} can't be a number.")
+        raise ValueError(f"{x} of Type {type(x)} can't be a number.")
 
 
 def string(x):
@@ -41,12 +41,27 @@ def string(x):
 def remove_sign(x):
     """
     Returns number or string with '+' and '-' signs removed.
-    Tries to type-cast x into number first, if it fails returns string.
+
+    1) Removes '+' or '-' from x
+    2) Tries to type-cast x into number(int / float)
+    3) If step number 2 fails, returns string.
     """
     x = x.translate({ord('+'): '', ord('-'): ''})
     try:
         x = number(x)
-    except TypeError:
+    except ValueError:
         x = string(x)
     return x
 
+
+def prep(x):
+    """
+    Pre-process x into number or string
+
+    :param x: str
+    :return: int/float/str
+    """
+    try:
+        return number(x)
+    except ValueError:
+        return string(x)

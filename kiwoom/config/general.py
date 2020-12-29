@@ -1,4 +1,4 @@
-from kiwoom.config.const import events
+from .const import events
 
 
 def valid_event(event):

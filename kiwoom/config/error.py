@@ -36,12 +36,6 @@ err = {
 }
 
 
-# Exit code when process terminates
-class ExitCode:
-    success = 0
-    failure = -1
-
-
 def msg(ecode):
     """
     Returns an error message that corresponds to given error code.

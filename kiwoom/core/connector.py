@@ -1,4 +1,6 @@
+from kiwoom import config
 from kiwoom.config import events, valid_event
+
 from functools import wraps
 from textwrap import dedent
 from types import LambdaType
@@ -49,7 +51,6 @@ class Connector:
       - Bounded method is important to handle continuous information
     """
     # Class variable
-    warn = True
     nargs = {
         'on_event_connect': 1,
         'on_receive_msg': 4,
@@ -366,7 +367,7 @@ class Connector:
                 slot = api.slot(event, key)
 
             except KeyError:
-                if Connector.warn:
+                if not config.mute:
                     msg = dedent(
                         f"""
                         kiwoom.{event}({', '.join(map(str, args))}) has been called.
@@ -375,9 +376,8 @@ class Connector:
                         Please try to connect event and slot by using kiwoom.connect() method.
                           >> api.connect('{event}', slot=slot_method)
     
-                        This warning message can disappear by the following.
-                          >> from kiwoom import Connector 
-                          >> Connector.mute(True)  # class method
+                        This warning message can disappear by the following. 
+                          >> kiwoom.config.mute = True  # global variable
                         """
                     )
                     print(msg)
@@ -401,7 +401,7 @@ class Connector:
         :param bool: bool
             If True, no warning message else warning.
         """
-        cls.warn = not bool
+        config.mute = bool
 
     @staticmethod
     def connectable(fn):

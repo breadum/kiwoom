@@ -1,7 +1,8 @@
 from collections import defaultdict
 from pandas import to_datetime
+
+import kiwoom.config
 from kiwoom.config import types, markets, market_gubuns, sectors
-from kiwoom.config.types import single, multi
 from kiwoom.utils import list_wrapper
 from kiwoom.data.prep import number, string, remove_sign
 
@@ -14,19 +15,30 @@ Global Variables (Int, Dictionary type)
     2) config.global_variable.update({key1: val1, ..., keyn: valn})
     3) del config.global_variable[key] 
 """
+# Download configuration
+speeding = False
+disciplined = False
+request_limit_time = 3600
+request_limit_try = float('inf')
+
+
 # Download progress bar divisor
 download_progress_display = 10
+
 
 # Code types
 stock = types.CodeType.stock
 sector = types.CodeType.sector
 
+
 # Code lengths for each type
 sector_code_len = 3
 stock_code_lens = [6, 9]  # 일반주식 = 6, 신주인수권 = 9
 
+
 # Periods
 periods = ['tick', 'min', 'day', 'week', 'month', 'year']
+
 
 # 체결시간 예외 케이스 변환기 (in Regular Expression)
 exceptional_datetime_replacer = {
@@ -34,11 +46,22 @@ exceptional_datetime_replacer = {
     '999999$': '180000'  # 시간외 종료에 이루어진 거래 (18:00:00)
 }
 
+
 # 장 종료시간이 변경된 예외
 exceptional_dates = {
     # 'YYYYMMDD': delay(hour)
     '20201203': 1  # 수능일 1시간 지연
 }
+
+
+# Exit code when process terminates
+class ExitCode:
+    # Return codes
+    success = 0
+    failure = -1
+    # Hidden config
+    impossible = 712
+
 
 """
 Configuration for downloading historical data.
@@ -98,6 +121,7 @@ def get_code_type(code):
 def get_tr_code(periods, ctypes=None):
     """
     Returns TR code for given code type and period.
+
     :param ctypes: 'stock', 'sector', or list of ctype
     :param periods: 'tick', 'min', 'day', 'week', 'month', 'year', or list of period
     """
@@ -124,7 +148,7 @@ def get_period(tr_code):
     return _tr_code_to_period[tr_code]
 
 
-def get_record_name_for_code(tr_code):
+def get_record_name_for_its_name(tr_code):
     return _code_type_to_record_name[_tr_code_to_code_type[tr_code]]
 
 
@@ -136,12 +160,50 @@ def get_datetime_format(period):
     return _period_to_datetime_format[period]
 
 
-def inputs(tr_code, code, unit=None, end=None, prev_next='0'):
+def boost():
+    kiwoom.config.history.speeding = True
+    kiwoom.config.history.disciplined = False
+    kiwoom.config.history.request_limit_time = 500
+    kiwoom.config.history.request_limit_try = 1000
+
+
+def regret():
+    kiwoom.config.history.speeding = False
+    kiwoom.config.history.disciplined = True
+    kiwoom.config.history.request_limit_time = 3600
+    kiwoom.config.history.request_limit_try = float('inf')
+
+
+def preper(tr_code, otype):
+    """
+    Returns needed keys to fetch and pre-processor for each key as a tuple
+
+    :param tr_code: str
+        one of TR codes listed in KOA Studio or API Manual Guide
+    :param otype: OutputType
+        type can be either single or multi
+    :return: tuple
+        each element in tuple has key and pre-processor for its key, i.e. ((key1, function1), ...)
+    """
+    return ((key, _prep_for_outputs[key]) for key in _outputs_for_tr_code[tr_code][otype])
+
+
+def inputs(tr_code, code, unit=None, end=None):
+    """
+    Returns an iterator of key, val for each TR request
+
+    :param tr_code: str
+    :param code: str
+    :param unit: int/str
+    :param end: str
+    :param prev_next: str
+    :return: iterator
+    """
     # Copy needed inputs to modify
     inputs = dict(_inputs_for_tr_code[tr_code])
 
     # To set code with appropriate record name for each TR code
-    record_name = get_record_name_for_code(tr_code)  # '종목코드' or '업종코드'
+    record_name = get_record_name_for_its_name(tr_code)  # '종목코드' or '업종코드'
     inputs[record_name] = code
 
     # To set key, val for each different period
@@ -151,16 +213,23 @@ def inputs(tr_code, code, unit=None, end=None, prev_next='0'):
     if tr_code in use_unit:
         inputs['틱범위'] = str(unit) if unit else '1'
     elif tr_code in use_date:
-        # inputs['끝일자'] = str(end) if end else ''  # deprecated
-        inputs['기준일자'] = str(end) if end else ''  # cf. 기준일자 = end (not start)
+        inputs['기준일자'] = str(end) if end else ''  # cf. 기준일자 != start
     else:
         raise KeyError(f'Tr_code must be one of opt10079 ~ opt10083.')
-
     return inputs.items()
 
 
-def preper(tr_code, otype):
-    return ((key, _prep_for_outputs[key]) for key in _outputs_for_tr_code[tr_code][otype])
+def outputs(tr_code, otype):
+    """
+    Returns needed keys to fetch data for each OutputType
+
+    :param tr_code: str
+        one of TR codes listed in KOA Studio or API Manual Guide
+    :param otype: OutputType
+        type can be either single or multi
+    :return: list
+    """
+    return _outputs_for_tr_code[tr_code][otype]
 
 
 """
@@ -232,6 +301,42 @@ _period_to_datetime_format = {
     'year': '%Y%m%d'
 }
 
+
+"""
+Configuration for pre-process
+"""
+# How to pre-process for each output
+_prep_for_outputs = {
+    number: [
+        '평가손익', '총평가손익금액', '수익률(%)', '총수익률(%)',
+        '주문가격', '주문번호', '주문수량',
+        '예수금',  '보유수량',
+        '매입가', '전일종가', '미체결수량',
+        '체결량', '거래량',
+        '거래대금'
+    ],
+    string: [
+        '종목번호', '종목코드', '종목명',
+        '주문상태', '일자', '체결시간',
+        '주문구분'
+    ],
+    remove_sign: [
+        '현재가', '시가', '고가',
+        '저가',
+
+    ]
+}
+
+# Revert dictionary to be in the form of {'key': function}
+_prep_for_outputs = defaultdict(
+    lambda: string,
+    {val: key for key, vals in _prep_for_outputs.items() for val in vals}
+)
+
+
+"""
+Configuration for inputs and outputs
+"""
 # Inputs needed for each TR code request
 _inputs_for_tr_code = {
     'opt10079': {  # 주식틱차트조회요청
@@ -307,34 +412,6 @@ _inputs_for_tr_code = {
         '기준일자': None
     },
 }
-
-# How to pre-process for each output
-_prep_for_outputs = {
-    number: [
-        '평가손익', '총평가손익금액', '수익률(%)', '총수익률(%)',
-        '주문가격', '주문번호', '주문수량',
-        '예수금',  '보유수량',
-        '매입가', '전일종가', '미체결수량',
-        '체결량', '거래량',
-        '거래대금'
-    ],
-    string: [
-        '종목번호', '종목코드', '종목명',
-        '주문상태', '일자', '체결시간',
-        '주문구분'
-    ],
-    remove_sign: [
-        '현재가', '시가', '고가',
-        '저가',
-
-    ]
-}
-
-# Revert dictionary to be in the form of {'key': function}
-_prep_for_outputs = defaultdict(
-    lambda: string,
-    {val: key for key, vals in _prep_for_outputs.items() for val in vals}
-)
 
 # Outputs for each TR code in the form of {'TR code': [[single data], [multi data]]}
 _outputs_for_tr_code = {

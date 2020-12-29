@@ -76,7 +76,7 @@ class Bot(Bot):
 
         # 접속 성공여부 확인
         if not self.connected():
-            raise RuntimeError(f"Server NOT connected.")
+            raise RuntimeError(f"Server NOT Connected.")
             # or you may exit script - import sys; sys.exit()
 
         # 계좌 정보 출력
@@ -91,7 +91,7 @@ class Bot(Bot):
 # 실행 스크립트
 if __name__ == '__main__':
     """
-    >> python3 3.Account.py 명령을 통해 실행하거나 IDE를 통해 직접 실행해볼 수 있다. 
+    >> python3 4.Account.py 명령을 통해 실행하거나 IDE를 통해 직접 실행해볼 수 있다. 
     """
 
     # 통신을 위해 QApplication 이용

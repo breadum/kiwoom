@@ -13,8 +13,8 @@ class Share:
 
     Each of data has 3 methods.
     1. get
-    2. update
-    3. remove
+    2. remove
+    3. update/extend
     """
     def __init__(self):
         self.args = dict()
@@ -58,7 +58,8 @@ class Share:
             return self.multi[fn]
         return self.multi[fn][key]
 
-    def update_multi(self, fn, key, vals):
+    def extend_multi(self, fn, key, vals):
+        # To Extend list to original data
         self.multi[fn][key] += vals
 
     def remove_multi(self, fn):
@@ -74,7 +75,8 @@ class Share:
             return self.history[code]
         return self.history[code][key]
 
-    def update_history(self, code, key, vals):
+    def extend_history(self, code, key, vals):
+        # To Extend list to original data
         self.history[code][key] += vals
 
     def remove_history(self, code):

@@ -9,3 +9,5 @@ Release History of Distribution
 0.1.0 Restructuring codes
 0.1.1 Fix bug in api.py (*args)
 0.1.2 Fix bug in api.py again ([args])
+
+1.0.0 Restructuring and Histories() update

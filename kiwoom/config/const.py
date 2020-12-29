@@ -1,9 +1,11 @@
-# General Variables
+"""
+Global Variables
+"""
+# Connector
+mute = False
+
+# 인코딩
 encoding = 'euc-kr'
-
-request_limit_time = 3600
-request_limit_try = float('inf')
-
 
 # Event Slots
 events = [

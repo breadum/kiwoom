@@ -1,7 +1,7 @@
 import time
 import sys
 
-from kiwoom.config.error import ExitCode
+from kiwoom.config.history import ExitCode
 from kiwoom.utils import clock
 from kiwoom.core.bot import Bot
 from kiwoom.core import Connector

@@ -61,6 +61,7 @@ class Kiwoom(API):
     """
     # Class variable just for convenience
     map = Connector.map
+    msg = True
 
     def __init__(self):
         super().__init__()
@@ -115,14 +116,15 @@ class Kiwoom(API):
         self.comm_connect()
         self.loop()
 
-    def message(self, bool):
+    @classmethod
+    def message(cls, bool):
         """
         Turn on/off printing message from Kiwoom.on_receive_msg() event.
 
         :param bool: bool
             If True, then it prints message else does not.
         """
-        self.msg = bool
+        cls.msg = bool
 
     def signal(self, event, key=None):
         """

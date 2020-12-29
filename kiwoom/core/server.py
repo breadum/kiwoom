@@ -5,10 +5,10 @@ from kiwoom.data.prep import string
 from kiwoom.utils import name, date
 from kiwoom.utils.manager import Downloader
 
-from collections import defaultdict
 from os import getcwd, makedirs
 from os.path import join, exists
 from textwrap import dedent
+from traceback import format_exc
 from warnings import warn
 
 import pandas as pd
@@ -59,11 +59,11 @@ class Server:
         kwargs = self.share.get_args(name())
         period = history.get_period(tr_code)
 
-        rec = history.get_record_name_for_code(tr_code)  # record_name = '종목코드' | '업종코드'
+        rec = history.get_record_name_for_its_name(tr_code)  # record_name = '종목코드' | '업종코드'
         code = string(self.api.get_comm_data(tr_code, rq_name, 0, rec))
 
         # Handle trading suspended stock
-        if not code:  # if code = '', 거래정지
+        if not code:  # code = ''
             code = kwargs['code']
 
         # Check if wrong data received
@@ -71,30 +71,36 @@ class Server:
             raise RuntimeError(f"Requested {kwargs['code']}, but the server still sends {code}.")
 
         # Fetch multi data
-        data = defaultdict(list)
+        data = {key: list() for key in history.outputs(tr_code, multi)}
         cnt = self.api.get_repeat_cnt(tr_code, rq_name)
         for i in range(cnt):
             for key, fn in history.preper(tr_code, multi):
                 data[key].append(fn(self.api.get_comm_data(tr_code, rq_name, i, key)))
 
+        # Update downloaded data
         for key in data.keys():
-            self.share.update_history(code, key, data[key])
+            self.share.extend_history(code, key, data[key])
 
         # If data is more than needed, then stop downloading.
         if 'start' in kwargs:
             col = history.get_datetime_column(period)
             # To check whether it's an empty data.
             if len(data[col]) != 0:
-                last = pd.Timestamp(data[col][-1]).date()
+                last = pd.Timestamp(data[col][-1][:len('YYYYMMDD')]).date()
                 # Note that data is ordered from newest to oldest
                 if last < pd.Timestamp(kwargs['start']).date():
                     prev_next = ''
 
         # Continue to download
         if prev_next == '2':
-            # Call signal method again, but with prev_next='2'
-            signal = self.api.signal('on_receive_tr_data', name())
-            signal(code, period=period, prev_next=prev_next)
+            try:
+                # Call signal method again, but with prev_next='2'
+                bot = self.api.signal('on_receive_tr_data', name())
+                bot(code, period=period, prev_next=prev_next)
+            except Exception as err:
+                args = f"code={code}, period={period}, prev_next={prev_next}"
+                self.share.update_single('history', 'error', True)
+                print(f"An error at Bot.history({args}).\n\n{format_exc()}")
 
         # Download done
         else:
@@ -105,9 +111,13 @@ class Server:
             col = history.get_datetime_column(period)
             fmt = history.get_datetime_format(period)
 
+            # To handle empty data
+            if df.empty:
+                df[col] = pd.to_datetime(df[col], format=fmt)
+
             # To handle exceptional time and dates
             if col == '체결시간':
-                if len(df[col]) > 0:
+                if len(df) > 0:
                     # Find index of dates that delayed market opening time and inconvertibles in df
                     indices = dict()
                     exceptions = list()
@@ -124,7 +134,7 @@ class Server:
                                 series = pd.to_datetime(series, format='%Y%m%d%H%M%S')
                                 exceptions.append(series)
 
-                    # Replace inconvertibles (888888, 999999) to (160000, 180000)
+                    # Replace inconvertibles (888888, 999999) to (16:00:00, 18:00:00)
                     df[col].replace(regex=history.exceptional_datetime_replacer, inplace=True)
 
                     # To make column as pandas datetime series
@@ -139,9 +149,9 @@ class Server:
                     for series in exceptions:
                         df.loc[series.index, col] = series
 
-            # If no data available
-            else:
-                df[col] = pd.to_datetime(df[col], format=fmt)
+                # If no data available
+                else:
+                    df[col] = pd.to_datetime(df[col], format=fmt)
 
             # Make the column representing time as index
             df.set_index(col, inplace=True)
@@ -153,9 +163,11 @@ class Server:
             if 'end' in kwargs:
                 df = df.loc[:kwargs['end']]
 
-            # The server sent mixed data
+            # If server sent mixed data
             if not df.index.is_monotonic_increasing:
-                raise RuntimeError(f'Downloaded data is not monotonic increasing. Error at Slot.history(code={code}).')
+                raise RuntimeError(
+                    f'Downloaded data is not monotonic increasing. Error at Server.history() with code={code}.'
+                )
 
             # Save data to csv file
             self.history_to_csv(df, code, kwargs['path'], kwargs['merge'], kwargs['warning'])
@@ -166,8 +178,8 @@ class Server:
 
             # Mark successfully downloaded
             self.share.update_single(name(), 'success', True)
-
             self.api.disconnect_real_data(scr_no)
+
             self.api.unloop()
 
     def history_to_csv(self, df, file, path=None, merge=False, warning=True):
@@ -260,6 +272,17 @@ class Server:
                         df = pd.concat([db, df], axis=0, join='outer', copy=False)
 
         if not df.index.is_monotonic_increasing:
-            raise RuntimeError(f'Files to write, {file}, is not monotonic increasing. Error at Slot.history_to_csv().')
+            raise RuntimeError(
+                f'Error at Slot.history_to_csv(file={file}, ...)/\n'
+                + 'File to write is not monotonic increasing with respect to time.'
+            )
 
+        # To prevent overwriting
+        if not merge and exists(file):
+            raise FileExistsError(
+                f'Error at Slot.history_to_csv(file={file}, ...)/\n'
+                + "File already exists. Set merge=True or move the file to prevent from losing data."
+            )
+
+        # Finally write to csv file
         df.to_csv(file, encoding=encoding)
