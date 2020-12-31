@@ -23,6 +23,9 @@ class Bot(Bot):
         2) 다운로드 시작
         3) 다운로드 결과 확인
         """
+        # 경고 메세지 제거
+        config.mute = True
+        
         # 로그인 요청
         self.login()
 
@@ -65,7 +68,7 @@ if __name__ == '__main__':
     result = bot.run()
 
     # 다운로드 완료 시 종료
-    bot.exit(0)
+    app.exit(0)
 
 
 """
@@ -95,7 +98,7 @@ def run_24(kwargs, share):
     share['complete'] = True
 
     # Bot 실행 종료
-    bot.exit()
+    app.exit()
 
 
 # 24시간 끊기지 않는 버전 실행 스크립트
@@ -156,7 +159,7 @@ if __name__ == '__main__':
 
         # 4) Not allowed
         else:
-            raise RuntimeError(f'[{clock()}] Download fails.')
+            raise RuntimeError(f'[{clock()}] Download failed.')
 
     """
         # Hidden Case ^^
@@ -185,8 +188,3 @@ if __name__ == '__main__':
 
     # Script done
     print(f'[{clock()}] Script All Finished.')
-
-
-"""
-[실행결과]
-"""
