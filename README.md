@@ -85,7 +85,7 @@ Simple Python Wrapper for Kiwoom Open API+
 >     pass
 > ```
 
-- 주가, 지수, 섹터, 국내선옵 Historical Market Data 다운로드
+- 주가와 지수의 Historical Market Data 24시간 다운로드
 
 > ```python
 > from kiwoom import *
