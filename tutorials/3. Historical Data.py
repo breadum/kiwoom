@@ -2,6 +2,7 @@ from kiwoom import *
 from kiwoom.utils import clock
 from kiwoom.config.history import ExitCode
 
+from os import geteuid
 from PyQt5.QtWidgets import QApplication
 from multiprocessing import Process, Manager
 
@@ -103,6 +104,11 @@ def run_24(kwargs, share):
 
 # 24시간 끊기지 않는 버전 실행 스크립트
 if __name__ == '__main__':
+    # Check if run as root
+    from ctypes import windll
+    if not windll.shell32.IsUserAnAdmin():
+        raise EnvironmentError("Please run the script as root.")
+
     # Default args
     kwargs = {
         'market': '0',
