@@ -107,7 +107,7 @@ if __name__ == '__main__':
     # 프로그램 시작시 예/아니오 팝업을 없애기 위해 관리자 권한으로 실행
     from ctypes import windll
     if not windll.shell32.IsUserAnAdmin():
-        raise EnvironmentError("Please run the script as root.")
+        raise EnvironmentError("Please run as root.")
 
     # Default args
     kwargs = {
