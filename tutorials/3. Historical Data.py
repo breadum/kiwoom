@@ -75,7 +75,7 @@ Multi-processing을 활용하여 24시간 다운로드 받을 수 있는 버전 
 
 # 24시간 끊기지 않는 버전
 def run_24(kwargs, share):
-    # To Suppress warning messages
+    # To suppress warning messages
     config.mute = True
 
     # 초기화 및 로그인
@@ -116,7 +116,6 @@ if __name__ == '__main__':
 
     # Share data between processes
     share = Manager().dict()
-    share['error'] = False
     share['complete'] = False
     share['impossible'] = False
 
@@ -126,7 +125,6 @@ if __name__ == '__main__':
         print(f"[{clock()}] Starting a new loop!")
 
         # Variables
-        share['error'] = False
         share['complete'] = False
 
         # Spawning a process
