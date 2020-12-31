@@ -175,7 +175,7 @@ class Bot:
                                 self.share.update_single(name(), 'success', True)
                                 return
 
-                # If any exception other than UserWarning, just skip
+                # If any exception, just skip
                 except Exception as err:
                     pass
 

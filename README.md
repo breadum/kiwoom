@@ -107,7 +107,7 @@ Simple Python Wrapper for Kiwoom Open API+
 
 #### 3. 통신을 위한 체계적인 코드 작성 지원
 
-- 데이터를 요청하는 함수와 데이터를 받는 함수를 분리해서 작성 (Signal & Slot)
+- 데이터를 요청하는 함수와 데이터를 받는 함수를 분리해서 작성 (Bot & Server)
 
 - 작성 후 Kiwoom.connect() 함수로 서로 연결시켜 서버에서 응답 시 자동 호출 지원
 
@@ -209,7 +209,7 @@ Simple Python Wrapper for Kiwoom Open API+
 >         self.balance()
 >
 >         # 전송된 데이터 확인
->         print(self.data)
+>         print(self.share['balance']['예탁금'])
 >
 >     
 > if __name__ == '__main__':

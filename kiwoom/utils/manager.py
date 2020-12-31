@@ -15,7 +15,10 @@ def timer(fn):
 
         def unloop():
             if not bot.connected():
-                print('Timeover for login. Please try again.')
+                print(f'[{clock()}] Timeover for login. Please try again.')
+                # Close all pop-up windows from Kiwoom
+                app = QApplication.instance()
+                app.closeAllWindows()
                 bot.api.unloop()
 
         # Set timer waiting for 1 minute
