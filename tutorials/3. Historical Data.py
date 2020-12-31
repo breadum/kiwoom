@@ -104,7 +104,7 @@ def run_24(kwargs, share):
 
 # 24시간 끊기지 않는 버전 실행 스크립트
 if __name__ == '__main__':
-    # Check if run as root
+    # 프로그램 시작시 예/아니오 팝업을 없애기 위해 관리자 권한으로 실행
     from ctypes import windll
     if not windll.shell32.IsUserAnAdmin():
         raise EnvironmentError("Please run the script as root.")
