@@ -25,7 +25,7 @@ class Bot(Bot):
         """
         # 경고 메세지 제거
         config.mute = True
-        
+
         # 로그인 요청
         self.login()
 
