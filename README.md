@@ -117,11 +117,34 @@ Simple Python Wrapper for Kiwoom Open API+
 > from kiwoom import *
 >
 > # 서버에 데이터를 요청하는 클래스 (사용자 작성)
-> class Bot(Bot):  
->
->     # 주어진 api는 Kiwoom() 인스턴스
+> class Bot(Bot):
 >     def __init__(self, server):
 >         super().__init__(server)
+>
+>         # 1) Kiwoom.set_connect_hook(event, param)
+>         # 이벤트 OnReceiveTrData 발생 시 주어진 rq_name 인자값에 따라 slot을 호출하도록 설정
+>         # 만일 설정하지 않는다면, 하나의 이벤트에는 하나의 slot만 연결가능
+>         self.api.set_connect_hook('on_receive_tr_data', 'rq_name')
+>
+>         # 2) Kiwoom.connect(event, signal, slot, key=None)
+>         # OnReceiveTrData 이벤트에 대하여 1)에 의해 특정 rq_name 값에 따라 signal과 slot을 연결
+>         # key 값이 주어지지 않을 시, rq_name은 signal과 slot의 함수 이름 'balance'로 자동 설정
+>         self.api.connect(
+>             event='on_receive_tr_data',
+>             signal=self.balance, 
+>             slot=self.server.balance,
+>         )
+> 
+>         # 1)과 2) 연결 설정 후에는 다음과 같이 활용할 수 있다.
+>         # on_receive_tr_data(..., rq_name='balance', ...) 이벤트 수신 시 server.balance 자동 호출됨
+>         # self.api.signal('on_receive_tr_event', 'balance') 호출 시 bot.balance 함수 반환
+>         # self.api.slot('on_receive_tr_event', 'balance') 호출 시 server.balance 함수 반환 
+>
+>         # 참고 가이드          
+>         # 1) print(config.events)  # 이벤트 목록
+>         # 2) print(Kiwoom.api_arg_spec('on_receive_tr_data'))  # 함수인자 목록
+>         # 3) help(Kiwoom.connect) and help(Kiwoom.set_connect_hook)  # Doc String
+>         # 4) Github 튜토리얼 (https://github.com/breadum/kiwoom/tree/main/tutorials)
 >     
 >     def balance(self, prev_next='0'):
 >         ...
@@ -129,6 +152,16 @@ Simple Python Wrapper for Kiwoom Open API+
 >         self.api.comm_rq_data(rq_name='balance', tr_code='opw00018', prev_next='0', scr_no='0000')
 >         self.api.loop()  # 이벤트가 호출 될 때까지 대기
 >         ...
+>
+>     def run(self):
+>         # 버전처리 및 로그인 
+>         self.login()
+>
+>         # 계좌평가잔고내역 요청
+>         self.balance()
+>
+>         # 전송된 데이터 확인
+>         print(self.share['balance']['예탁금'])
 > ```
 > ```python
 > from kiwoom import *
@@ -171,45 +204,6 @@ Simple Python Wrapper for Kiwoom Open API+
 > from PyQt5.QtWidgets import QApplication
 > from kiwoom import *
 > import sys
-> 
-> class Bot(Bot):
->     def __init__(self, server):
->         super().__init__(server)
->
->         # 1) Kiwoom.set_connect_hook(event, param)
->         # 이벤트 OnReceiveTrData 발생 시 주어진 rq_name 인자값에 따라 slot을 호출하도록 설정
->         # 만일 설정하지 않는다면, 하나의 이벤트에는 하나의 slot만 연결가능
->         self.api.set_connect_hook('on_receive_tr_data', 'rq_name')
->
->         # 2) Kiwoom.connect(event, signal, slot, key=None)
->         # OnReceiveTrData 이벤트에 대하여 1)에 의해 특정 rq_name 값에 따라 signal과 slot을 연결
->         # key 값이 주어지지 않을 시, rq_name은 signal과 slot의 함수 이름 'balance'로 자동 설정
->         self.api.connect(
->             event='on_receive_tr_data',
->             signal=self.balance, 
->             slot=self.server.balance,
->         )
-> 
->         # 1)과 2) 연결 설정 후에는 다음과 같이 활용할 수 있다.
->         # on_receive_tr_data(..., rq_name='balance', ...) 이벤트 수신 시 server.balance 자동 호출됨
->         # self.api.signal('on_receive_tr_event', 'balance') 호출 시 bot.balance 함수 반환
->         # self.api.slot('on_receive_tr_event', 'balance') 호출 시 server.balance 함수 반환 
->
->         # 참고 가이드          
->         # 1) print(config.events)  # 이벤트 목록
->         # 2) print(Kiwoom.api_arg_spec('on_receive_tr_data'))  # 함수인자 목록
->         # 3) help(Kiwoom.connect) and help(Kiwoom.set_connect_hook)  # Doc String
->         # 4) Github 튜토리얼 (https://github.com/breadum/kiwoom/tree/main/tutorials)
->
->     def run(self):
->         # 버전처리 및 로그인 
->         self.login()
->
->         # 계좌평가잔고내역 요청
->         self.balance()
->
->         # 전송된 데이터 확인
->         print(self.share['balance']['예탁금'])
 >
 >     
 > if __name__ == '__main__':

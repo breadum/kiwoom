@@ -10,5 +10,5 @@ Release History of Distribution
 0.1.1 Fix bug in api.py (*args)
 0.1.2 Fix bug in api.py again ([args])
 
-1.0.0 Restructuring and Histories() update
+1.0.0 Restructuring and launch Histories() function!
 1.0.1 Add closeAllWindows() on timer() for Kiwoom.login()

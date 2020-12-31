@@ -185,14 +185,16 @@ class Server:
     def history_to_csv(self, df, file, path=None, merge=False, warning=True):
         """
         Save historical data of given code at path in .csv format.
+
         Once the data is saved, it will be removed from the memory.
         When merge is True, data will be merged with existing file.
         Data will be overwritten by default, otherwise.
-        :param df    : dataframe of historical data
-        :param file  : filename
-        :param path  : data path if '' or None, then currend dir will be set
-        :param merge : if same file exist, merge with existing data
-        :param warn  : turn on the warning message
+
+        :param df: pd.Dataframe
+        :param file: str
+        :param path: str
+        :param merge : bool
+        :param warning: bool
         """
         # In case, path is '' or None
         if not path:
