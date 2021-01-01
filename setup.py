@@ -21,7 +21,7 @@ EMAIL = "breadum.kr@gmail.com"
 # Miscellaneous
 LICENSE = "MIT License"
 CLASSIFIERS = [
-    "DEVELOPMENT STATUS :: 3 - ALPHA",
+    "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: MIT License",
     "Operating System :: Microsoft :: Windows",
     "Programming Language :: Python",
