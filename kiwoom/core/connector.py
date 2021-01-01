@@ -1,17 +1,15 @@
 from kiwoom import config
-from kiwoom.config import events, valid_event
+from kiwoom.config import valid_event
 
 from functools import wraps
 from textwrap import dedent
 from types import LambdaType
 from inspect import (
-    getfullargspec,
     getattr_static,
     ismethod,
     isfunction,
     isclass,
-    ismodule,
-    signature,
+    ismodule
 )
 
 

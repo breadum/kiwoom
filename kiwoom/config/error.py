@@ -50,7 +50,7 @@ def msg(ecode):
     etype, msg = err[ecode]
     if ecode == 0:
         return f'{msg}'
-    return f'Error - Code: {ecode}, Type: {etype}, Msg: {msg}'
+    return f'Error {{Code: {ecode}, Type: {etype}, Msg: {msg}}}'
 
 
 def catch_error(fn):
@@ -70,6 +70,6 @@ def catch_error(fn):
     def wrapper(*args, **kwargs):
         out = fn(*args, **kwargs)
         if out != 0:  # 0: ('OP_ERR_NONE', '정상처리')
-            print(f'An error occurred from {fn.__name__}.\n  * {msg(out)}')
+            print(f'\nAn error occurred from {fn.__name__}.\n  * {msg(out)}')
         return out
     return wrapper

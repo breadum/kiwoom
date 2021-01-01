@@ -1,10 +1,11 @@
 # Namespace Control
-from kiwoom.wrapper.api import API
-from kiwoom.config import *
+from . import (
+    config,
+    core,
+    data,
+    utils,
+    wrapper
+)
 
-from kiwoom.config.const import *
-from kiwoom.config.general import *
-
-from kiwoom.core.bot import Bot
-from kiwoom.core.kiwoom import Kiwoom
-from kiwoom.core.server import Server
+from .core import Bot, Server, Kiwoom
+from .wrapper import API

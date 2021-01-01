@@ -1,4 +1,5 @@
-from kiwoom.utils import clock
+from kiwoom.utils.general import clock
+
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QTimer
 from traceback import format_exc
@@ -72,9 +73,9 @@ class Downloader:
                 # Update nrq
                 Downloader.nrq = nrq
 
-            # Set timer for every 10 minutes
+            # Set timer for every 3 minutes
             timer = QTimer(bot.api)
-            timer.start(10 * 60 * 1000)
+            timer.start(1 * 60 * 1000)
             timer.timeout.connect(watcher)
 
             # Execute Slot.on_event_connect()
@@ -104,6 +105,7 @@ class Downloader:
                 # Print error message
                 print(f'\n[{clock()}] An error at Server.history{args[1:]} with code={code}.\n\n{format_exc()}')
                 # Reset variables
+                server.share.update_single('history', 'complete', False)
                 server.share.remove_history(code)
                 # Return to Signal.history()
                 server.api.unloop()

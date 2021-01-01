@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 # Project Information
-VERSION = "1.0.1"
+VERSION = "1.1"
 DISTNAME = "kiwoom"
 DESCRIPTION = "Simple Python Wrapper for Kiwoom OPEN API+"
 LONG_DESCRIPTION = open("README.md", encoding="utf-8").read()
@@ -21,7 +21,7 @@ EMAIL = "breadum.kr@gmail.com"
 # Miscellaneous
 LICENSE = "MIT License"
 CLASSIFIERS = [
-    "Development Status :: 2 - Pre-Alpha",
+    "DEVELOPMENT STATUS :: 3 - ALPHA",
     "License :: OSI Approved :: MIT License",
     "Operating System :: Microsoft :: Windows",
     "Programming Language :: Python",

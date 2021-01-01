@@ -1,19 +1,32 @@
-from collections import defaultdict
-
-
 """
 Default configuration of how to pre-process raw inputs from the server.
 Default way to deal with data is considering one as a string.  
 
-1) number
+1) prep (default)
+    : returns number(x) if possible, else string(x)
+
+2) number
     : returns an int or a float
 
-2) string
+3) string
     : returns a string with white space removed
 
-3) remove_sign (special case)
+4) remove_sign (special case)
     : returns a number/string without any signs (+/-)
 """
+
+
+def prep(x):
+    """
+    Preprocess x into number or string (default preprocessor)
+
+    :param x: str
+    :return: int/float/str
+    """
+    try:
+        return number(x)
+    except ValueError:
+        return string(x)
 
 
 def number(x):
@@ -52,16 +65,3 @@ def remove_sign(x):
     except ValueError:
         x = string(x)
     return x
-
-
-def prep(x):
-    """
-    Pre-process x into number or string
-
-    :param x: str
-    :return: int/float/str
-    """
-    try:
-        return number(x)
-    except ValueError:
-        return string(x)

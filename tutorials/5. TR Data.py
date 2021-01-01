@@ -1,6 +1,6 @@
 from kiwoom import *
 from kiwoom.data import Share
-from kiwoom.data.prep import prep
+from kiwoom.data.preps import prep
 from kiwoom.utils import name
 from PyQt5.QtWidgets import QApplication
 from textwrap import dedent

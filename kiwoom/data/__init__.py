@@ -1,2 +1,6 @@
-from kiwoom.data.share import Share
-import kiwoom.data.prep
+from . import (
+    preps,
+    share
+)
+
+from .share import Share

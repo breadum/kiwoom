@@ -2,7 +2,6 @@ from kiwoom import *
 from kiwoom.utils import clock
 from kiwoom.config.history import ExitCode
 
-from os import geteuid
 from PyQt5.QtWidgets import QApplication
 from multiprocessing import Process, Manager
 

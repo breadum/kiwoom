@@ -1,10 +1,10 @@
 from collections import defaultdict
 from pandas import to_datetime
 
-import kiwoom.config
-from kiwoom.config import types, markets, market_gubuns, sectors
+from kiwoom.config import types
+from kiwoom.config.const import markets, market_gubuns, sectors
+from kiwoom.data.preps import number, string, remove_sign
 from kiwoom.utils import list_wrapper
-from kiwoom.data.prep import number, string, remove_sign
 
 
 """
@@ -20,6 +20,7 @@ speeding = False
 disciplined = False
 request_limit_time = 3600
 request_limit_try = float('inf')
+request_limit_item = float('inf')
 
 
 # Download progress bar divisor
@@ -161,17 +162,25 @@ def get_datetime_format(period):
 
 
 def boost():
-    kiwoom.config.history.speeding = True
-    kiwoom.config.history.disciplined = False
-    kiwoom.config.history.request_limit_time = 500
-    kiwoom.config.history.request_limit_try = 1000
+    global speeding, disciplined
+    speeding = True
+    disciplined = False
+
+    global request_limit_time, request_limit_try, request_limit_item
+    request_limit_time = 500
+    request_limit_try = 1000
+    request_limit_item = 95
 
 
 def regret():
-    kiwoom.config.history.speeding = False
-    kiwoom.config.history.disciplined = True
-    kiwoom.config.history.request_limit_time = 3600
-    kiwoom.config.history.request_limit_try = float('inf')
+    global speeding, disciplined
+    speeding = False
+    disciplined = True
+
+    global request_limit_time, request_limit_try, request_limit_item
+    request_limit_time = 3600
+    request_limit_try = float('inf')
+    request_limit_item = float('inf')
 
 
 def preper(tr_code, otype):

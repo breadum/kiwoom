@@ -5,7 +5,7 @@ from kiwoom.config.screen import Screen
 from kiwoom.core.kiwoom import Kiwoom
 from kiwoom.core.server import Server
 from kiwoom.data.share import Share
-from kiwoom.utils import clock, effective_args, name, unpack_args
+from kiwoom.utils.general import *
 from kiwoom.utils.manager import timer, Downloader
 
 from PyQt5.QtWidgets import QApplication
@@ -117,7 +117,9 @@ class Bot:
         ctype = history.get_code_type(code)  # ctype = 'stock' | 'sector'
         tr_code = history.get_tr_code(period, ctype)
 
-        # If download starts, set args for only once.
+        """
+            Setting args just for once.
+        """
         if prev_next == '0':
             # In case path is '' or None
             if not path:
@@ -127,7 +129,7 @@ class Bot:
             kwargs = effective_args(locals(), remove=['ctype', 'tr_code'])
             self.share.update_single(name(), 'error', False)
             self.share.update_single(name(), 'restart', False)
-            self.share.update_single(name(), 'success', False)
+            self.share.update_single(name(), 'complete', False)
             self.share.update_single(name(), 'impossible', False)
 
             # To check format of input dates
@@ -138,8 +140,10 @@ class Bot:
                 if not history.is_date(end):
                     raise ValueError(f"Given 'end' {end} is not a valid date.")
 
-            # To save time, find out lastly downloaded data and change 'start' point
-            if merge and period in ['tick', 'min']:
+            """
+                Check 'start' and 'end' points to save downloading time. 
+            """
+            if merge:
                 try:
                     file = join(path, code + '.csv')
                     col = history.get_datetime_column(period)
@@ -150,35 +154,52 @@ class Bot:
                         encoding=config.encoding
                     )
 
-                    # Last tick for stock is 15:30 and for sector is 18:00
-                    h, m = (15, 30) if ctype is history.stock else (18, 00)  # else for sector
-                    last_day = Timestamp(df.index[-1]).date()
-                    last_tick_of_day = Timestamp(df.index[-1]).replace(hour=h, minute=m)
-                    download_completed = last_tick_of_day <= df.index[-1]
+                    if period in ['tick', 'min']:
+                        # Last tick for stock is 15:30 and for sector is 18:00
+                        h, m = (15, 30) if ctype is history.stock else (18, 00)  # else for sector
+                        last_day = date(df.index[-1])
+                        last_tick_of_day = Timestamp(df.index[-1]).replace(hour=h, minute=m)
+                        download_completed = last_tick_of_day <= df.index[-1]
+
+                        # To push 'start' date further as much as possible. If None, set newly.
+                        if 'start' not in kwargs or date(kwargs['start']) <= last_day:
+                            if download_completed:
+                                # Start from the day after last day
+                                kwargs['start'] = str((last_day + DateOffset(1)).date()).replace('-', '')
+                            else:
+                                # Start from the last day
+                                kwargs['start'] = str(last_day).replace('-', '')
+
+                        # If downloading is not needed, just return
+                        if 'end' in kwargs:
+                            if download_completed:
+                                if date(kwargs['end']) <= last_day:
+                                    self.share.update_single(name(), 'complete', True)
+                                    return
+
+                    else:  # if period in ['day', 'week', 'year']
+                        last_day = date(df.index[-1])
+                        # To push 'start' date further as much as possible. If None, set newly.
+                        if 'start' not in kwargs or date(kwargs['start']) <= last_day:
+                            # Start from the last day
+                            kwargs['start'] = str(last_day).replace('-', '')
+
+                        # If downloading is not needed, just return
+                        if 'end' in kwargs:
+                            if date(kwargs['end']) < last_day:
+                                self.share.update_single(name(), 'complete', True)
+                                return
 
                     # Resolve memory issues
                     del df
-
-                    # To push 'start' date further as much as possible. If None, set newly.
-                    if 'start' not in kwargs or Timestamp(kwargs['start']).date() <= last_day:
-                        if download_completed:
-                            # start from the day after last day
-                            kwargs['start'] = str((last_day + DateOffset(1)).date()).replace('-', '')
-                        else:
-                            # start from the last day
-                            kwargs['start'] = str(last_day).replace('-', '')
-
-                    # If downloading is not needed, just return
-                    if 'end' in kwargs:
-                        if download_completed:
-                            if Timestamp(kwargs['end']).date() <= last_day:
-                                self.share.update_single(name(), 'success', True)
-                                return
 
                 # If any exception, just skip
                 except Exception as err:
                     pass
 
+            """
+                Update and print arguments. 
+            """
             # Done arg setting
             self.share.update_args(name(), kwargs)
 
@@ -186,6 +207,9 @@ class Bot:
             f = lambda key: f"'{kwargs[key]}'" if key in kwargs else None
             print(f"{{code={f('code')}, start={f('start')}, end={f('end')}, period={f('period')}}}")
 
+        """
+            Start downloading.
+        """
         # Check requesting status
         self.share.single['histories']['nrq'] += 1
         if history.speeding:
@@ -193,7 +217,7 @@ class Bot:
                 # Set back to default configuration
                 if self.share.get_single('histories', 'cnt') == 0:
                     self.share.update_single('history', 'impossible', True)
-                self.share.update_single('history', 'restart', True)
+                self.share.update_single(name(), 'restart', True)
                 self.api.unloop()
                 return
 
@@ -201,7 +225,14 @@ class Bot:
         for key, val in history.inputs(tr_code, code, unit, end):
             self.api.set_input_value(key, val)
         scr_no = self.scr.alloc(tr_code, code)
-        self.api.comm_rq_data(name(), tr_code, prev_next, scr_no)
+
+        # If comm_rq_data returns non-zero error code, restart downloading
+        if self.api.comm_rq_data(name(), tr_code, prev_next, scr_no) != 0:
+            self.share.update_single('history', 'restart', True)
+            self.api.unloop()
+            return
+
+        # Wait response from the server
         self.api.loop()
 
     @Downloader.watcher
@@ -335,13 +366,13 @@ class Bot:
                 break
 
             # 4) Error that Server.history() couldn't be finished.
-            elif not self.share.get_single('history', 'success'):
+            elif not self.share.get_single('history', 'complete'):
                 # Give one more last chance
                 print(f'\n[{clock()}] Try to restart downloading for {code}.\n')
                 self.history(code, period, unit=unit, start=start, end=end, path=path, merge=merge, warning=warning)
 
                 # If it fails again, stop downloading.
-                if not self.share.get_single('history', 'success'):
+                if not self.share.get_single('history', 'complete'):
                     slice = (from_ + self.share.single[name()]['cnt'], to_)
                     print(f"\n[{clock()}] Run Bot.histories() with slice={slice} or code='{code}' for the next time.")
                     return ExitCode.failure
@@ -349,14 +380,19 @@ class Bot:
             """
                 Download completed for one item in the list
             """
+            # Finally successfully downloaded
+            self.share.single[name()]['cnt'] += 1
+
             # 5) Successfully downloaded with disciplined, but it's time for speeding again.
             if history.disciplined:
-                self.share.single[name()]['cnt'] += 1
                 status = f"[{clock()}] The program needs to be restarted for speeding again."
                 break
 
-            # Finally successfully downloaded
-            self.share.single[name()]['cnt'] += 1
+            # 6) Successfully downloaded but exceeds request limit items
+            if history.speeding:
+                # Restarts the program
+                if self.share.single[name()]['cnt'] >= history.request_limit_item:
+                    break
 
         """
             Close downloading

@@ -1,8 +1,9 @@
-from kiwoom.config import history, encoding
+from kiwoom import config
+from kiwoom.config import history
 from kiwoom.config.error import msg
 from kiwoom.config.types import multi
-from kiwoom.data.prep import string
-from kiwoom.utils import name, date
+from kiwoom.data.preps import string
+from kiwoom.utils.general import name, date
 from kiwoom.utils.manager import Downloader
 
 from os import getcwd, makedirs
@@ -85,10 +86,10 @@ class Server:
         if 'start' in kwargs:
             col = history.get_datetime_column(period)
             # To check whether it's an empty data.
-            if len(data[col]) != 0:
-                last = pd.Timestamp(data[col][-1][:len('YYYYMMDD')]).date()
+            if len(data[col]) > 0:
+                last = data[col][-1][:len('YYYYMMDD')]
                 # Note that data is ordered from newest to oldest
-                if last < pd.Timestamp(kwargs['start']).date():
+                if date(last) < date(kwargs['start']):
                     prev_next = ''
 
         # Continue to download
@@ -115,8 +116,14 @@ class Server:
             if df.empty:
                 df[col] = pd.to_datetime(df[col], format=fmt)
 
-            # To handle exceptional time and dates
-            if col == '체결시간':
+            """
+                Make time-related column as pandas Datetime index
+            """
+            if col == '일자':
+                df[col] = pd.to_datetime(df[col], format=fmt)
+
+            elif col == '체결시간':
+                # To handle exceptional time and dates
                 if len(df) > 0:
                     # Find index of dates that delayed market opening time and inconvertibles in df
                     indices = dict()
@@ -153,9 +160,18 @@ class Server:
                 else:
                     df[col] = pd.to_datetime(df[col], format=fmt)
 
-            # Make the column representing time as index
+            # Exception
+            else:
+                raise RuntimeError(
+                    f"There is no column either of '일자' or '체결시간' in downloaded data."
+                )
+
+            # Finally make datetime column as index
             df.set_index(col, inplace=True)
 
+            """
+                Close downloading process
+            """
             # To get rid of data preceding 'start'
             if 'start' in kwargs:
                 df = df.loc[kwargs['start']:]
@@ -177,9 +193,9 @@ class Server:
             self.share.remove_history(code)
 
             # Mark successfully downloaded
-            self.share.update_single(name(), 'success', True)
-            self.api.disconnect_real_data(scr_no)
+            self.share.update_single(name(), 'complete', True)
 
+            self.api.disconnect_real_data(scr_no)
             self.api.unloop()
 
     def history_to_csv(self, df, file, path=None, merge=False, warning=True):
@@ -190,7 +206,7 @@ class Server:
         When merge is True, data will be merged with existing file.
         Data will be overwritten by default, otherwise.
 
-        :param df: pd.Dataframe
+        :param df: pandas.Dataframe
         :param file: str
         :param path: str
         :param merge : bool
@@ -209,6 +225,7 @@ class Server:
         if merge:
             # No file to merge with
             if not exists(file):
+                # An empty file will be created later
                 pass
 
             # Nothing to be done
@@ -224,7 +241,7 @@ class Server:
                     file,
                     index_col=[col],
                     parse_dates=[col],
-                    encoding=encoding
+                    encoding=config.encoding
                 )
                 db.dropna(axis='index', inplace=True)
 
@@ -275,16 +292,16 @@ class Server:
 
         if not df.index.is_monotonic_increasing:
             raise RuntimeError(
-                f'Error at Slot.history_to_csv(file={file}, ...)/\n'
+                f'Error at Server.history_to_csv(file={file}, ...)/\n'
                 + 'File to write is not monotonic increasing with respect to time.'
             )
 
         # To prevent overwriting
         if not merge and exists(file):
             raise FileExistsError(
-                f'Error at Slot.history_to_csv(file={file}, ...)/\n'
+                f'Error at Server.history_to_csv(file={file}, ...)/\n'
                 + "File already exists. Set merge=True or move the file to prevent from losing data."
             )
 
         # Finally write to csv file
-        df.to_csv(file, encoding=encoding)
+        df.to_csv(file, encoding=config.encoding)
