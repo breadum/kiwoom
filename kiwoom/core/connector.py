@@ -365,7 +365,7 @@ class Connector:
                 slot = api.slot(event, key)
 
             except KeyError:
-                if not config.mute:
+                if not config.MUTE:
                     msg = dedent(
                         f"""
                         kiwoom.{event}({', '.join(map(str, args))}) has been called.
@@ -375,7 +375,7 @@ class Connector:
                           >> api.connect('{event}', slot=slot_method)
     
                         This warning message can disappear by the following. 
-                          >> kiwoom.config.mute = True  # global variable
+                          >> kiwoom.config.MUTE = True  # global variable
                         """
                     )
                     print(msg)
@@ -399,7 +399,7 @@ class Connector:
         :param bool: bool
             If True, no warning message else warning.
         """
-        config.mute = bool
+        config.MUTE = bool
 
     @staticmethod
     def connectable(fn):

@@ -80,7 +80,7 @@ class Bot(Bot):
         self.acc = None
 
         # 1) 상속받고 있는 Bot 클래스 초기화
-        super().__init__(server=server)
+        super().__init__(server)
 
         # 2) OnEventConnect 발생 시 Server.login 함수가 호출되도록 연동
         self.api.connect('on_event_connect', signal=self.login, slot=self.server.login)

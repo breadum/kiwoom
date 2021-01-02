@@ -20,7 +20,7 @@ import sys
 class Bot(Bot):
     def __init__(self, server=None):
         # 상속받는 Bot 클래스 초기화
-        super().__init__(server=server)
+        super().__init__(server)
 
         """
         # Bot(Signal), Server(Slot) and Event 연결과정

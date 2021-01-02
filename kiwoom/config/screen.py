@@ -2,8 +2,8 @@ from collections import defaultdict
 from random import randint
 
 
-max_screen_count = 200
-max_stock_per_screen = 90
+MAX_SCREEN_COUNT = 200
+MAX_STOCK_PER_SCREEN = 90
 
 
 class Screen:
@@ -31,8 +31,8 @@ class Screen:
             self._used.add(self.config[tr_code])
             return self.config[tr_code]
 
-        if len(self._used) >= max_screen_count:
-            raise RuntimeError(f'The number of screen exceeds maximum limit {max_screen_count}.')
+        if len(self._used) >= MAX_SCREEN_COUNT:
+            raise RuntimeError(f'The number of screen exceeds maximum limit {MAX_SCREEN_COUNT}.')
 
         # Assign new random screen number to tr code
         scr_no = str(randint(0, 9999)).zfill(4)
@@ -58,7 +58,7 @@ class Screen:
 
         scr_no = self(tr_code)
         # To check the number of allocated stock/sector exceeds maximum elements per screen
-        if self._count[scr_no] >= max_stock_per_screen:
+        if self._count[scr_no] >= MAX_STOCK_PER_SCREEN:
             # Try out for the next screen number first
             scr_no = str(int(scr_no.lstrip('0')) + 1).zfill(4)
             # In case next number is already in use

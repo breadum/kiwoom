@@ -1,6 +1,6 @@
 from kiwoom import *
 from kiwoom.utils import clock
-from kiwoom.config.history import ExitCode
+from kiwoom.config.types import ExitType
 
 from PyQt5.QtWidgets import QApplication
 from multiprocessing import Process, Manager
@@ -15,7 +15,7 @@ import time
 1) 시장선택 
 >> bot.histories(market='0', ...)
 
-config.markets = {
+config.MARKETS = {
     '0': 'KOSPI',
     '3': 'ELW',
     '4': '뮤추얼펀드',
@@ -32,7 +32,7 @@ config.markets = {
 2) 지수선택
 >> bot.histories(sector='0', ...)
 
-config.market_gubuns = {
+config.MARKET_GUBUNS = {
     '0': 'KOSPI',
     '1': 'KOSDAQ',
     '2': 'KOSPI200',
@@ -42,7 +42,7 @@ config.market_gubuns = {
 
 # 각각의 시장구분안에 아래 지수들이 적절히 포함되어 있다. 
 # 키움에서 왜 이런식으로 만들었는지는 의문이다.
-# config.sectors = {
+# config.SECTORS = {
 #    '001': '종합(KOSPI)',
 #    '002': '대형주',
 #    '003': '중형주',
@@ -63,16 +63,16 @@ class Bot(Bot):
         3) 다운로드 결과 확인
         """
         # 경고 메세지 제거
-        config.mute = True
+        config.MUTE = True
 
         # 로그인 요청
         self.login()
 
         # 시장 데이터 요청
         kwargs = {
-            # 1) 시장선택 - print(config.markets), {'0': 'KOSPI', '10': 'KOSDAQ', ...}
+            # 1) 시장선택 - print(config.MARKETS), {'0': 'KOSPI', '10': 'KOSDAQ', ...}
             'market': '0',
-            # 2) 기간선택 - print(config.periods), ['tick', 'min', 'day', 'week', 'month', 'year']
+            # 2) 기간선택 - print(config.PERIODS), ['tick', 'min', 'day', 'week', 'month', 'year']
             'period': 'tick',
             # 3) 저장위치 - 다운받은 데이터 csv 파일로 저장할 위치
             'path': 'C:/Data/market/KOSPI/tick',
@@ -86,8 +86,8 @@ class Bot(Bot):
         result = self.histories(**kwargs)
 
         # 결과 확인
-        # 1) 0 = ExitCode.success : 완전히 다 받은 경우
-        # 2) 1 = ExitCode.failure : 다운 요청 중 오류가 난 경우
+        # 1) 0 = ExitCode.SUCCESS : 완전히 다 받은 경우
+        # 2) 1 = ExitCode.FAILURE : 다운 요청 중 오류가 난 경우
         # 3) slice = (from, to)   : 다운 완료 된 항목 제외 후 다시 시작할 위치
         print(f'다운로드 결과 = {result}')
 
@@ -118,7 +118,7 @@ Multi-processing을 활용하여 24시간 다운로드 받을 수 있는 버전 
 # 24시간 끊기지 않는 버전
 def run_24(kwargs, share):
     # To suppress warning messages
-    config.mute = True
+    config.MUTE = True
 
     # 초기화 및 로그인
     app = QApplication(sys.argv)
@@ -180,13 +180,13 @@ if __name__ == '__main__':
         p.join()
 
         # 1) Download done
-        if share['result'] == ExitCode.success:
-            print(f"[{clock()}] Download done for {config.markets[kwargs['market']]}!")
+        if share['result'] == ExitType.SUCCESS:
+            print(f"[{clock()}] Download done for {config.MARKETS[kwargs['market']]}!")
             time.sleep(1)
             break
 
         # 2) Download failed by local errors
-        elif share['result'] == ExitCode.failure:
+        elif share['result'] == ExitType.FAILURE:
             # If maximum try, stop
             if ntry == maxtry:
                 print(f'[{clock()}] Max tryout reached, stop downloading.')
@@ -210,7 +210,7 @@ if __name__ == '__main__':
         # 4) When script re-start is needed
         else:
             # In case, we have to slow down for the next run
-            if share['result'] == ExitCode.impossible:
+            if share['result'] == ExitCode.IMPOSSIBLE:
                 share['impossible'] = True
 
             # Otherwise, speeding again

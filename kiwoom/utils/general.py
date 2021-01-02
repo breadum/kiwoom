@@ -6,7 +6,7 @@ from pandas import Timestamp
 
 
 # Global Variables
-array_type = (list, tuple, ndarray, Series)
+ARRAY_TYPE = (list, tuple, ndarray, Series)
 
 
 def name():
@@ -39,7 +39,7 @@ def date(raw):
 def list_wrapper(item):
     if item is None:
         return None
-    if isinstance(item, array_type):
+    if isinstance(item, ARRAY_TYPE):
         return item
     return [item]
 
@@ -56,7 +56,7 @@ def effective_args(local, remove=None):
 
     # Delete unwanted args in local
     if remove is not None:
-        if isinstance(remove, array_type):
+        if isinstance(remove, ARRAY_TYPE):
             for param in remove:
                 del dic[param]
         else:

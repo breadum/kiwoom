@@ -2,7 +2,8 @@ from collections import defaultdict
 from pandas import to_datetime
 
 from kiwoom.config import types
-from kiwoom.config.const import markets, market_gubuns, sectors
+from kiwoom.config.const import MARKETS, MARKET_GUBUNS, SECTORS
+from kiwoom.config.types import STOCK, SECTOR
 from kiwoom.data.preps import number, string, remove_sign
 from kiwoom.utils import list_wrapper
 
@@ -16,52 +17,38 @@ Global Variables (Int, Dictionary type)
     3) del config.global_variable[key] 
 """
 # Download configuration
-speeding = False
-disciplined = False
-request_limit_time = 3600
-request_limit_try = float('inf')
-request_limit_item = float('inf')
+SPEEDING = False
+DISCIPLINED = False
+REQUEST_LIMIT_TIME = 3600
+REQUEST_LIMIT_TRY = float('inf')
+REQUEST_LMIT_ITEM = float('inf')
 
 
 # Download progress bar divisor
-download_progress_display = 10
-
-
-# Code types
-stock = types.CodeType.stock
-sector = types.CodeType.sector
+DOWNLOAD_PROGRESS_DISPLAY = 10
 
 
 # Code lengths for each type
-sector_code_len = 3
-stock_code_lens = [6, 9]  # 일반주식 = 6, 신주인수권 = 9
+SECTOR_CODE_LEN = 3
+STOCK_CODE_LENS = [6, 9]  # 일반주식 = 6, 신주인수권 = 9
 
 
 # Periods
-periods = ['tick', 'min', 'day', 'week', 'month', 'year']
+PERIODS = ['tick', 'min', 'day', 'week', 'month', 'year']
 
 
 # 체결시간 예외 케이스 변환기 (in Regular Expression)
-exceptional_datetime_replacer = {
+EXCEPTIONAL_DATETIME_REPLACER = {
     '888888$': '160000',  # 장마감 시간에 이루어진 거래 (16:00:00)
     '999999$': '180000'  # 시간외 종료에 이루어진 거래 (18:00:00)
 }
 
 
 # 장 종료시간이 변경된 예외
-exceptional_dates = {
+EXCEPTIONAL_DATES = {
     # 'YYYYMMDD': delay(hour)
     '20201203': 1  # 수능일 1시간 지연
 }
-
-
-# Exit code when process terminates
-class ExitCode:
-    # Return codes
-    success = 0
-    failure = -1
-    # Hidden config
-    impossible = 712
 
 
 """
@@ -78,7 +65,7 @@ def is_date(date):
         print(f"'date' must be in form 'YYYYMMDD', not {date}.")
         return False
     try:
-        datetime = to_datetime(date, format=_period_to_datetime_format['day'])
+        datetime = to_datetime(date, format=_PERIOD_TO_DATETIME_FORMAT['day'])
     except Exception:  # TypeError, ValueError
         print(f"'date' must be in form 'YYYYMMDD' with appropriate value, not {date}.")
         return False
@@ -87,23 +74,23 @@ def is_date(date):
 
 def is_market(code):
     code = str(code)
-    if code not in markets:
-        print(f'Market code must be one of {markets}')
+    if code not in MARKETS:
+        print(f'Market code must be one of {MARKETS}')
         return False
     return True
 
 
 def is_market_gubun(code):
     code = str(code)
-    if code not in market_gubuns:
-        raise ValueError(f'Market Gubun code must be one of {market_gubuns}')
+    if code not in MARKET_GUBUNS:
+        raise ValueError(f'Market Gubun code must be one of {MARKET_GUBUNS}')
     return True
 
 
 def is_sector(code):
     code = str(code)
-    if code not in sectors:
-        raise ValueError(f'Sector code must be one of {sector}')
+    if code not in SECTORS:
+        raise ValueError(f'Sector code must be one of {SECTOR}')
     return True
 
 
@@ -111,10 +98,10 @@ def get_code_type(code):
     """
     Returns whether code belongs to stock or sector.
     """
-    if len(code) == sector_code_len:
-        return sector
-    elif len(code) in stock_code_lens:
-        return stock
+    if len(code) == SECTOR_CODE_LEN:
+        return SECTOR
+    elif len(code) in STOCK_CODE_LENS:
+        return STOCK
     else:
         raise ValueError(f'Given code {code} is not a stock code nor a sector code.')
 
@@ -132,9 +119,9 @@ def get_tr_code(periods, ctypes=None):
 
     for period in periods:
         if ctypes is None:
-            tr_codes.extend([_period_to_tr_code[period][ctype] for ctype in types.CodeType])
+            tr_codes.extend([_PERIOD_TO_TR_CODE[period][ctype] for ctype in types.CodeType])
             continue
-        tr_codes.extend([_period_to_tr_code[period][ctype] for ctype in ctypes])
+        tr_codes.extend([_PERIOD_TO_TR_CODE[period][ctype] for ctype in ctypes])
 
     if len(tr_codes) == 1:
         return tr_codes[0]
@@ -146,41 +133,41 @@ def get_period(tr_code):
     Returns period for given TR code.
     Period can be one of  'tick', 'min', 'day', 'week', 'month' or 'year'.
     """
-    return _tr_code_to_period[tr_code]
+    return _TR_CODE_TO_PERIOD[tr_code]
 
 
 def get_record_name_for_its_name(tr_code):
-    return _code_type_to_record_name[_tr_code_to_code_type[tr_code]]
+    return _CODE_TYPE_TO_RECORD_NAME[_TR_CODE_TO_CODE_TYPE[tr_code]]
 
 
 def get_datetime_column(period):
-    return _period_to_datetime_column[period]
+    return _PERIOD_TO_DATETIME_COLUMN[period]
 
 
 def get_datetime_format(period):
-    return _period_to_datetime_format[period]
+    return _PERIOD_TO_DATETIME_FORMAT[period]
 
 
 def boost():
-    global speeding, disciplined
-    speeding = True
-    disciplined = False
+    global SPEEDING, DISCIPLINED
+    SPEEDING = True
+    DISCIPLINED = False
 
-    global request_limit_time, request_limit_try, request_limit_item
-    request_limit_time = 500
-    request_limit_try = 1000
-    request_limit_item = 95
+    global REQUEST_LIMIT_TIME, REQUEST_LIMIT_TRY, REQUEST_LMIT_ITEM
+    REQUEST_LIMIT_TIME = 500
+    REQUEST_LIMIT_TRY = 1000
+    REQUEST_LMIT_ITEM = 95
 
 
 def regret():
-    global speeding, disciplined
-    speeding = False
-    disciplined = True
+    global SPEEDING, DISCIPLINED
+    SPEEDING = False
+    DISCIPLINED = True
 
-    global request_limit_time, request_limit_try, request_limit_item
-    request_limit_time = 3600
-    request_limit_try = float('inf')
-    request_limit_item = float('inf')
+    global REQUEST_LIMIT_TIME, REQUEST_LIMIT_TRY, REQUEST_LMIT_ITEM
+    REQUEST_LIMIT_TIME = 3600
+    REQUEST_LIMIT_TRY = float('inf')
+    REQUEST_LMIT_ITEM = float('inf')
 
 
 def preper(tr_code, otype):
@@ -194,7 +181,7 @@ def preper(tr_code, otype):
     :return: tuple
         each element in tuple has key and pre-processor for its key, i.e. ((key1, function1), ...)
     """
-    return ((key, _prep_for_outputs[key]) for key in _outputs_for_tr_code[tr_code][otype])
+    return ((key, _PREP_FOR_OUTPUTS[key]) for key in _OUTPUTS_FOR_TR_CODE[tr_code][otype])
 
 
 def inputs(tr_code, code, unit=None, end=None):
@@ -209,7 +196,7 @@ def inputs(tr_code, code, unit=None, end=None):
     :return: iterator
     """
     # Copy needed inputs to modify
-    inputs = dict(_inputs_for_tr_code[tr_code])
+    inputs = dict(_INPUTS_FOR_TR_CODE[tr_code])
 
     # To set code with appropriate record name for each TR code
     record_name = get_record_name_for_its_name(tr_code)  # '종목코드' or '업종코드'
@@ -235,10 +222,10 @@ def outputs(tr_code, otype):
     :param tr_code: str
         one of TR codes listed in KOA Studio or API Manual Guide
     :param otype: OutputType
-        type can be either single or multi
+        type can be either SINGLE or MULTI
     :return: list
     """
-    return _outputs_for_tr_code[tr_code][otype]
+    return _OUTPUTS_FOR_TR_CODE[tr_code][otype]
 
 
 """
@@ -246,51 +233,51 @@ Protected Variables
   - Instead of directly accessing to these variables, use get methods in this module 
 """
 # Map period, code type to matching TR code
-_period_to_tr_code = {
+_PERIOD_TO_TR_CODE = {
     'tick': {
-        stock: 'opt10079',
-        sector: 'opt20004'
+        STOCK: 'opt10079',
+        SECTOR: 'opt20004'
     },
     'min': {
-        stock: 'opt10080',
-        sector: 'opt20005'
+        STOCK: 'opt10080',
+        SECTOR: 'opt20005'
     },
     'day': {
-        stock: 'opt10081',
-        sector: 'opt20006'
+        STOCK: 'opt10081',
+        SECTOR: 'opt20006'
     },
     'week': {
-        stock: 'opt10082',
-        sector: 'opt20007'
+        STOCK: 'opt10082',
+        SECTOR: 'opt20007'
     },
     'month': {
-        stock: 'opt10083',
-        sector: 'opt20008'
+        STOCK: 'opt10083',
+        SECTOR: 'opt20008'
     },
     'year': {
-        stock: 'opt10094',
-        sector: 'opt20019'
+        STOCK: 'opt10094',
+        SECTOR: 'opt20019'
     }
 }
 
 # Map TR code to matching period
-_tr_code_to_period = {
-    tr_code: period for period, tr_dic in _period_to_tr_code.items() for ctype, tr_code in tr_dic.items()
+_TR_CODE_TO_PERIOD = {
+    tr_code: period for period, tr_dic in _PERIOD_TO_TR_CODE.items() for ctype, tr_code in tr_dic.items()
 }
 
 # Map TR code to code type
-_tr_code_to_code_type = {
-    tr_code: ctype for tr_dic in _period_to_tr_code.values() for ctype, tr_code in tr_dic.items()
+_TR_CODE_TO_CODE_TYPE = {
+    tr_code: ctype for tr_dic in _PERIOD_TO_TR_CODE.values() for ctype, tr_code in tr_dic.items()
 }
 
 # Map code type to record name to fetch code from downloaded data
-_code_type_to_record_name = {
-    stock: '종목코드',
-    sector: '업종코드'
+_CODE_TYPE_TO_RECORD_NAME = {
+    STOCK: '종목코드',
+    SECTOR: '업종코드'
 }
 
 # Datetime column name for each period
-_period_to_datetime_column = {
+_PERIOD_TO_DATETIME_COLUMN = {
     'tick': '체결시간',
     'min': '체결시간',
     'day': '일자',
@@ -300,7 +287,7 @@ _period_to_datetime_column = {
 }
 
 # Pandas parsing format of datetime column for each period
-_period_to_datetime_format = {
+_PERIOD_TO_DATETIME_FORMAT = {
     # YYYYMMDDHHMMSS = %Y%m%d%H%M%S
     'tick': '%Y%m%d%H%M%S',
     'min': '%Y%m%d%H%M%S',
@@ -315,7 +302,7 @@ _period_to_datetime_format = {
 Configuration for pre-process
 """
 # How to pre-process for each output
-_prep_for_outputs = {
+_PREP_FOR_OUTPUTS = {
     number: [
         '평가손익', '총평가손익금액', '수익률(%)', '총수익률(%)',
         '주문가격', '주문번호', '주문수량',
@@ -337,9 +324,9 @@ _prep_for_outputs = {
 }
 
 # Revert dictionary to be in the form of {'key': function}
-_prep_for_outputs = defaultdict(
+_PREP_FOR_OUTPUTS = defaultdict(
     lambda: string,
-    {val: key for key, vals in _prep_for_outputs.items() for val in vals}
+    {val: key for key, vals in _PREP_FOR_OUTPUTS.items() for val in vals}
 )
 
 
@@ -347,7 +334,7 @@ _prep_for_outputs = defaultdict(
 Configuration for inputs and outputs
 """
 # Inputs needed for each TR code request
-_inputs_for_tr_code = {
+_INPUTS_FOR_TR_CODE = {
     'opt10079': {  # 주식틱차트조회요청
         '종목코드': None,
         '틱범위': None,
@@ -423,7 +410,7 @@ _inputs_for_tr_code = {
 }
 
 # Outputs for each TR code in the form of {'TR code': [[single data], [multi data]]}
-_outputs_for_tr_code = {
+_OUTPUTS_FOR_TR_CODE = {
     'opt10079': [  # 주식틱차트조회요청
         ['종목코드', '마지막틱갯수'],
         [

@@ -1,14 +1,14 @@
 """
 Global Variables
 """
-# Connector
-mute = False
+# 경고설정
+MUTE = False
 
 # 인코딩
-encoding = 'euc-kr'
+ENCODING = 'euc-kr'
 
-# Event Slots
-events = [
+# 이벤트
+EVENTS = [
     'on_event_connect',
     'on_receive_msg',
     'on_receive_tr_data',
@@ -20,10 +20,10 @@ events = [
 ]
 
 # 기간
-periods = ['tick', 'min', 'day', 'week', 'month', 'year']
+PERIODS = ['tick', 'min', 'day', 'week', 'month', 'year']
 
 # 시장
-markets = {
+MARKETS = {
     '0': 'KOSPI',
     '3': 'ELW',
     '4': '뮤추얼펀드',
@@ -39,7 +39,7 @@ markets = {
 
 
 # 시장구분
-market_gubuns = {
+MARKET_GUBUNS = {
     '0': 'KOSPI',
     '1': 'KOSDAQ',
     '2': 'KOSPI200',
@@ -49,7 +49,7 @@ market_gubuns = {
 
 
 # 업종
-sectors = {
+SECTORS = {
     '001': '종합(KOSPI)',
     '002': '대형주',
     '003': '중형주',

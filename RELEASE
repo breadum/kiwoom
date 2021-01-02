@@ -15,3 +15,4 @@ Release History of Distribution
 
 1.1   Library packaging and change development status from pre-alpha to alpha
 1.1.1 Minor bug fix in Bot.histories()
+1.1.2 Capitalize various constants that are globally used, move ExitCode to config.types and rename it as ExitType

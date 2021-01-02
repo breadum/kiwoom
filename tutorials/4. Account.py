@@ -17,7 +17,7 @@ class Bot(Bot):
         """
         튜토리얼 2.Login.py 참고
         """
-        super().__init__(server=server)
+        super().__init__(server)
         self.api.connect(
             event='on_event_connect',
             signal=self.login,

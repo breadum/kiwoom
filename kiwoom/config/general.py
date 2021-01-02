@@ -1,4 +1,4 @@
-from kiwoom.config.const import events
+from kiwoom.config.const import EVENTS
 
 
 def valid_event(event):
@@ -9,7 +9,7 @@ def valid_event(event):
         One of the pre-defined event names in string.
     :return: bool
     """
-    if event not in events:
-        print(f"{event} is not a valid event.\nSelect one of {events}.")
+    if event not in EVENTS:
+        print(f"{event} is not a valid event.\nSelect one of {EVENTS}.")
         return False
     return True

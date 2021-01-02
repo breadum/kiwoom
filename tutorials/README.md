@@ -57,11 +57,11 @@ Simple Python Wrapper for Kiwoom Open API+
 
 > 여러가지 설정들이 저장된 패키지로 Print 함수를 통해 확인 가능 
    
-   - events
+   - EVENTS
    
          API에 정의된 이벤트 핸들러 8가지로 자세한 사항은 KOA Studio 참고
    
-   - markets, market_gubuns, sectors
+   - MARKETS, MARKET_GUBUNS, SECTORS
     
          API에 입력값으로 사용되는 시장, 시장구분, 섹터 모음
    

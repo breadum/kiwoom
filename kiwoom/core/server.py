@@ -1,7 +1,7 @@
 from kiwoom import config
 from kiwoom.config import history
 from kiwoom.config.error import msg
-from kiwoom.config.types import multi
+from kiwoom.config.types import MULTI
 from kiwoom.data.preps import string
 from kiwoom.utils.general import name, date
 from kiwoom.utils.manager import Downloader
@@ -72,10 +72,10 @@ class Server:
             raise RuntimeError(f"Requested {kwargs['code']}, but the server still sends {code}.")
 
         # Fetch multi data
-        data = {key: list() for key in history.outputs(tr_code, multi)}
+        data = {key: list() for key in history.outputs(tr_code, MULTI)}
         cnt = self.api.get_repeat_cnt(tr_code, rq_name)
         for i in range(cnt):
-            for key, fn in history.preper(tr_code, multi):
+            for key, fn in history.preper(tr_code, MULTI):
                 data[key].append(fn(self.api.get_comm_data(tr_code, rq_name, i, key)))
 
         # Update downloaded data
@@ -129,27 +129,27 @@ class Server:
                     indices = dict()
                     exceptions = list()
                     start, end = date(df[col].iat[0][:len('YYYYMMDD')]), date(df[col].iat[-1][:len('YYYYMMDD')])
-                    for ymd, delay in history.exceptional_dates.items():
+                    for ymd, delay in history.EXCEPTIONAL_DATES.items():
                         if start <= date(ymd) <= end:
                             day = df[col].loc[df[col].str.match(ymd)]
                             indices[ymd] = day.index
 
                             # To save original data
-                            for regex, datetime in history.exceptional_datetime_replacer.items():
+                            for regex, datetime in history.EXCEPTIONAL_DATETIME_REPLACER.items():
                                 series = day.loc[day.str.contains(regex, regex=True)]
                                 series = series.replace(regex={regex: datetime})
                                 series = pd.to_datetime(series, format='%Y%m%d%H%M%S')
                                 exceptions.append(series)
 
                     # Replace inconvertibles (888888, 999999) to (16:00:00, 18:00:00)
-                    df[col].replace(regex=history.exceptional_datetime_replacer, inplace=True)
+                    df[col].replace(regex=history.EXCEPTIONAL_DATETIME_REPLACER, inplace=True)
 
                     # To make column as pandas datetime series
                     df[col] = pd.to_datetime(df[col], format=fmt)
 
                     # Subtract delayed market time as if it pretends to start normally
                     for ymd, idx in indices.items():
-                        delay = history.exceptional_dates[ymd]
+                        delay = history.EXCEPTIONAL_DATES[ymd]
                         df.loc[idx, col] -= pd.DateOffset(hours=delay)
 
                     # Replace subtracted exceptional times back to original
@@ -241,7 +241,7 @@ class Server:
                     file,
                     index_col=[col],
                     parse_dates=[col],
-                    encoding=config.encoding
+                    encoding=config.ENCODING
                 )
                 db.dropna(axis='index', inplace=True)
 
@@ -304,4 +304,4 @@ class Server:
             )
 
         # Finally write to csv file
-        df.to_csv(file, encoding=config.encoding)
+        df.to_csv(file, encoding=config.ENCODING)

@@ -1,6 +1,6 @@
 from kiwoom import config
 from kiwoom.config import history
-from kiwoom.config.history import ExitCode
+from kiwoom.config.types import ExitType
 from kiwoom.config.screen import Screen
 from kiwoom.core.kiwoom import Kiwoom
 from kiwoom.core.server import Server
@@ -112,7 +112,7 @@ class Bot:
             this param is given by the response from the server. default is '0'
         """
         # Wait for default request limit, 3600 ms
-        QTest.qWait(history.request_limit_time)
+        QTest.qWait(history.REQUEST_LIMIT_TIME)
 
         ctype = history.get_code_type(code)  # ctype = 'stock' | 'sector'
         tr_code = history.get_tr_code(period, ctype)
@@ -151,12 +151,12 @@ class Bot:
                         file,
                         index_col=[col],
                         parse_dates=[col],
-                        encoding=config.encoding
+                        encoding=config.ENCODING
                     )
 
                     if period in ['tick', 'min']:
                         # Last tick for stock is 15:30 and for sector is 18:00
-                        h, m = (15, 30) if ctype is history.stock else (18, 00)  # else for sector
+                        h, m = (15, 30) if ctype is history.STOCK else (18, 00)  # else for sector
                         last_day = date(df.index[-1])
                         last_tick_of_day = Timestamp(df.index[-1]).replace(hour=h, minute=m)
                         download_completed = last_tick_of_day <= df.index[-1]
@@ -212,8 +212,8 @@ class Bot:
         """
         # Check requesting status
         self.share.single['histories']['nrq'] += 1
-        if history.speeding:
-            if self.share.get_single('histories', 'nrq') >= history.request_limit_try:
+        if history.SPEEDING:
+            if self.share.get_single('histories', 'nrq') >= history.REQUEST_LIMIT_TRY:
                 # Set back to default configuration
                 if self.share.get_single('histories', 'cnt') == 0:
                     self.share.update_single('history', 'impossible', True)
@@ -298,9 +298,9 @@ class Bot:
         if not any([market, sector]) or all([market, sector]):
             raise RuntimeError("Download target must be either of 'market' or 'sector'.")
         elif market is not None:
-            lst, ctype, mname = self.stock_list(market), history.stock, history.markets[market]
+            lst, ctype, mname = self.stock_list(market), str(history.STOCK).lower(), history.MARKETS[market]
         elif sector is not None:
-            lst, ctype, mname = self.sector_list(sector), history.sector, history.market_gubuns[sector]
+            lst, ctype, mname = self.sector_list(sector), str(history.SECTOR).lower(), history.MARKET_GUBUNS[sector]
 
         # Set the portion in download list
         from_, to_ = None, None
@@ -323,7 +323,7 @@ class Bot:
         lst = lst[from_: to_]
 
         # To print progress bar
-        divisor = history.download_progress_display
+        divisor = history.DOWNLOAD_PROGRESS_DISPLAY
         if len(lst) < 4 * divisor:
             # At least print 25% of progress if possible
             divisor = max(1, len(lst) // 4)
@@ -335,7 +335,7 @@ class Bot:
         status = ''
         begin = time()
         print(f'Download Start for {len(lst)} {ctype}s in {mname}.')
-        print(f' - Encoding : {config.encoding}\n - DataPath : {path}')
+        print(f' - Encoding : {config.ENCODING}\n - DataPath : {path}')
 
         for i, code in enumerate(lst):
             if i % divisor == 0:
@@ -350,19 +350,19 @@ class Bot:
             except Exception:
                 args = unpack_args(self.share.get_args('history'))
                 print(f"\nAn error at Bot.history({args}).\n\n{format_exc()}")
-                return ExitCode.failure
+                return ExitType.FAILURE
 
             # 2) Error with continuing Bot history() (at least second call, by prev_next='2')
             if self.share.get_single('history', 'error'):
                 # Note that error message will be printed by Server.history()
-                return ExitCode.failure
+                return ExitType.FAILURE
 
             # 3) Error with reaching the request limit or error with server freezing
             elif self.share.get_single('history', 'restart'):
                 # If it's impossible to download with the trick
                 if self.share.get_single('history', 'impossible'):
                     print(f"\n[{clock()}] The {ctype} {code} can't be downloaded with speeding.")
-                    return ExitCode.impossible
+                    return ExitType.IMPOSSIBLE
                 break
 
             # 4) Error that Server.history() couldn't be finished.
@@ -375,7 +375,7 @@ class Bot:
                 if not self.share.get_single('history', 'complete'):
                     slice = (from_ + self.share.single[name()]['cnt'], to_)
                     print(f"\n[{clock()}] Run Bot.histories() with slice={slice} or code='{code}' for the next time.")
-                    return ExitCode.failure
+                    return ExitType.FAILURE
 
             """
                 Download completed for one item in the list
@@ -384,14 +384,14 @@ class Bot:
             self.share.single[name()]['cnt'] += 1
 
             # 5) Successfully downloaded with disciplined, but it's time for speeding again.
-            if history.disciplined:
+            if history.DISCIPLINED:
                 status = f"[{clock()}] The program needs to be restarted for speeding again."
                 break
 
             # 6) Successfully downloaded but exceeds request limit items
-            if history.speeding:
+            if history.SPEEDING:
                 # Restarts the program
-                if self.share.single[name()]['cnt'] >= history.request_limit_item:
+                if self.share.single[name()]['cnt'] >= history.REQUEST_LMIT_ITEM:
                     break
 
         """
@@ -408,17 +408,17 @@ class Bot:
 
         # If complete
         if cnt == len(lst):
-            return ExitCode.success
+            return ExitType.SUCCESS
         # Else return remaining items
         return from_ + cnt, to_
 
-    def exit(self, rcode=0):
+    def exit(self, ecode=0):
         """
         Close all windows open and exit the application that runs this bot
 
-        :param rcode: int
+        :param ecode: int
             return code when exiting the program
         """
         app = QApplication.instance()
         app.closeAllWindows()
-        app.exit(rcode)
+        app.exit(ecode)

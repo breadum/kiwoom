@@ -2,7 +2,7 @@ from functools import wraps
 
 
 # Dictionary for error information
-err = {
+ERR = {
     0: ('OP_ERR_NONE', '정상처리'),
     -10: ('OP_ERR_FAIL', '실패'),
     -100: ('OP_ERR_LOGIN', '사용자정보교환실패'),
@@ -47,7 +47,7 @@ def msg(ecode):
     :return: str
         One line error message combined with code, type, and explanation.
     """
-    etype, msg = err[ecode]
+    etype, msg = ERR[ecode]
     if ecode == 0:
         return f'{msg}'
     return f'Error {{Code: {ecode}, Type: {etype}, Msg: {msg}}}'

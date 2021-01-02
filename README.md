@@ -71,8 +71,8 @@ Simple Python Wrapper for Kiwoom Open API+
 > import kiwoom
 >
 > # 단, 주기적 업데이트 필요!
-> print(kiwoom.config.markets)  # {'0': 'KOSPI', '3': 'ELW', ... }
-> print(kiwoom.config.sectors)  # {'001': '종합(KOSPI)', '002': '대형주', ... }
+> print(kiwoom.config.MARKETS)  # {'0': 'KOSPI', '3': 'ELW', ... }
+> print(kiwoom.config.SECTORS)  # {'001': '종합(KOSPI)', '002': '대형주', ... }
 > ```
 
 - 순수한 API 기능만을 사용하고 싶은 경우 지원
