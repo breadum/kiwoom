@@ -85,9 +85,11 @@ Simple Python Wrapper for Kiwoom Open API+
 > ```python
 > from kiwoom import API
 >
-> # Overriding
+> # API 파이썬 래핑 
 > class Kiwoom(API):
->     pass
+>     # Overriding Here
+>     def __init__(self):
+>         super().__init__()
 > ```
 
 #### 3. 통신을 위한 체계적인 코드 작성 지원
