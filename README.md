@@ -33,7 +33,7 @@ Simple Python Wrapper for Kiwoom Open API+
 
 #### 2. 간단한 기능 지원
 
-- 로그인
+- 로그인 기능
 
 > ```python
 > from kiwoom import *
@@ -65,44 +65,29 @@ Simple Python Wrapper for Kiwoom Open API+
 >         return super().send_order(rq_name, scr_no, acc_no, ord_type, code, qty, price, hoga_gb, org_order_no)
 >     ...
 
-- 시장과 섹터 지정 번호 확인
-
-> ```python
-> import kiwoom
->
-> # 단, 주기적 업데이트 필요!
-> print(kiwoom.config.MARKETS)  # {'0': 'KOSPI', '3': 'ELW', ... }
-> print(kiwoom.config.SECTORS)  # {'001': '종합(KOSPI)', '002': '대형주', ... }
-> ```
-
-- 순수한 API 기능만을 사용하고 싶은 경우 지원
-
-> ```python
-> from kiwoom import API
->
-> # Overriding
-> class Bot(API):
->     pass
-> ```
-
-- 주가와 지수의 Historical Market Data 24시간 다운로드
+- [주가 & 지수 Historical Market Data 24시간 다운로더][tut3]
 
 > ```python
 > from kiwoom import *
+>
+> # 지정번호 확인
+> print(config.MARKETS)  # {'0': 'KOSPI', '3': 'ELW', ... }
+> print(config.SECTORS)  # {'001': '종합(KOSPI)', '002': '대형주', ... }
 > 
+> # 다운로드
 > api = Kiwoom()
 > api.histories(market='0', period='tick', start='20201001', merge=True)  # KOSPI
 > api.histories(sector='7', period='tick', start='20201001', merge=True)  # KRX100
 > ```
 
-- API 이용 과정 로깅 기능 제공 (지원예정)
+- 순수한 API 기능만을 사용해 직접 개발하고 싶은 경우
 
 > ```python
-> from kiwoom import *
-> 
-> api = Kiwoom()
-> api.logging(True, path='log/20201015')
-> api.logging(False)
+> from kiwoom import API
+>
+> # Overriding
+> class Kiwoom(API):
+>     pass
 > ```
 
 #### 3. 통신을 위한 체계적인 코드 작성 지원
