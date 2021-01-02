@@ -400,7 +400,7 @@ class Bot:
         cnt = self.share.get_single(name(), 'cnt')
         msg = dedent(
             f"""
-            Download Done for {100 * cnt / len(lst): .1f}% ({cnt} of {len(lst)}) {ctype}s in {mname}.
+            Download Done for {100 * cnt / len(lst) if lst else 100: .1f}% ({cnt} of {len(lst)}) {ctype}s in {mname}.
             Download Time : {(time() - begin) / 60: .1f} minutes (with {self.share.single[name()]['nrq']} requests)\n
             """
         ) + status

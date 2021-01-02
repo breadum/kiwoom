@@ -14,3 +14,4 @@ Release History of Distribution
 1.0.1 Add closeAllWindows() on timer() for Kiwoom.login()
 
 1.1   Library packaging and change development status from pre-alpha to alpha
+1.1.1 Minor bug fix in Bot.histories()

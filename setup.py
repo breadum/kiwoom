@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 # Project Information
-VERSION = "1.1"
+VERSION = "1.1.1"
 DISTNAME = "kiwoom"
 DESCRIPTION = "Simple Python Wrapper for Kiwoom OPEN API+"
 LONG_DESCRIPTION = open("README.md", encoding="utf-8").read()
@@ -32,6 +32,15 @@ CLASSIFIERS = [
     "Programming Language :: Python :: 3.9",
     "Topic :: Office/Business :: Financial :: Investment"
 ]
+KEYWORDS =[
+    "Kiwoom",
+    "Heroes",
+    "Open API+",
+    "키움",
+    "영웅문",
+    "System Trading",
+    "Algorithmic Trading"
+]
 
 
 def setup_package():
@@ -40,7 +49,6 @@ def setup_package():
             'PyQt5 >= 5.12'
         ],
         "setup_requires": [],
-        "keywords": ["Kiwoom", "Open API+", "키움", "영웅문"],
         'zip_safe': False
     }
 
@@ -59,6 +67,7 @@ def setup_package():
         python_requires=">=3.6",
         license=LICENSE,
         classifiers=CLASSIFIERS,
+        keywords=KEYWORDS,
         **kwargs
     )
 
