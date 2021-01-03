@@ -2,10 +2,6 @@ from PyQt5.QAxContainer import QAxWidget
 from kiwoom.core.connector import Connector
 
 
-# Global variable for convenience
-map = Connector.map
-
-
 class API(QAxWidget):
     """
     Python Wrapper Class of Kiwoom Open API+

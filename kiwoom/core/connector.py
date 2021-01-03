@@ -84,7 +84,7 @@ class Connector:
         Kiwoom.signal() returns the exact signal method that can request more data.
 
         :param event: str
-            One of the pre-defined event names in string. See kiwoom.config.events.
+            One of the pre-defined event names in string. See kiwoom.config.EVENTS.
         :param key: str, optional
             If hook is set by Kiwoom.set_connect_hook() method and signal is connected
             by Kiwoom.connect(), then key is needed. 'key' is set to be name of the
@@ -115,7 +115,7 @@ class Connector:
         that wraps events to execute connected slot with the event.
 
         :param event: str
-            One of the pre-defined event names in string. See kiwoom.config.events.
+            One of the pre-defined event names in string. See kiwoom.config.EVENTS.
         :param key: str, optional
             If hook is set by Kiwoom.set_connect_hook() method and slot is connected
             by Kiwoom.connect(), then key is needed. 'key' is set to be name of the
@@ -162,7 +162,7 @@ class Connector:
         https://github.com/breadum/kiwoom/blob/main/tutorials/4.%20TR%20Data.py
 
         :param event: str
-            One of the pre-defined event names in string. See kiwoom.config.events.
+            One of the pre-defined event names in string. See kiwoom.config.EVENTS.
         :param signal: method, optional
             A method that requests to the server
         :param slot: method, optional
@@ -227,7 +227,7 @@ class Connector:
         Returns whether a hook is set for given event.
 
         :param event: str
-            One of the pre-defined event names in string. See kiwoom.config.events.
+            One of the pre-defined event names in string. See kiwoom.config.EVENTS.
         :return: bool
         """
         if event in self._hooks:
@@ -250,10 +250,10 @@ class Connector:
         Convention is that the name of signal and slot that deal with the related task
         is recommended to be the same, so that 'key' is set to be the method name of
         signal and slot by default. See examples on the tutorials link below.
-        https://github.com/breadum/kiwoom/blob/main/tutorials/4.%20TR%20Data.py
+        https://github.com/breadum/kiwoom/blob/main/tutorials/5.%20TR%20Data.py
 
         :param event: str
-            One of the pre-defined event names in string. See kiwoom.config.events.
+            One of the pre-defined event names in string. See kiwoom.config.EVENTS.
         :param param: str
             Parameter name defined in given event. To see all parameters to event,
             use Kiwoom.api_arg_spec(event) method or help(...) built-in function.
@@ -280,7 +280,7 @@ class Connector:
         Returns a hook (i.e. name of parameter) set in given event.
 
         :param event: str
-            One of the pre-defined event names in string. See kiwoom.config.events.
+            One of the pre-defined event names in string. See kiwoom.config.EVENTS.
         :return: str or None
             If exists, returns hook in string else None. If not a valid event is given,
             this returns None.
@@ -298,7 +298,7 @@ class Connector:
         a KeyError.
 
         :param event: str
-            One of the pre-defined event names in string. See kiwoom.config.events.
+            One of the pre-defined event names in string. See kiwoom.config.EVENTS.
         """
         del self._hooks[event]
         del self._signals[event]
@@ -321,27 +321,27 @@ class Connector:
         """
         Decorator method to call slot method when event connected to slot has been called.
 
-        When event has been called, this decorator method is called with event method as arg.
-        Then wrapper function wraps the event and then the function is returned to be called.
+        When event has been called, this decorator method is called with event method as arg,
+        'ehandler'. Then wrapper function wraps the event and will be executed.
 
         Inside the wrapper, it takes all args from the event. The First arg is 'self' which is
         an instance of Kiwoom class. The rest of args depends on which event has been called.
 
         Firstly, execute event handler which is initially an empty method in the module. But
-        this process is needed when an empty method is overridden. Then, find the right slot
-        connected to the event. If found, execute it with the same args forwarded from event.
-        If not, just print a warning message. This message can be turned on/off.
+        this process is needed for when an empty default method is overridden. Then, find the
+        right slot connected to the event. If found, execute it with the same args forwarded
+        from event. If not, just print a warning message. This message can be turned on/off.
 
         Usage example
         >>  class Kiwoom(API):
         >>      ...
-        >>      @Connector()  # decorator
+        >>      @map  # decorator
         >>      def on_event_connect(self, err_code):
         >>          pass  # empty event
         >>      ...
 
         :param ehandler: method
-            One of pre-defined event handlers, see kiwoom.config.events.
+            One of pre-defined event handlers, see kiwoom.config.EVENTS.
         :return: function
             Wrapper function that executes a slot method connected to the event.
         """
