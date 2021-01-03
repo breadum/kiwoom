@@ -210,7 +210,7 @@ if __name__ == '__main__':
         # 4) When script re-start is needed
         else:
             # In case, we have to slow down for the next run
-            if share['result'] == ExitCode.IMPOSSIBLE:
+            if share['result'] == ExitType.IMPOSSIBLE:
                 share['impossible'] = True
 
             # Otherwise, speeding again
