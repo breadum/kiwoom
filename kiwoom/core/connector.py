@@ -29,13 +29,13 @@ class Connector:
     in __call__ method, i.e. api, is 'self' argument for Kiwoom object.
 
     This class has three main methods.
-    1) Connector.__call__(event)
+    1) Connector.map(event)
       - act as a decorator for pre-defined Kiwoom events
       - below is the usage example
 
         class Kiwoom(API):
             ...
-            @Connector()
+            @map
             def on_event_connect(self, err_code):
                 pass
             ...
