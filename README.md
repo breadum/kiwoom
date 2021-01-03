@@ -77,7 +77,7 @@ Simple Python Wrapper for Kiwoom Open API+
 > # 다운로드
 > api = Kiwoom()
 > api.histories(market='0', period='tick', start='20201001', merge=True)  # KOSPI
-> api.histories(sector='7', period='tick', start='20201001', merge=True)  # KRX100
+> api.histories(sector='2', period='tick', start='20201001', merge=True)  # KOSPI200
 > ```
 
 - 순수한 API 기능만을 사용해 직접 개발하고 싶은 경우

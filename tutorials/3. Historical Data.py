@@ -13,7 +13,7 @@ import time
 시장 데이터 수집을 위한 스크립트
 
 1) 시장선택 
->> bot.histories(market='0', ...)
+>> bot.histories(market='0', ...)  # KOSPI
 
 config.MARKETS = {
     '0': 'KOSPI',
@@ -30,7 +30,7 @@ config.MARKETS = {
 }
 
 2) 지수선택
->> bot.histories(sector='0', ...)
+>> bot.histories(sector='2', ...)  # KOSPI200
 
 config.MARKET_GUBUNS = {
     '0': 'KOSPI',
@@ -41,14 +41,17 @@ config.MARKET_GUBUNS = {
 }
 
 # 각각의 시장구분 안에 아래 지수들이 적절히 포함되어 있다. 
-# 키움에서 왜 이런식으로 만들었는지는 의문이다.
+# 시장구분이 '2'라면, KOSPI200의 지수들은 2로 시작한다.
 # config.SECTORS = {
-#    '001': '종합(KOSPI)',
-#    '002': '대형주',
-#    '003': '중형주',
-#    '004': '소형주',
-#    '005': '음식료업',
-#    ...
+#     ...
+#    '201': 'KOSPI200',
+#    '207': 'F-KOSPI200',
+#    '208': 'F-KOSPI200인버스',
+#    '209': '레버리지KOSPI200',
+#    '210': 'F-KOSPI200레버리지',
+#    '211': '건설',
+#    '212': '중공업',
+#     ...
 # }
 """
 
