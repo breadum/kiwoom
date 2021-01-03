@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QApplication
-from kiwoom import *
+from kiwoom import Bot, Server, config
 
 import sys
 
@@ -16,8 +16,8 @@ import sys
 """
 
 
-# 서버에 데이터를 요청하는 클래스
-class Bot(Bot):
+# 서버에 데이터를 요청하는 클래스 (사용자 작성)
+class myBot(Bot):
     def __init__(self, server=None):
         # 상속받는 Bot 클래스 초기화
         super().__init__(server)
@@ -106,8 +106,8 @@ class Bot(Bot):
         print('Bot.run() 종료')
 
 
-# 서버에서 데이터를 받아 처리하는 클래스
-class Server(Server):
+# 서버에서 데이터를 받아 처리하는 클래스 (사용자 작성)
+class myServer(Server):
     def login(self, err_code):
         """
         Signal.login() 함수로 인해 OnEventConnect 이벤트 발생 시 로그인 메세지 처리함수
@@ -149,7 +149,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     # 인스턴스 생성
-    bot = Bot(Server())
+    bot = myBot(server=myServer())
 
     # 로그인
     bot.run()

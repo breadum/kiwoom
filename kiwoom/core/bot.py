@@ -390,9 +390,10 @@ class Bot:
 
             # 6) Successfully downloaded but exceeds request limit items
             if history.SPEEDING:
-                # Restarts the program
-                if self.share.single[name()]['cnt'] >= history.REQUEST_LMIT_ITEM:
-                    break
+                if self.share.single[name()]['cnt'] >= history.REQUEST_LIMIT_ITEM:
+                    # To check whether items are downloaded by the actual requests
+                    if self.share.single[name()]['nrq'] >= history.REQUEST_LIMIT_ITEM:
+                        break
 
         """
             Close downloading

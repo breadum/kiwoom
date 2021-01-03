@@ -1,5 +1,5 @@
+from kiwoom import Bot
 from PyQt5.QtWidgets import QApplication
-from kiwoom import *
 
 import sys
 
@@ -11,8 +11,8 @@ import sys
 """
 
 
-# 서버에 데이터를 요청하는 클래스
-class Bot(Bot):
+# 서버에 데이터를 요청하는 클래스 (사용자 작성)
+class myBot(Bot):
     def __init__(self, server=None):
         """
         튜토리얼 2.Login.py 참고
@@ -33,7 +33,8 @@ class Bot(Bot):
 
         * Note
         get_login_info 함수는 이벤트를 거치지 않고 즉시 요청값을 반환해주기 때문에,
-        별도로 이벤트를 통해 요청한 데이터를 받아볼 수 있는 slot 함수와 api.loop() 함수가 필요없다.
+        별도로 이벤트를 통해 요청한 데이터를 받아볼 수 있는 slot 함수와 api.loop()
+        함수가 필요없다. 즉, Server 클래스의 사용이 필요없다.
 
         * KOA Studio 참고 가이드
         개발가이드 > 로그인 버전처리 > 관련함수 > GetLoginInfo
@@ -98,7 +99,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     # 인스턴스 생성
-    bot = Bot()
+    bot = myBot()
 
     # 로그인
     bot.run()

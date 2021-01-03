@@ -21,7 +21,7 @@ SPEEDING = False
 DISCIPLINED = False
 REQUEST_LIMIT_TIME = 3600
 REQUEST_LIMIT_TRY = float('inf')
-REQUEST_LMIT_ITEM = float('inf')
+REQUEST_LIMIT_ITEM = float('inf')
 
 
 # Download progress bar divisor
@@ -153,10 +153,10 @@ def boost():
     SPEEDING = True
     DISCIPLINED = False
 
-    global REQUEST_LIMIT_TIME, REQUEST_LIMIT_TRY, REQUEST_LMIT_ITEM
+    global REQUEST_LIMIT_TIME, REQUEST_LIMIT_TRY, REQUEST_LIMIT_ITEM
     REQUEST_LIMIT_TIME = 500
     REQUEST_LIMIT_TRY = 1000
-    REQUEST_LMIT_ITEM = 99
+    REQUEST_LIMIT_ITEM = 99
 
 
 def regret():
@@ -164,10 +164,10 @@ def regret():
     SPEEDING = False
     DISCIPLINED = True
 
-    global REQUEST_LIMIT_TIME, REQUEST_LIMIT_TRY, REQUEST_LMIT_ITEM
+    global REQUEST_LIMIT_TIME, REQUEST_LIMIT_TRY, REQUEST_LIMIT_ITEM
     REQUEST_LIMIT_TIME = 3600
     REQUEST_LIMIT_TRY = float('inf')
-    REQUEST_LMIT_ITEM = float('inf')
+    REQUEST_LIMIT_ITEM = float('inf')
 
 
 def preper(tr_code, otype):

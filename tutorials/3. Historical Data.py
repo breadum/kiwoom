@@ -1,4 +1,4 @@
-from kiwoom import *
+from kiwoom import Bot, config
 from kiwoom.utils import clock
 from kiwoom.config.types import ExitType
 
@@ -56,7 +56,8 @@ config.MARKET_GUBUNS = {
 """
 
 
-class Bot(Bot):
+# 서버에 데이터를 요청하는 클래스 (사용자 작성)
+class myBot(Bot):
     def run(self, kwargs=None):
         """
         Bot 실행함수
@@ -104,7 +105,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     # 인스턴스 생성
-    bot = Bot()
+    bot = myBot()
 
     # 로그인 및 다운로드
     result = bot.run()
@@ -125,7 +126,7 @@ def run_24(kwargs, share):
 
     # 초기화 및 로그인
     app = QApplication(sys.argv)
-    bot = Bot()
+    bot = myBot()
     bot.login()
 
     """
