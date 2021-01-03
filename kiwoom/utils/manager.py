@@ -73,9 +73,9 @@ class Downloader:
                 # Update nrq
                 Downloader.nrq = nrq
 
-            # Set timer for every 3 minutes
+            # Set timer for every 10 minutes
             timer = QTimer(bot.api)
-            timer.start(1 * 60 * 1000)
+            timer.start(10 * 60 * 1000)
             timer.timeout.connect(watcher)
 
             # Execute Slot.on_event_connect()
