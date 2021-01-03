@@ -101,10 +101,10 @@ Simple Python Wrapper for Kiwoom Open API+
 - 자세한 내용 및 코드는 [튜토리얼][tutorial] 중 [5. TR 데이터][tut5] 항목을 통해 확인 가능
 
 > ```python
-> from kiwoom import *
+> from kiwoom import Bot
 >
 > # 서버에 데이터를 요청하는 클래스 (사용자 작성)
-> class Bot(Bot):
+> class myBot(Bot):
 >     def __init__(self, server):
 >         super().__init__(server)
 >
@@ -151,10 +151,10 @@ Simple Python Wrapper for Kiwoom Open API+
 >         print(self.share['balance']['예탁금'])
 > ```
 > ```python
-> from kiwoom import *
+> from kiwoom import Server
 > 
 > # 서버에서 데이터를 받아 처리하는 클래스 (사용자 작성)
-> class Server:
+> class myServer(Server):
 >
 >     # 주어진 api는 Kiwoom() 인스턴스
 >     def __init__(self, api):
@@ -199,7 +199,7 @@ Simple Python Wrapper for Kiwoom Open API+
 >     app = QApplication(sys.argv)
 >
 >     # 인스턴스 생성
->     bot = Bot()
+>     bot = myBot()
 >    
 >     # 봇 작동시작
 >     bot.run() 
