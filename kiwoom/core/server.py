@@ -112,59 +112,45 @@ class Server:
             col = history.get_datetime_column(period)
             fmt = history.get_datetime_format(period)
 
-            # To handle empty data
-            if df.empty:
-                df[col] = pd.to_datetime(df[col], format=fmt)
-
             """
                 Make time-related column as pandas Datetime index
             """
-            if col == '일자':
+            # To handle exceptional time and dates
+            if not df.empty and col == '체결시간':
+                # Find index of dates that delayed market opening time and inconvertibles in df
+                indices = dict()
+                exceptions = list()
+                start, end = date(df[col].iat[0][:len('YYYYMMDD')]), date(df[col].iat[-1][:len('YYYYMMDD')])
+                for ymd, delay in history.EXCEPTIONAL_DATES.items():
+                    if start <= date(ymd) <= end:
+                        day = df[col].loc[df[col].str.match(ymd)]
+                        indices[ymd] = day.index
+
+                        # To save original data
+                        for regex, datetime in history.EXCEPTIONAL_DATETIME_REPLACER.items():
+                            series = day.loc[day.str.contains(regex, regex=True)]
+                            series = series.replace(regex={regex: datetime})
+                            series = pd.to_datetime(series, format='%Y%m%d%H%M%S')
+                            exceptions.append(series)
+
+                # Replace inconvertibles (888888, 999999) to (16:00:00, 18:00:00)
+                df[col].replace(regex=history.EXCEPTIONAL_DATETIME_REPLACER, inplace=True)
+
+                # To make column as pandas datetime series
                 df[col] = pd.to_datetime(df[col], format=fmt)
 
-            elif col == '체결시간':
-                # To handle exceptional time and dates
-                if len(df) > 0:
-                    # Find index of dates that delayed market opening time and inconvertibles in df
-                    indices = dict()
-                    exceptions = list()
-                    start, end = date(df[col].iat[0][:len('YYYYMMDD')]), date(df[col].iat[-1][:len('YYYYMMDD')])
-                    for ymd, delay in history.EXCEPTIONAL_DATES.items():
-                        if start <= date(ymd) <= end:
-                            day = df[col].loc[df[col].str.match(ymd)]
-                            indices[ymd] = day.index
+                # Subtract delayed market time as if it pretends to start normally
+                for ymd, idx in indices.items():
+                    delay = history.EXCEPTIONAL_DATES[ymd]
+                    df.loc[idx, col] -= pd.DateOffset(hours=delay)
 
-                            # To save original data
-                            for regex, datetime in history.EXCEPTIONAL_DATETIME_REPLACER.items():
-                                series = day.loc[day.str.contains(regex, regex=True)]
-                                series = series.replace(regex={regex: datetime})
-                                series = pd.to_datetime(series, format='%Y%m%d%H%M%S')
-                                exceptions.append(series)
+                # Replace subtracted exceptional times back to original
+                for series in exceptions:
+                    df.loc[series.index, col] = series
 
-                    # Replace inconvertibles (888888, 999999) to (16:00:00, 18:00:00)
-                    df[col].replace(regex=history.EXCEPTIONAL_DATETIME_REPLACER, inplace=True)
-
-                    # To make column as pandas datetime series
-                    df[col] = pd.to_datetime(df[col], format=fmt)
-
-                    # Subtract delayed market time as if it pretends to start normally
-                    for ymd, idx in indices.items():
-                        delay = history.EXCEPTIONAL_DATES[ymd]
-                        df.loc[idx, col] -= pd.DateOffset(hours=delay)
-
-                    # Replace subtracted exceptional times back to original
-                    for series in exceptions:
-                        df.loc[series.index, col] = series
-
-                # If no data available
-                else:
-                    df[col] = pd.to_datetime(df[col], format=fmt)
-
-            # Exception
+            # col='일자' and including df.empty for both col
             else:
-                raise RuntimeError(
-                    f"There is no column either of '일자' or '체결시간' in downloaded data."
-                )
+                df[col] = pd.to_datetime(df[col], format=fmt)
 
             # Finally make datetime column as index
             df.set_index(col, inplace=True)
@@ -184,6 +170,10 @@ class Server:
                 raise RuntimeError(
                     f'Downloaded data is not monotonic increasing. Error at Server.history() with code={code}.'
                 )
+
+            # Rename column
+            if period == 'tick':
+                df.rename(columns={'현재가': '체결가'}, inplace=True)
 
             # Save data to csv file
             self.history_to_csv(df, code, kwargs['path'], kwargs['merge'], kwargs['warning'])

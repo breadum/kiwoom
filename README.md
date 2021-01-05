@@ -199,7 +199,7 @@ Simple Python Wrapper for Kiwoom Open API+
 >     app = QApplication(sys.argv)
 >
 >     # 인스턴스 생성
->     bot = myBot()
+>     bot = myBot(server=myServer())
 >    
 >     # 봇 작동시작
 >     bot.run() 

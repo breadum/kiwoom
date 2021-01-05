@@ -2,9 +2,9 @@ from setuptools import setup, find_packages
 
 
 # Project Information
-VERSION = "1.1.4"
+VERSION = "1.1.6"
 DISTNAME = "kiwoom"
-DESCRIPTION = "Simple Python Wrapper for Kiwoom OPEN API+"
+DESCRIPTION = "Simple Python Wrapper for Kiwoom Open API+"
 LONG_DESCRIPTION = open("README.md", encoding="utf-8").read()
 LONG_DESCRIPTION_CONTENT_TYPE = 'text/markdown'
 URL = "https://github.com/breadum/kiwoom"
