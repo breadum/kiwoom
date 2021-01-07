@@ -34,7 +34,8 @@ class Share:
         self.args[fn] = args
 
     def remove_args(self, fn):
-        del self.args[fn]
+        if fn in self.args:
+            del self.args[fn]
 
     """
     Single Data
@@ -48,7 +49,8 @@ class Share:
         self.single[fn][key] = val
 
     def remove_single(self, fn):
-        del self.single[fn]
+        if fn in self.single:
+            del self.single[fn]
 
     """
     Multi Data
@@ -63,7 +65,8 @@ class Share:
         self.multi[fn][key] += vals
 
     def remove_multi(self, fn):
-        del self.multi[fn]
+        if fn in self.multi:
+            del self.multi[fn]
 
     """
     History Data
@@ -80,4 +83,5 @@ class Share:
         self.history[code][key] += vals
 
     def remove_history(self, code):
-        del self.history[code]
+        if code in self.history:
+            del self.history[code]

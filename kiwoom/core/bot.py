@@ -352,12 +352,12 @@ class Bot:
                 print(f"\nAn error at Bot.history({args}).\n\n{format_exc()}")
                 return ExitType.FAILURE
 
-            # 2) Error with continuing Bot history() (at least second call, by prev_next='2')
+            # 2) Error with continuing Signal.history() or Slot.history()
             if self.share.get_single('history', 'error'):
-                # Note that error message will be printed by Server.history()
+                # Note that error message will be printed
                 return ExitType.FAILURE
 
-            # 3) Error with reaching the request limit or error with server freezing
+            # 3) Error with reaching the request limit or error with frozen server
             elif self.share.get_single('history', 'restart'):
                 # If it's impossible to download with the trick
                 if self.share.get_single('history', 'impossible'):
@@ -365,17 +365,10 @@ class Bot:
                     return ExitType.IMPOSSIBLE
                 break
 
-            # 4) Error that Server.history() couldn't be finished.
+            # 4) Unexpected error from Signal.history() or Slot.history()
             elif not self.share.get_single('history', 'complete'):
-                # Give one more last chance
-                print(f'\n[{clock()}] Try to restart downloading for {code}.\n')
-                self.history(code, period, unit=unit, start=start, end=end, path=path, merge=merge, warning=warning)
-
-                # If it fails again, stop downloading.
-                if not self.share.get_single('history', 'complete'):
-                    slice = (from_ + self.share.single[name()]['cnt'], to_)
-                    print(f"\n[{clock()}] Run Bot.histories() with slice={slice} or code='{code}' for the next time.")
-                    return ExitType.FAILURE
+                print(f'\n[{clock()}] Stop downloading due to unexpected error at code {code}.\n')
+                return ExitType.FAILURE
 
             """
                 Download completed for one item in the list

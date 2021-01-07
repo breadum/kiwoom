@@ -49,8 +49,8 @@ class myBot(Bot):
         user_name = self.api.get_login_info('USER_NAME')  # 유저이름
 
         # 접속 서버 타입
-        server = int(self.api.get_login_info('GetServerGubun'))
-        server = '모의투자' if server == 1 else '실서버'
+        server = self.api.get_login_info('GetServerGubun')
+        server = '모의투자' if server == '1' else '실서버'
 
         # 첫번 째 계좌 사용 (거래종목에 따라 확인)
         self.acc = accounts[0]

@@ -116,7 +116,11 @@ class Server:
                 Make time-related column as pandas Datetime index
             """
             # To handle exceptional time and dates
-            if not df.empty and col == '체결시간':
+            if not df.empty and history.is_sector(code) and col == '체결시간':
+                # To choose exceptional datetime replacer
+                edrfec = history.EXCEPTIONAL_DATETIME_REPLACER_FOR_EXCEPTIONAL_CODE
+                replacer = edrfec[code] if code in edrfec else history.EXCEPTIONAL_DATETIME_REPLACER
+
                 # Find index of dates that delayed market opening time and inconvertibles in df
                 indices = dict()
                 exceptions = list()
@@ -127,14 +131,14 @@ class Server:
                         indices[ymd] = day.index
 
                         # To save original data
-                        for regex, datetime in history.EXCEPTIONAL_DATETIME_REPLACER.items():
+                        for regex, datetime in replacer.items():
                             series = day.loc[day.str.contains(regex, regex=True)]
                             series = series.replace(regex={regex: datetime})
                             series = pd.to_datetime(series, format='%Y%m%d%H%M%S')
                             exceptions.append(series)
 
                 # Replace inconvertibles (888888, 999999) to (16:00:00, 18:00:00)
-                df[col].replace(regex=history.EXCEPTIONAL_DATETIME_REPLACER, inplace=True)
+                df[col].replace(regex=replacer, inplace=True)
 
                 # To make column as pandas datetime series
                 df[col] = pd.to_datetime(df[col], format=fmt)
@@ -148,7 +152,7 @@ class Server:
                 for series in exceptions:
                     df.loc[series.index, col] = series
 
-            # col='일자' and including df.empty for both col
+            # col='일자' or including df.empty for both col
             else:
                 df[col] = pd.to_datetime(df[col], format=fmt)
 

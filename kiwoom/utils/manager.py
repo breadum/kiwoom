@@ -98,15 +98,16 @@ class Downloader:
             try:
                 fn(*args)
 
-            # Handle RuntimeError caused by two cases
+            # RuntimeError can be caused by two cases
             # 1) not monotonic increasing data
             # 2) received wrong data other than requested
             except Exception:
                 # Print error message
                 print(f'\n[{clock()}] An error at Server.history{args[1:]} with code={code}.\n\n{format_exc()}')
                 # Reset variables
-                server.share.update_single('history', 'complete', False)
                 server.share.remove_history(code)
+                server.share.remove_args('history')
+                server.share.update_single('history', 'error', True)
                 # Return to Signal.history()
                 server.api.unloop()
 

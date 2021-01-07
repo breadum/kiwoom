@@ -19,4 +19,5 @@ Release History of Distribution
 1.1.3 Extend timer on Downloader.watcher() from 1 min to 10 mins
 1.1.4 Performance improvement on Bot.histories()
 1.1.5 Remove redundant columns when downloading 'tick' data
-1.1.6 Change column name from '현재가' to '체결가' for 'tick and reorder columns for other periods
+1.1.6 Change column name from '현재가' to '체결가' for 'tick' and reorder columns for other periods
+1.1.7 Minor bug fix on Bot.histories() and Server.history()
