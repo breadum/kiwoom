@@ -88,7 +88,7 @@ def is_date(date):
 def is_market(code):
     code = str(code)
     if code not in MARKETS:
-        print(f'Market code must be one of {MARKETS}')
+        # print(f'Market code must be one of {MARKETS}')
         return False
     return True
 
@@ -96,14 +96,16 @@ def is_market(code):
 def is_market_gubun(code):
     code = str(code)
     if code not in MARKET_GUBUNS:
-        raise ValueError(f'Market Gubun code must be one of {MARKET_GUBUNS}')
+        # raise ValueError(f'Market Gubun code must be one of {MARKET_GUBUNS}')
+        return False
     return True
 
 
 def is_sector(code):
     code = str(code)
     if code not in SECTORS:
-        raise ValueError(f'Sector code must be one of {SECTOR}')
+        # raise ValueError(f'Sector code must be one of {SECTOR}')
+        return False
     return True
 
 
