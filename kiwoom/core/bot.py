@@ -216,7 +216,7 @@ class Bot:
             if self.share.get_single('histories', 'nrq') >= history.REQUEST_LIMIT_TRY:
                 # Set back to default configuration
                 if self.share.get_single('histories', 'cnt') == 0:
-                    self.share.update_single('history', 'impossible', True)
+                    self.share.update_single(name(), 'impossible', True)
                 self.share.update_single(name(), 'restart', True)
                 self.api.unloop()
                 return
@@ -228,7 +228,8 @@ class Bot:
 
         # If comm_rq_data returns non-zero error code, restart downloading
         if self.api.comm_rq_data(name(), tr_code, prev_next, scr_no) != 0:
-            self.share.update_single('history', 'restart', True)
+            self.share.update_single(name(), 'impossible', True)
+            self.share.update_single(name(), 'restart', True)
             self.api.unloop()
             return
 

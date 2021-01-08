@@ -121,6 +121,9 @@ Multi-processing을 활용하여 24시간 다운로드 받을 수 있는 버전 
 
 # 24시간 끊기지 않는 버전
 def run_24(kwargs, share):
+    # To make process stable
+    time.sleep(5)
+
     # To suppress warning messages
     config.MUTE = True
 
