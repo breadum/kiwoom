@@ -304,7 +304,7 @@ class Bot:
             lst, ctype, mname = self.sector_list(sector), str(history.SECTOR).lower(), history.MARKET_GUBUNS[sector]
 
         # Set the portion in download list
-        from_, to_ = None, None
+        from_, to_ = 0, None
         if all([slice, code]):
             raise RuntimeError("Only one option is available: either of 'slice' or 'start_code'.")
         # Option1 - Slice
@@ -316,11 +316,9 @@ class Bot:
         # Option2 - Code
         elif code is not None:
             from_, to_ = lst.index(code), None
-        # Fully download
-        else:
-            from_, to_ = 0, None
 
         # Select target in download list
+        tot = len(lst)
         lst = lst[from_: to_]
 
         # To print progress bar
@@ -340,8 +338,8 @@ class Bot:
 
         for i, code in enumerate(lst):
             if i % divisor == 0:
-                pct = (i / len(lst)) * 100
-                print(f'\nDownloading ..\t{pct: .1f}% ({i} of {len(lst)})')
+                pct = ((from_ + i) / tot) * 100
+                print(f'Downloading ..\t{pct: .1f}% ({from_ + i} of {tot})')
 
             # Try downloading
             try:
@@ -393,9 +391,10 @@ class Bot:
             Close downloading
         """
         cnt = self.share.get_single(name(), 'cnt')
+        cum = from_ + cnt
         msg = dedent(
             f"""
-            Download Done for {100 * cnt / len(lst) if lst else 100: .1f}% ({cnt} of {len(lst)}) {ctype}s in {mname}.
+            Download Done for {100 * cum / tot if lst else 100: .1f}% ({cum} of {tot}) {ctype}s in {mname}.
             Download Time : {(time() - begin) / 60: .1f} minutes (with {self.share.single[name()]['nrq']} requests)\n
             """
         ) + status
@@ -405,7 +404,7 @@ class Bot:
         if cnt == len(lst):
             return ExitType.SUCCESS
         # Else return remaining items
-        return from_ + cnt, to_
+        return cum, to_
 
     def exit(self, ecode=0):
         """
