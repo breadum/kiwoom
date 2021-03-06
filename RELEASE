@@ -23,3 +23,4 @@ Release History of Distribution
 1.1.7 Minor bug fix on Bot.histories() and Server.history()
 1.1.8 Change behavior for history.is_sector()
 1.1.9 Change some conditions related to history
+1.2.0 Display accumulated number of downloaded stocks in Bot.histories()
