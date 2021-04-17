@@ -127,7 +127,7 @@ class Bot:
 
             # To share variables with Slot
             kwargs = effective_args(locals(), remove=['ctype', 'tr_code'])
-            self.share.reset_single(name())
+            self.share.remove_single(name())
             self.share.update_single(name(), 'error', False)
             self.share.update_single(name(), 'restart', False)
             self.share.update_single(name(), 'complete', False)
@@ -288,7 +288,7 @@ class Bot:
             path = getcwd()
 
         # Initialize status
-        self.share.reset_single(name())
+        self.share.remove_single(name())
         self.share.single[name()]['nrq'] = 0  # number of request
         self.share.single[name()]['cnt'] = 0  # number of stocks
         self.share.update_args(name(), effective_args(locals()))
