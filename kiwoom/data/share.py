@@ -48,9 +48,16 @@ class Share:
     def update_single(self, fn, key, val):
         self.single[fn][key] = val
 
-    def remove_single(self, fn):
+    def reset_single(self, fn):
         if fn in self.single:
             del self.single[fn]
+
+    def remove_single(self, fn, key=None):
+        if key is None:
+            self.reset_single(fn)
+        if fn in self.single:
+            if key in self.single[fn]:
+                del self.single[fn][key]
 
     """
     Multi Data

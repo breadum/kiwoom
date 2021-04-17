@@ -231,12 +231,18 @@ class Server:
                 col = df.index.name
                 if col not in ['일자', '체결시간']:
                     raise ValueError(f"No column matches '일자' or '체결시간'. Merge can't be done.")
-                db = pd.read_csv(
-                    file,
-                    index_col=[col],
-                    parse_dates=[col],
-                    encoding=config.ENCODING
-                )
+
+                # Existing data
+                if 'file' in self.share.single['history']:
+                    db = self.share.get_single('history', 'file')
+                else:
+                    # Read the existing file from disk
+                    db = pd.read_csv(
+                        file,
+                        index_col=[col],
+                        parse_dates=[col],
+                        encoding=config.ENCODING
+                    )
                 db.dropna(axis='index', inplace=True)
 
                 if not db.empty:

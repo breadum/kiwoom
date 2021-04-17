@@ -127,6 +127,7 @@ class Bot:
 
             # To share variables with Slot
             kwargs = effective_args(locals(), remove=['ctype', 'tr_code'])
+            self.share.reset_single(name())
             self.share.update_single(name(), 'error', False)
             self.share.update_single(name(), 'restart', False)
             self.share.update_single(name(), 'complete', False)
@@ -190,8 +191,8 @@ class Bot:
                                 self.share.update_single(name(), 'complete', True)
                                 return
 
-                    # Resolve memory issues
-                    del df
+                    # Once read, use later in Server.history_to_csv() to increase efficiency
+                    self.share.update_single(name(), 'file', df)
 
                 # If any exception, just skip
                 except Exception as err:
@@ -287,8 +288,9 @@ class Bot:
             path = getcwd()
 
         # Initialize status
-        self.share.update_single(name(), 'nrq', 0)  # number of request
-        self.share.update_single(name(), 'cnt', 0)  # number of stocks
+        self.share.reset_single(name())
+        self.share.single[name()]['nrq'] = 0  # number of request
+        self.share.single[name()]['cnt'] = 0  # number of stocks
         self.share.update_args(name(), effective_args(locals()))
 
         """
@@ -383,7 +385,7 @@ class Bot:
             # 6) Successfully downloaded but exceeds request limit items
             if history.SPEEDING:
                 if self.share.single[name()]['cnt'] >= history.REQUEST_LIMIT_ITEM:
-                    # To check whether items are downloaded by the actual requests
+                    # To check whether items are downloaded by the actual requests to download more if possible
                     if self.share.single[name()]['nrq'] >= history.REQUEST_LIMIT_ITEM:
                         break
 

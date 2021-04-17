@@ -158,8 +158,8 @@ if __name__ == '__main__':
     kwargs = {
         'market': '0',
         'period': 'tick',
-        'start': '20201215',
-        'end': '20201230',
+        'start': '20210405',
+        'end': '20210416',
         'merge': True,
         'warning': False,
         'path': 'C:/Data/market/KOSPI/tick'
