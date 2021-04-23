@@ -1,8 +1,12 @@
 # Private scripts
+test.py
 kospi.py
 kosdaq.py
 sector.py
 downloader.py
+
+# Private files
+*.pkl
 
 # Pycharm files
 .idea/
