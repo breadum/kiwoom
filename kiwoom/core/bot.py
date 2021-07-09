@@ -178,7 +178,7 @@ class Bot:
                                     self.share.update_single(name(), 'complete', True)
                                     return
 
-                    else:  # if period in ['day', 'week', 'year']
+                    else:  # if period in ['day', 'week', 'month', 'year']
                         last_day = date(df.index[-1])
                         # To push 'start' date further as much as possible. If None, set newly.
                         if 'start' not in kwargs or date(kwargs['start']) <= last_day:
