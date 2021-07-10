@@ -94,7 +94,9 @@ Simple Python Wrapper for Kiwoom Open API+
 
 #### 3. 통신을 위한 체계적인 코드 작성 지원
 
-- 데이터를 요청하는 함수와 데이터를 받는 함수를 분리해서 작성 (Bot & Server)
+- 데이터를 요청하는 함수와 데이터를 받는 함수를 분리해서 작성 
+
+- Signal에 해당하는 'Bot' 클래스와 Slot에 해당하는 'Server' 클래스
 
 - 작성 후 Kiwoom.connect() 함수로 서로 연결시켜 서버에서 응답 시 자동 호출 지원
 
@@ -104,7 +106,7 @@ Simple Python Wrapper for Kiwoom Open API+
 > from kiwoom import Bot
 >
 > # 서버에 데이터를 요청하는 클래스 (사용자 작성)
-> class myBot(Bot):
+> class MyBot(Bot):
 >     def __init__(self, server):
 >         super().__init__(server)
 >
@@ -124,8 +126,8 @@ Simple Python Wrapper for Kiwoom Open API+
 > 
 >         # 1)과 2) 연결 설정 후에는 다음과 같이 활용할 수 있다.
 >         # on_receive_tr_data(..., rq_name='balance', ...) 이벤트 수신 시 server.balance 자동 호출됨
->         # self.api.signal('on_receive_tr_event', 'balance') 호출 시 bot.balance 함수 반환
->         # self.api.slot('on_receive_tr_event', 'balance') 호출 시 server.balance 함수 반환 
+>         # self.api.signal('on_receive_tr_event', 'balance') 호출 시 bot.balance 함수 핸들 반환
+>         # self.api.slot('on_receive_tr_event', 'balance') 호출 시 server.balance 함수 핸들 반환 
 >
 >         # 참고 가이드          
 >         # 1) print(config.events)  # 이벤트 목록
@@ -154,10 +156,8 @@ Simple Python Wrapper for Kiwoom Open API+
 > from kiwoom import Server
 > 
 > # 서버에서 데이터를 받아 처리하는 클래스 (사용자 작성)
-> class myServer(Server):
->
->     # 주어진 api는 Kiwoom() 인스턴스
->     def __init__(self, api):
+> class MyServer(Server):
+>     def __init__(self):
 >         super().__init__()
 >         self.downloading = False
 >
@@ -199,9 +199,7 @@ Simple Python Wrapper for Kiwoom Open API+
 >     app = QApplication(sys.argv)
 >
 >     # 인스턴스 생성
->     bot = myBot(
->         server=myServer()
->     )
+>     bot = MyBot(MyServer())
 >    
 >     # 봇 작동시작
 >     bot.run() 
