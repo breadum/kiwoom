@@ -25,10 +25,10 @@ API와 사용자 정의 함수들을 연결해 활용할 수 있게 해주는 �
 
 
 # 서버에 데이터를 요청하는 클래스 (사용자 작성)
-class myBot(Bot):
+class MyBot(Bot):
     def __init__(self, server=None):
-        # 상속받는 Bot 클래스 초기화
-        # (self.api = Kiwoom())
+        # 상속받는 Bot 클래스 초기화 필수
+        # self.api = Kiwoom() 설정됨
         super().__init__(server)
 
         # Bot(Signal), Server(Slot) and Event 연결
@@ -50,7 +50,7 @@ class myBot(Bot):
 
 
 # 서버에서 데이터를 받아 처리하는 클래스 (사용자 작성)
-class myServer(Server):
+class MyServer(Server):
     # ex) 서버로 부터 로그인 응답을 받았을 때 처리하는 함수
     def login(self):
         pass
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     # 인스턴스 생성
-    bot = myBot(server=myServer())
+    bot = MyBot(MyServer())
 
     # 봇 작동시작
     bot.run()

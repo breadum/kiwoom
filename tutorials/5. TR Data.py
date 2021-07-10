@@ -54,7 +54,7 @@ CommRqData로 원하는 TR 데이터를 요청할 때 입력하는 인자 중 rq
 
 
 # 서버에 데이터를 요청하는 클래스 (사용자 작성)
-class myBot(Bot):
+class MyBot(Bot):
     def __init__(self, server=None):
         """
         Bot 클래스 초기화 함수 (super().__init__(server))
@@ -100,8 +100,8 @@ class myBot(Bot):
 
         # 3)과 4) 연결 설정 후에는 다음과 같이 활용할 수 있다.
         # on_receive_tr_data(..., rq_name='balance', ...) 이벤트 수신 시 server.balance 자동 호출됨
-        # self.api.signal('on_receive_tr_event', 'balance') 호출 시 bot.balance 함수 반환
-        # self.api.slot('on_receive_tr_event', 'balance') 호출 시 server.balance 함수 반환
+        # self.api.signal('on_receive_tr_event', 'balance') 호출 시 bot.balance 함수 핸들 반환
+        # self.api.slot('on_receive_tr_event', 'balance') 호출 시 server.balance 함수 핸들 반환
 
         # * 이벤트가 호출될 때 사용되는 입력 변수 확인하기
         # (1) help(Kiwoom.on_receive_tr_data)
@@ -124,8 +124,8 @@ class myBot(Bot):
         user_name = self.api.get_login_info('USER_NAME')  # 유저이름
 
         # 접속 서버 타입
-        server = int(self.api.get_login_info('GetServerGubun'))
-        server = '모의투자' if server == 1 else '실서버'
+        server = self.api.get_login_info('GetServerGubun')
+        server = '모의투자' if server.strip() == '1' else '실서버'
 
         # 첫번 째 계좌 사용 (거래종목에 따라 확인)
         self.acc = accounts[0]
@@ -260,7 +260,7 @@ class myBot(Bot):
 
 
 # 서버에서 데이터를 받아 처리하는 클래스 (사용자 작성)
-class myServer(Server):
+class MyServer(Server):
     def __init__(self):
         """
         Server Class 초기화 함수
@@ -275,8 +275,8 @@ class myServer(Server):
         """
         super().__init__()
 
-        # Bot Class를 초기화 할 때 공유됨
-        # 튜토리얼에서는 자동완성 기능을 위해 선언
+        # Bot Class를 초기화 할 때 다음 두 변수가 자동 설정됨
+        # 다만, 튜토리얼에서는 IDE에서 자동완성 편의를 위해 선언
         self.api = Kiwoom()
         self.share = Share()
 
@@ -302,7 +302,7 @@ class myServer(Server):
         # 예수금 데이터 저장
         self.share.update_single('deposit', '예수금', int(self.api.get_comm_data(tr_code, rq_name, 0, '예수금')))
 
-        # [필수] 대기중인 코드 실행 (176번째 줄)
+        # [필수] 대기중인 코드 실행 (177번째 줄)
         self.api.unloop()
         print('\tServer.deposit(scr_no, rq_name, tr_code, record_name, prev_next) 종료')
 
@@ -357,7 +357,7 @@ class myServer(Server):
 
             # 다운로드 완료
             self.downloading = False
-            self.api.unloop()  # 214번 째 줄 실행
+            self.api.unloop()  # 216번 째 줄 실행
             print('\tServer.balance(scr_no, rq_name, tr_code, record_name, prev_next) 종료')
 
 
@@ -368,7 +368,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     # 인스턴스 생성
-    bot = myBot(server=myServer())
+    bot = MyBot(MyServer())
 
     # 로그인
     bot.run()

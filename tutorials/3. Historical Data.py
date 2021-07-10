@@ -57,7 +57,7 @@ config.MARKET_GUBUNS = {
 
 
 # 서버에 데이터를 요청하는 클래스 (사용자 작성)
-class myBot(Bot):
+class MyBot(Bot):
     def run(self, kwargs=None):
         """
         Bot 실행함수
@@ -105,7 +105,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     # 인스턴스 생성
-    bot = myBot()
+    bot = MyBot()
 
     # 로그인 및 다운로드
     result = bot.run()
@@ -129,7 +129,7 @@ def run_24(kwargs, share):
 
     # 초기화 및 로그인
     app = QApplication(sys.argv)
-    bot = myBot()
+    bot = MyBot()
     bot.login()
 
     """

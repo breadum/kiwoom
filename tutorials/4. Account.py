@@ -12,7 +12,7 @@ import sys
 
 
 # 서버에 데이터를 요청하는 클래스 (사용자 작성)
-class myBot(Bot):
+class MyBot(Bot):
     def __init__(self, server=None):
         """
         튜토리얼 2.Login.py 참고
@@ -50,7 +50,7 @@ class myBot(Bot):
 
         # 접속 서버 타입
         server = self.api.get_login_info('GetServerGubun')
-        server = '모의투자' if server == '1' else '실서버'
+        server = '모의투자' if server.strip() == '1' else '실서버'
 
         # 첫번 째 계좌 사용 (거래종목에 따라 확인)
         self.acc = accounts[0]
@@ -99,7 +99,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     # 인스턴스 생성
-    bot = myBot()
+    bot = MyBot()
 
     # 로그인
     bot.run()

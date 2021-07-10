@@ -17,7 +17,7 @@ import sys
 
 
 # 서버에 데이터를 요청하는 클래스 (사용자 작성)
-class myBot(Bot):
+class MyBot(Bot):
     def __init__(self, server=None):
         # 상속받는 Bot 클래스 초기화
         super().__init__(server)
@@ -107,7 +107,7 @@ class myBot(Bot):
 
 
 # 서버에서 데이터를 받아 처리하는 클래스 (사용자 작성)
-class myServer(Server):
+class MyServer(Server):
     def login(self, err_code):
         """
         Signal.login() 함수로 인해 OnEventConnect 이벤트 발생 시 로그인 메세지 처리함수
@@ -133,7 +133,7 @@ class myServer(Server):
         # 로그인 성공/실패 출력
         print(f'\t\tLogin ({emsg})')
 
-        # [필수] 이벤트를 기다리며 대기중이었던 코드 실행 (89번째 줄)
+        # [필수] 이벤트를 기다리며 대기중이었던 코드 실행 (60번째 줄)
         self.api.unloop()
 
         print('\t\tServer.login(err_code) 종료')
@@ -149,7 +149,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     # 인스턴스 생성
-    bot = myBot(server=myServer())
+    bot = MyBot(MyServer())
 
     # 로그인
     bot.run()
