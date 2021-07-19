@@ -24,3 +24,4 @@ Release History of Distribution
 1.1.8 Change behavior for history.is_sector()
 1.1.9 Change some conditions related to history
 1.2.0 Display accumulated number of downloaded stocks in Bot.histories()
+1.2.1 Fix a bug from Bot.history() executed alone, not by Bot.histories() and a bug from new sector '257'(KOSPI TOP 10)

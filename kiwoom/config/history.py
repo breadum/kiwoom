@@ -103,10 +103,9 @@ def is_market_gubun(code):
 
 def is_sector(code):
     code = str(code)
-    if code not in SECTORS:
-        # raise ValueError(f'Sector code must be one of {SECTOR}')
-        return False
-    return True
+    if len(code) == 3:
+        return True
+    return False
 
 
 def get_code_type(code):

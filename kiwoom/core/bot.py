@@ -212,15 +212,16 @@ class Bot:
             Start downloading.
         """
         # Check requesting status
-        self.share.single['histories']['nrq'] += 1
-        if history.SPEEDING:
-            if self.share.get_single('histories', 'nrq') >= history.REQUEST_LIMIT_TRY:
-                # Set back to default configuration
-                if self.share.get_single('histories', 'cnt') == 0:
-                    self.share.update_single(name(), 'impossible', True)
-                self.share.update_single(name(), 'restart', True)
-                self.api.unloop()
-                return
+        if 'histories' in self.share.single:
+            self.share.single['histories']['nrq'] += 1
+            if history.SPEEDING:
+                if self.share.get_single('histories', 'nrq') >= history.REQUEST_LIMIT_TRY:
+                    # Set back to default configuration
+                    if self.share.get_single('histories', 'cnt') == 0:
+                        self.share.update_single(name(), 'impossible', True)
+                    self.share.update_single(name(), 'restart', True)
+                    self.api.unloop()
+                    return
 
         # Finally request data to server
         for key, val in history.inputs(tr_code, code, unit, end):
