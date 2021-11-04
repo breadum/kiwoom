@@ -1,8 +1,8 @@
-from sys import _getframe
-from numpy import ndarray
-from pandas import Series
 from datetime import datetime
-from pandas import Timestamp
+from sys import _getframe
+
+from numpy import ndarray
+from pandas import Series, Timestamp
 
 
 # Global Variables

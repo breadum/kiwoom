@@ -1,5 +1,4 @@
 from PyQt5.QAxContainer import QAxWidget
-from kiwoom.core.connector import Connector
 
 
 class API(QAxWidget):

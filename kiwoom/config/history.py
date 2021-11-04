@@ -1,8 +1,9 @@
 from collections import defaultdict
+
 from pandas import to_datetime
 
 from kiwoom.config import types
-from kiwoom.config.const import MARKETS, MARKET_GUBUNS, SECTORS
+from kiwoom.config.const import MARKETS, MARKET_GUBUNS
 from kiwoom.config.types import STOCK, SECTOR
 from kiwoom.data.preps import number, string, remove_sign
 from kiwoom.utils import list_wrapper

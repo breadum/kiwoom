@@ -1,11 +1,11 @@
-from kiwoom.wrapper.api import API
-from kiwoom.config.error import catch_error
-from kiwoom.core.connector import Connector
-
+import sys
 from inspect import signature
+
 from PyQt5.QtCore import QEventLoop
 
-import sys
+from kiwoom.config.error import catch_error
+from kiwoom.core.connector import Connector
+from kiwoom.wrapper.api import API
 
 
 class Kiwoom(API):

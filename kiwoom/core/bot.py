@@ -1,21 +1,22 @@
+from os import getcwd
+from os.path import join
+from textwrap import dedent
+from time import time
+from traceback import format_exc
+
+from pandas import read_csv, DateOffset
+from PyQt5.QtTest import QTest
+from PyQt5.QtWidgets import QApplication
+
 from kiwoom import config
 from kiwoom.config import history
-from kiwoom.config.types import ExitType
 from kiwoom.config.screen import Screen
+from kiwoom.config.types import ExitType
 from kiwoom.core.kiwoom import Kiwoom
 from kiwoom.core.server import Server
 from kiwoom.data.share import Share
 from kiwoom.utils.general import *
-from kiwoom.utils.manager import timer, Downloader
-
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtTest import QTest
-from time import time
-from os import getcwd
-from os.path import join
-from textwrap import dedent
-from traceback import format_exc
-from pandas import read_csv, DateOffset, Timestamp
+from kiwoom.utils.manager import Downloader, timer
 
 
 class Bot:

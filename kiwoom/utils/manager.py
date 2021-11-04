@@ -1,11 +1,11 @@
-from kiwoom.utils.general import clock
-
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtCore import QTimer
-from traceback import format_exc
-from functools import wraps
-
 import sys
+from functools import wraps
+from traceback import format_exc
+
+from PyQt5.QtCore import QTimer
+from PyQt5.QtWidgets import QApplication
+
+from kiwoom.utils.general import clock
 
 
 def timer(fn):
