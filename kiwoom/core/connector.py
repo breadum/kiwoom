@@ -197,7 +197,7 @@ class Connector:
                 valid = True
                 self._slots[event] = slot
 
-        # Connect slot to the event when
+        # Connect slot to the event when connect hook is already set
         else:
             if connectable(signal):
                 if connectable(slot):
@@ -224,7 +224,7 @@ class Connector:
 
     def connect_hook(self, event):
         """
-        Returns whether a hook is set for given event.
+        Returns whether a hook is set for the given event.
 
         :param event: str
             One of the pre-defined event names in string. See kiwoom.config.EVENTS.
