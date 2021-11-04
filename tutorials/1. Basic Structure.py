@@ -1,9 +1,3 @@
-from PyQt5.QtWidgets import QApplication
-from kiwoom import Bot, Server
-
-import sys
-
-
 """
 키움증권 Open API+ 활용을 위한 기본적인 Class 구성
 
@@ -22,6 +16,11 @@ API와 사용자 정의 함수들을 연결해 활용할 수 있게 해주는 �
 2. KOA Studio 개발가이드
 3. 키움증권 Open API 고객문의 게시판
 """
+
+
+import sys
+from PyQt5.QtWidgets import QApplication
+from kiwoom import Bot, Server
 
 
 # 서버에 데이터를 요청하는 클래스 (사용자 작성)

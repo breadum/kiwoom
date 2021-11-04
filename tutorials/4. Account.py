@@ -1,14 +1,13 @@
-from kiwoom import Bot
-from PyQt5.QtWidgets import QApplication
-
-import sys
-
-
 """
 로그인 후 유저 및 서버에 대한 정보 확인 예제 스크립트로 KOA Studio에서 아래 항목 참조
 
 개발가이드 > 로그인 버전처리 > 관련함수 > GetLoginInfo
 """
+
+
+import sys
+from PyQt5.QtWidgets import QApplication
+from kiwoom import Bot
 
 
 # 서버에 데이터를 요청하는 클래스 (사용자 작성)
@@ -17,15 +16,19 @@ class MyBot(Bot):
         """
         튜토리얼 2.Login.py 참고
         """
+        # 상속받는 Bot 클래스 초기화 필수
+        # self.api = Kiwoom() 설정됨
         super().__init__(server)
+
+        # 사용할 변수 초기화
+        self.acc = None
+
+        # 이벤트 핸들러 연결
         self.api.connect(
             event='on_event_connect',
             signal=self.login,
             slot=self.server.login
         )
-
-        # 사용할 변수 초기화
-        self.acc = None
 
     def account(self):
         """

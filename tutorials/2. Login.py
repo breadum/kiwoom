@@ -1,9 +1,3 @@
-from PyQt5.QtWidgets import QApplication
-from kiwoom import Bot, Server, config
-
-import sys
-
-
 """
 로그인과 버전처리에 대한 예제 스크립트 
 
@@ -16,10 +10,16 @@ import sys
 """
 
 
+import sys
+from PyQt5.QtWidgets import QApplication
+from kiwoom import Bot, Server, config
+
+
 # 서버에 데이터를 요청하는 클래스 (사용자 작성)
 class MyBot(Bot):
     def __init__(self, server=None):
-        # 상속받는 Bot 클래스 초기화
+        # 상속받는 Bot 클래스 초기화 필수
+        # self.api = Kiwoom() 설정됨
         super().__init__(server)
 
         """
@@ -29,7 +29,7 @@ class MyBot(Bot):
         # 3) 따라서 self.api.on_event_connect() 호출되면, self.server.login() 함수가 호출될 수 있도록 연결해 준다.
         
         # 자세한 사항은 KOA Studio 개발가이드와 help(Kiwoom.connect) 참조
-        # 사실 'on_event_connect' 이벤트의 경우 자동으로 signal, slot이 설정되어 있음
+        # 'on_event_connect' 이벤트의 경우 자동으로 signal, slot이 설정되어 있음
         """
         self.api.connect(
             event='on_event_connect',

@@ -1,14 +1,3 @@
-from kiwoom import Bot, config
-from kiwoom.utils import clock
-from kiwoom.config.types import ExitType
-
-from PyQt5.QtWidgets import QApplication
-from multiprocessing import Process, Manager
-
-import sys
-import time
-
-
 """
 시장 데이터 수집을 위한 스크립트
 
@@ -54,6 +43,17 @@ config.MARKET_GUBUNS = {
 #     ...
 # }
 """
+
+
+import sys
+import time
+from multiprocessing import Process, Manager
+
+from PyQt5.QtWidgets import QApplication
+
+from kiwoom import Bot, config
+from kiwoom.config.types import ExitType
+from kiwoom.utils import clock
 
 
 # 서버에 데이터를 요청하는 클래스 (사용자 작성)
@@ -115,7 +115,7 @@ if __name__ == '__main__':
 
 
 """
-Multi-processing을 활용하여 24시간 다운로드 받을 수 있는 버전 (고급과정)
+Multi-processing을 활용하여 24시간 다운로드 받을 수 있는 버전
 """
 
 
@@ -213,7 +213,7 @@ if __name__ == '__main__':
             raise RuntimeError(f'[{clock()}] Download failed.')
 
     """
-        # Hidden Case ^^
+        # Hidden Case
         # 4) When script re-start is needed
         else:
             # In case, we have to slow down for the next run

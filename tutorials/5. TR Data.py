@@ -1,13 +1,3 @@
-from kiwoom import *
-from kiwoom.data import Share
-from kiwoom.data.preps import prep
-from kiwoom.utils import name
-from PyQt5.QtWidgets import QApplication
-from textwrap import dedent
-
-import sys
-
-
 """
 TR Data 수신에 관한 스크립트
 
@@ -53,6 +43,16 @@ CommRqData로 원하는 TR 데이터를 요청할 때 입력하는 인자 중 rq
 """
 
 
+import sys
+from textwrap import dedent
+
+from PyQt5.QtWidgets import QApplication
+
+from kiwoom import Bot, Server
+from kiwoom.data.preps import prep
+from kiwoom.utils import name
+
+
 # 서버에 데이터를 요청하는 클래스 (사용자 작성)
 class MyBot(Bot):
     def __init__(self, server=None):
@@ -79,7 +79,8 @@ class MyBot(Bot):
         # 사용할 변수 초기화
         self.acc = None
 
-        # 1) 상속받고 있는 Bot 클래스 초기화
+        # 1) 상속받는 Bot 클래스 초기화 필수
+        # self.api = Kiwoom() 설정됨
         super().__init__(server)
 
         # 2) OnEventConnect 발생 시 Server.login 함수가 호출되도록 연동
@@ -275,10 +276,9 @@ class MyServer(Server):
         """
         super().__init__()
 
-        # Bot Class를 초기화 할 때 다음 두 변수가 자동 설정됨
-        # 다만, 튜토리얼에서는 IDE에서 자동완성 편의를 위해 선언
-        self.api = Kiwoom()
-        self.share = Share()
+        # Bot 클래스를 초기화 할 때 다음 두 변수가 자동 설정됨
+        # self.api = Kiwoom()
+        # self.share = Share()
 
         # 사용할 변수
         self.downloading = False
