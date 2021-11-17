@@ -61,7 +61,10 @@ EXCEPTIONAL_DATETIME_REPLACER_FOR_EXCEPTIONAL_CODE = {
 # 장 종료시간이 변경된 예외
 EXCEPTIONAL_DATES = {
     # 'YYYYMMDD': delay(hour)
-    '20201203': 1  # 수능일 1시간 지연
+    '20201203': 1,  # 수능일 1시간 지연
+    '20211118': 1,  # 수능일 1시간 지연
+    '20221117': 1,  # 수능일 1시간 지연
+    '20231116': 1  # 수능일 1시간 지연
 }
 
 
