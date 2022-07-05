@@ -26,3 +26,4 @@ Release History of Distribution
 1.2.0 Display accumulated number of downloaded stocks in Bot.histories()
 1.2.1 Fix a bug from Bot.history() executed alone, not by Bot.histories() and a bug from new sector '257'(KOSPI TOP 10)
 1.2.2 Add SAT(Korea) schedules on '21, 22, 23 to EXCEPTIONAL_DATES in config.history
+1.2.3 Add HighYieldFund registered code and remove exception handling depending on code length
