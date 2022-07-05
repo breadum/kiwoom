@@ -31,7 +31,7 @@ DOWNLOAD_PROGRESS_DISPLAY = 10
 
 # Code lengths for each type
 SECTOR_CODE_LEN = 3
-STOCK_CODE_LENS = [6, 9]  # 일반주식 = 6, 신주인수권 = 9
+STOCK_CODE_LENS = [6, 8, 9]  # 일반주식 = 6, 하이일드펀드 = 8, 신주인수권 = 9
 
 
 # Periods
@@ -118,10 +118,11 @@ def get_code_type(code):
     """
     if len(code) == SECTOR_CODE_LEN:
         return SECTOR
-    elif len(code) in STOCK_CODE_LENS:
-        return STOCK
+    # elif len(code) in STOCK_CODE_LENS:
+    #    return STOCK
     else:
-        raise ValueError(f'Given code {code} is not a stock code nor a sector code.')
+        # raise ValueError(f'Given code {code} is not a stock code nor a sector code.')
+        return STOCK
 
 
 def get_tr_code(periods, ctypes=None):
