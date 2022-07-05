@@ -4,6 +4,7 @@ kospi.py
 kosdaq.py
 sector.py
 downloader.py
+COMMANDS
 
 # Private files
 *.pkl
