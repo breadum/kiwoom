@@ -34,12 +34,13 @@ def number(x):
     First, tries to type-cast x into int. If it fails, move on to float.
     If converting to float raises an ValueError, then throws the error.
     """
+    if '.' in x:
+        try:
+            return float(x)
+        except ValueError:
+            pass
     try:
         return int(x)
-    except ValueError:
-        pass
-    try:
-        return float(x)
     except ValueError:
         raise ValueError(f"{x} of Type {type(x)} can't be a number.")
 
