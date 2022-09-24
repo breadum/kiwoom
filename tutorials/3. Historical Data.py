@@ -47,6 +47,7 @@ config.MARKET_GUBUNS = {
 
 import sys
 import time
+from datetime import datetime
 from multiprocessing import Process, Manager
 
 from PyQt5.QtWidgets import QApplication
@@ -158,8 +159,8 @@ if __name__ == '__main__':
     kwargs = {
         'market': '0',
         'period': 'tick',
-        'start': '20210405',
-        'end': '20210416',
+        'start': '20220919',
+        'end': '20220923',
         'merge': True,
         'warning': False,
         'path': 'C:/Data/market/KOSPI/tick'
@@ -175,6 +176,12 @@ if __name__ == '__main__':
 
     # Loop start
     while True:
+        # 오전 5시부터 6시 사이에 데이터를 받으면 데이터 결손 발생
+        now = datetime.now()
+        if (now.hour == 4 and now.minute > 50) or (now.hour == 5):
+            print(f"[{clock()}] Avoid 5:00 ~ 6:00 AM.")
+            time.sleep(70 * 60)
+        
         # Print time
         print(f"[{clock()}] Starting a new loop!")
 
