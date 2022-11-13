@@ -45,14 +45,14 @@ class Share:
             if fn is None, returns all 'fn' stored 
         """
         if typ.lower() not in TYPES:
-            raise KeyError(f'Given type must be one of {TYPES}, not {typ}.')
+            raise KeyError(f"Given type must be one of {TYPES}, not '{typ}'.")
         
         dic = getattr(self, typ)
         if fn is None:
             return dic.keys()
         if fn in dic:
             return dic[fn].keys()
-        raise KeyError(f'Given fn, {fn}, is not in {typ} data.')
+        raise KeyError(f"Given fn, '{fn}', is not in {typ} data.")
 
     def has_key(self, typ, fn, key=None):
         """
@@ -90,8 +90,8 @@ class Share:
         
         # Raise an error
         if self.has_key(typ, fn):
-            raise KeyError(f'Given key, {key}, is not in {typ} data.')
-        raise KeyError(f'Given fn, {fn}, is not in {typ} data.')
+            raise KeyError(f"Given key, '{key}', is not in {typ} data.")
+        raise KeyError(f"Given fn, '{fn}', is not in {typ} data.")
 
     def items(self, typ, fn):
         """
