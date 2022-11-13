@@ -108,7 +108,7 @@ class Share:
     """
     Arg Data
     """
-    def in_args(self, fn, key=None):
+    def isin_args(self, fn, key=None):
         if key is None:
             return fn in self.args
         return key in self.args[fn]
@@ -128,7 +128,7 @@ class Share:
     """
     Single Data
     """
-    def in_single(self, fn, key=None):
+    def isin_single(self, fn, key=None):
         return self.has_key('single', fn, key)
 
     def get_single(self, fn, key=None):
@@ -149,7 +149,7 @@ class Share:
     """
     Multi Data
     """
-    def in_multi(self, fn, key=None):
+    def isin_multi(self, fn, key=None):
         return self.has_key('multi', fn, key)
 
     def get_multi(self, fn, key=None):
