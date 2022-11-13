@@ -225,6 +225,9 @@ Simple Python Wrapper for Kiwoom Open API+
    [4. 계좌확인][tut4]
    
    [5. TR 데이터][tut5]
+   
+   [6. 트레이딩][tut6]
+    
 
 ## Installation
 
@@ -306,3 +309,5 @@ Simple Python Wrapper for Kiwoom Open API+
 [tut3]: https://github.com/breadum/kiwoom/blob/main/tutorials/3.%20Historical%20Data.py
 [tut4]: https://github.com/breadum/kiwoom/blob/main/tutorials/4.%20Account.py
 [tut5]: https://github.com/breadum/kiwoom/blob/main/tutorials/5.%20TR%20Data.py
+[tut6]: https://github.com/breadum/kiwoom/blob/main/tutorials/6.%20Trading.py
+
