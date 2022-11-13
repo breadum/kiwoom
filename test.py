@@ -145,7 +145,7 @@ if __name__ == '__main__':
     """
     Check and get single/multi data
         * Two different styles.
-        * Must handle error for on your own.
+        * Must handle error on your own.
     """
     # All single data for balance
     if bot.share.isin_single('balance'):
