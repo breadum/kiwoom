@@ -35,11 +35,15 @@ def number(x):
     If it fails, move on to int and if fails again retry float.
     If converting to float raises an ValueError, then throws the error.
     """
+    if x is None or x.strip() == '':
+        return None
+
     if '.' in x:
         try:
             return float(x)
         except ValueError:
             raise ValueError(f"{x} of type {type(x)} can't be a number.")
+
     try:
         return int(x)
     except ValueError:
