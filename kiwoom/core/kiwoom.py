@@ -346,6 +346,7 @@ class Kiwoom(API):
         comm_rq_data
         comm_kw_rq_data
         send_order
+        send_order_fo
         send_order_credit
         set_real_reg
     """
@@ -360,6 +361,10 @@ class Kiwoom(API):
     @catch_error
     def send_order(self, rq_name, scr_no, acc_no, ord_type, code, qty, price, hoga_gb, org_order_no):
         return super().send_order(rq_name, scr_no, acc_no, ord_type, code, qty, price, hoga_gb, org_order_no)
+
+    @catch_error
+    def send_order_fo(self, rq_name, scr_no, acc_no, code, ord_kind, sl_by_tp, ord_tp, qty, price, org_ord_no):
+        return super().send_order_fo(rq_name, scr_no, acc_no, code, ord_kind, sl_by_tp, ord_tp, qty, price, org_ord_no)
 
     @catch_error
     def send_order_credit(
