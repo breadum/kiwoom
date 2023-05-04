@@ -298,11 +298,10 @@ Simple Python Wrapper for Kiwoom Open API+
 
 - 발생한 어떠한 손실에 대하여 어떻게 발생하였든지 개발자는 이에 대해 아무런 책임이 없음을 알립니다.
 
-- 버그, 기능요청, 문의사항 등은 [Github 이슈 게시판][issue] 및 [E-mail][email]을 통해 남겨주세요.
+- 버그, 기능요청, 문의사항 등은 [Github 이슈 게시판][issue]을 통해 남겨주세요.
 
 [mit]: https://github.com/breadum/kiwoom/blob/main/LICENSE
 [issue]: https://github.com/breadum/kiwoom/issues
-[email]: https://github.com/breadum
 [tutorial]: https://github.com/breadum/kiwoom/tree/main/tutorials
 [tut1]: https://github.com/breadum/kiwoom/blob/main/tutorials/1.%20Basic%20Structure.py
 [tut2]: https://github.com/breadum/kiwoom/blob/main/tutorials/2.%20Login.py
