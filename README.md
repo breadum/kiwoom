@@ -1,5 +1,5 @@
 # Kiwoom Open API+
-Simple Python Wrapper for Kiwoom Open API+
+Simple Python Wrapper for Kiwoom Open API+ (Stable)
 
 ## What is it?
 
@@ -250,10 +250,10 @@ Simple Python Wrapper for Kiwoom Open API+
 > set CONDA_FORCE_32BIT=1  
 >
 > # 권장하는 방식 
-> conda create -n your_awesome_bot  # 가상환경 생성
-> conda activate your_awesome_bot  # 가상환경 실행
+> conda create -n 32bit  # 가상환경 생성
+> conda activate 32bit  # 가상환경 실행
 > conda config --env --set subdir win-32  # 현위치에서 32bit 설정
-> conda install python=3.7  # Python 3.7 설치
+> conda install python=3.10  # Python 3.7/3.8/3.9/3.10 설치
 > ```
 
 - 아래 코드로 '32Bit'인지 반드시 확인 후 설치
