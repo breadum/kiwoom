@@ -71,7 +71,13 @@ if __name__ == '__main__':
     bot.run()
 
     # 통신 유지를 위해 스크립트 종료 방지
-    app.exec()
+    #   - 메인 윈도우 창을 종료하면 스크립트 종료
+    #   - app.exec() 단독 실행할 경우 작업관리자로 종료
+    from PyQt5.QtWidgets import QMainWindow
+    win = QMainWindow()
+    win.setWindowTitle('Quit!')
+    win.show()
+    sys.exit(app.exec())
 
 
 """
