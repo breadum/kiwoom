@@ -10,6 +10,7 @@ from kiwoom import config
 from kiwoom.config import history
 from kiwoom.config.error import msg
 from kiwoom.config.types import MULTI
+from kiwoom.core.kiwoom import Kiwoom
 from kiwoom.data.preps import string
 from kiwoom.utils.general import date, name
 from kiwoom.utils.manager import Downloader
@@ -17,7 +18,7 @@ from kiwoom.utils.manager import Downloader
 
 class Server:
     def __init__(self):
-        self.api = None
+        self.api: Kiwoom = None
         self.share = None
 
     def init(self, api, share):
@@ -34,7 +35,7 @@ class Server:
         """
         Default slot for 'on_event_connect'
 
-        When Kiwoom.on_event_connect(...) is called, this method automatically will be called.
+        When Kiwoom.on_event_connect(...) is called, this method will be automatically called.
         """
         print(f'\n로그인 {msg(err_code)}')
         print(f'\n* 시스템 점검\n  - 월 ~ 토 : 05:05 ~ 05:10\n  - 일 : 04:00 ~ 04:30\n')
