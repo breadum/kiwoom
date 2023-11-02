@@ -23,7 +23,7 @@ CommRqData로 원하는 TR 데이터를 요청할 때 입력하는 인자 중 rq
 이 때, 특정 TR code에 대해 작업하는 Signal과 Slot 함수 이름을 동일하게 작성하면 코드 관리가 쉬우므로 이를 권장한다. 
 
 >> (1) Kiwoom.set_connect_hook('on_receive_tr_data', 'rq_name')
->> (2) Kiwoom.connect('on_receive_tr_data', signal=bot.balance, slot=server.balance)
+>> (2) Kiwoom.connect('on_receive_tr_data', signal=bot.balance, slot=server.balance, key='balance')
 >> 두 함수에 관한 자세한 사항은 help() 함수를 이용하면 함수 활용 정보를 얻을 수 있다.  
 
 - 작동원리 (예시)
@@ -40,6 +40,9 @@ CommRqData로 원하는 TR 데이터를 요청할 때 입력하는 인자 중 rq
 >> Kiwoom.set_connect_hook('on_receive_tr_data', param='rq_name')
 >> Kiwoom.set_connect_hook('on_receive_tr_condition', param='condition_name')
 >> Kiwoom.set_connect_hook('on_receive_real_condition', param='condition_name')
+
+조건 검색 및 Connect 함수 활용할 때 아래 링크 꼭 참고해주세요.
+>> https://github.com/breadum/kiwoom/issues/13
 """
 
 
