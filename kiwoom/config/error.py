@@ -20,6 +20,7 @@ ERR = {
     -205: ('OP_ERR_DATA_RCV_FAIL', '데이터수신실패'),
     -206: ('OP_ERR_OVER_MAX_FID', '조회가능한FID수초과'),
     -207: ('OP_ERR_REAL_CANCEL', '실시간해제오류'),
+    -211: ('NO_OFFICIAL_ERROR_NAME', '계좌조회과부하'),
     -300: ('OP_ERR_ORD_WRONG_INPUT', '입력값오류'),
     -301: ('OP_ERR_ORD_WRONG_ACCTNO', '계좌비밀번호없음'),
     -302: ('OP_ERR_OTHER_ACC_USE', '타인계좌사용오류'),
