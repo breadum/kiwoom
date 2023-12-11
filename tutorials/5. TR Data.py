@@ -50,6 +50,7 @@ import sys
 from textwrap import dedent
 
 from PyQt5.QtWidgets import QApplication
+from PyQt5.QtTest import QTest
 
 from kiwoom import Bot, Server
 from kiwoom.data.preps import prep
@@ -210,6 +211,10 @@ class MyBot(Bot):
         # > help(Kiwoom.set_input_value)
         for key, val in inputs.items():
             self.api.set_input_value(key, val)
+
+        # 연속 조회 제한 회피를 위한 딜레이 0.5초
+        if prev_next != '0':
+            QTest.qWait(500) 
 
         # TR Data 요청함수 API 개발가이드
         # > help(Kiwoom.comm_rq_data)
