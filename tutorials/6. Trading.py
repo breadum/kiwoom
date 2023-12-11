@@ -13,6 +13,7 @@
 import sys
 
 from PyQt5.QtWidgets import QApplication
+from PyQt5.QtTest import QTest
 
 from kiwoom import Bot, Server
 from kiwoom.data.preps import prep
@@ -44,7 +45,8 @@ class Bot(Bot):
         }
         for key, val in inputs.items():
             self.api.set_input_value(key, val)
-        
+        if prev_next != '0':
+            QTest.qWait(500) 
         return_code = self.api.comm_rq_data('balance', tr_code, prev_next, '0000')
         if return_code == 0:
             self.api.loop()
