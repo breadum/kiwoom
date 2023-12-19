@@ -254,6 +254,7 @@ Simple Python Wrapper for Kiwoom Open API+ (Stable)
 > conda activate 32bit  # 가상환경 실행
 > conda config --env --set subdir win-32  # 현위치에서 32bit 설정
 > conda install python=3.10  # Python 3.7/3.8/3.9/3.10 설치
+> conda install pandas<2.0  # 32bit Pandas 별도 설치
 > ```
 
 - 아래 코드로 '32Bit'인지 반드시 확인 후 설치
