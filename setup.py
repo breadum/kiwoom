@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 # Project Information
-VERSION = "1.3.3"
+VERSION = "1.3.4"
 DISTNAME = "kiwoom"
 DESCRIPTION = "Simple Python Wrapper for Kiwoom Open API+"
 LONG_DESCRIPTION = open("README.md", encoding="utf-8").read()
@@ -46,7 +46,8 @@ KEYWORDS =[
 def setup_package():
     kwargs = {
         "install_requires": [
-            'PyQt5 >= 5.12'
+            'tabulate >= 0.9.0',
+            'PyQt5 >= 5.15.9'
         ],
         "setup_requires": [],
         'zip_safe': False
