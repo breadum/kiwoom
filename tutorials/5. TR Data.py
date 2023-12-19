@@ -353,8 +353,15 @@ class MyServer(Server):
 
         # 만일, 데이터가 더 있다면 signal 함수 한번 더 호출 (종목 수 25개 이상인 경우)
         if prev_next == '2':
+            # Signal 함수 접근 방법 1
             fn = self.api.signal('on_receive_tr_data', 'balance')
             fn(prev_next)  # call signal function again to receive remaining data
+
+            """
+            # Signal 함수 접근 방법 2 (2023.12. 업데이트)
+            fn = self.bot.balance
+            fn(prev_next)
+            """
 
         # 요청 할 데이터가 더 없는 경우
         else:
