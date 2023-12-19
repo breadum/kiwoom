@@ -21,14 +21,14 @@ from kiwoom.utils.manager import Downloader, timer
 
 class Bot:
     def __init__(self, server=None):
-        self.api = Kiwoom()
-        self.scr = Screen()
-        self.share = Share()
+        self.api: Kiwoom = Kiwoom()
+        self.scr: Screen = Screen()
+        self.share: Share = Share()
 
         # Connect server as a slot
-        self.server = server if issubclass(type(server), Server) else Server()
+        self.server: Server = server if issubclass(type(server), Server) else Server()
+        self.server.init(bot=self, api=self.api, share=self.share)
         self.default_connect(server)
-        self.server.init(api=self.api, share=self.share)
 
     def default_connect(self, server):
         self.api.set_connect_hook('on_receive_tr_data', 'rq_name')

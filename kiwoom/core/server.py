@@ -11,6 +11,7 @@ from kiwoom.config import history
 from kiwoom.config.error import msg
 from kiwoom.config.types import MULTI
 from kiwoom.core.kiwoom import Kiwoom
+from kiwoom.data.share import Share
 from kiwoom.data.preps import string
 from kiwoom.utils.general import date, name
 from kiwoom.utils.manager import Downloader
@@ -18,10 +19,13 @@ from kiwoom.utils.manager import Downloader
 
 class Server:
     def __init__(self):
+        from kiwoom.core.bot import Bot
+        self.bot: Bot = None
         self.api: Kiwoom = None
-        self.share = None
+        self.share: Share = None
 
-    def init(self, api, share):
+    def init(self, bot, api, share):
+        self.bot = bot
         self.api = api
         self.share = share
 
