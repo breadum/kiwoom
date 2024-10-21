@@ -1,6 +1,16 @@
 # Kiwoom Open API+
 Simple Python Wrapper for Kiwoom Open API+ (Stable)
 
+## News
+
+- 트레이딩 역량강화 플랫폼 알파노트 베타 버전을 오픈했습니다.
+
+- 실전투자대회 최상위 트레이더의 매매내역을 통해 전략을 학습해 볼 수 있어요.
+
+- 스터디 하려고 시작한건데 어느덧 출시까지 해버렸네요. 많은 관심 부탁드립니다! 
+  
+- https://alphanote.io
+
 ## What is it?
 
 - 키움증권에서 제공하는 Open API+ 인터페이스 사용을 위한 간단한 Python Wrapper 모듈
