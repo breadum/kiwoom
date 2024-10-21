@@ -33,3 +33,4 @@ Release History of Distribution
 1.3.2 Add type hint to Server class for linting.
 1.3.3 Add an error code -211, '계좌조회과부하'.
 1.3.4 Add a direct access to Bot methods from Server instance. 
+1.3.5 Add SAT(Korea) schedules on '24 to EXCEPTIONAL_DATES in config.history
