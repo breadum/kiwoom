@@ -9,8 +9,8 @@ Simple Python Wrapper for Kiwoom Open API+ (Stable)
 
 - 스터디 하려고 시작한건데 어느덧 출시까지 해버렸네요. 많은 관심 부탁드립니다! 
   
-- https://alphanote.io
-
+- [https://alphanote.io](https://alphanote.io/?utm_source=git)
+  
 ## What is it?
 
 - 키움증권에서 제공하는 Open API+ 인터페이스 사용을 위한 간단한 Python Wrapper 모듈
