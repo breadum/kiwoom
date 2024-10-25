@@ -9,7 +9,7 @@ Simple Python Wrapper for Kiwoom Open API+ (Stable)
 
 - 스터디 하려고 시작한건데 어느덧 출시까지 해버렸네요. 많은 관심 부탁드립니다! 
   
-- [https://alphanote.io](https://alphanote.io/?utm_source=git)
+- [https://alphanote.io](https://alphanote.io/?utm_source=git&utm_medium=referral)
   
 ## What is it?
 
