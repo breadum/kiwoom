@@ -9,7 +9,7 @@ Simple Python Wrapper for Kiwoom Open API+ (Stable)
 
 - 스터디 하려고 시작한건데 어느덧 출시까지 해버렸네요. 많은 관심 부탁드립니다! 
   
-- [https://alphanote.io](https://alphanote.io/?utm_source=git&utm_medium=referral)
+- [https://alphanote.io](https://alphanote.io/?utm_source=git)
   
 ## What is it?
 
@@ -245,7 +245,7 @@ Simple Python Wrapper for Kiwoom Open API+ (Stable)
 
 ##### 1. 키움 Open API+ 사용 신청 (Step1), 모듈 다운로드 (Step2), KOA Studio 다운로드 (Step3)
 
-- 키움 웹사이트 (https://www1.kiwoom.com/nkw.templateFrameSet.do?m=m1408000000)
+- [키움증권 Open API+ 신청 페이지][openapi]
 
 ##### 2. 32-bit Python 3.7 이상 Windows 환경 세팅
 
@@ -253,17 +253,15 @@ Simple Python Wrapper for Kiwoom Open API+ (Stable)
 
 - Anaconda 64-bit 에서 32-bit 가상환경 생성 시 유의사항
 
-     네이버 블로그 참고 페이지 (https://m.blog.naver.com/haanoon/221814660104)
-
 > ```bash
-> # 실제로 잘 작동하지 않는 방식
+> # 실제로 작동되지 않는 방식
 > set CONDA_FORCE_32BIT=1  
 >
-> # 권장하는 방식 
+> # 작동되는 방식 
 > conda create -n 32bit  # 가상환경 생성
 > conda activate 32bit  # 가상환경 실행
 > conda config --env --set subdir win-32  # 현위치에서 32bit 설정
-> conda install python=3.10  # Python 3.7/3.8/3.9/3.10 설치
+> conda install python=3.10  # Python 3.8/3.9/3.10/3.11 설치
 > conda install 'pandas<2.0'  # 32bit Pandas 별도 설치
 > ```
 
@@ -311,6 +309,7 @@ Simple Python Wrapper for Kiwoom Open API+ (Stable)
 
 - 버그, 기능요청, 문의사항 등은 [Github 이슈 게시판][issue]을 통해 남겨주세요.
 
+[openapi]: https://www3.kiwoom.com/h/customer/download/VOpenApiInfoView?dummyVal=0
 [mit]: https://github.com/breadum/kiwoom/blob/main/LICENSE
 [issue]: https://github.com/breadum/kiwoom/issues
 [tutorial]: https://github.com/breadum/kiwoom/tree/main/tutorials
