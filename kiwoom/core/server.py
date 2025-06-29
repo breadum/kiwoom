@@ -121,26 +121,33 @@ class Server:
                 Make time-related column as pandas Datetime index
             """
             # To handle exceptional time and dates
-            if not df.empty and history.is_sector(code) and col == '체결시간':
+            if not df.empty \
+               and history.is_sector(code) \
+               and col == '체결시간':
+
                 # To choose exceptional datetime replacer
-                edrfec = history.EXCEPTIONAL_DATETIME_REPLACER_FOR_EXCEPTIONAL_CODE
-                replacer = edrfec[code] if code in edrfec else history.EXCEPTIONAL_DATETIME_REPLACER
+                replacer = history.EXCEPTIONAL_DATETIME_REPLACER
+                if code in history.EXCEPTIONAL_DATETIME_REPLACER_FOR_EXCEPTIONAL_CODE:
+                    replacer = history.EXCEPTIONAL_DATETIME_REPLACER_FOR_EXCEPTIONAL_CODE[code]
 
-                # Find index of dates that delayed market opening time and inconvertibles in df
-                indices = dict()
-                exceptions = list()
-                start, end = date(df[col].iat[0][:len('YYYYMMDD')]), date(df[col].iat[-1][:len('YYYYMMDD')])
-                for ymd, delay in history.EXCEPTIONAL_DATES.items():
+                # To handle delayed market openings
+                delayed = dict()
+                start = date(df[col].iat[0][:len('YYYYMMDD')])
+                end = date(df[col].iat[-1][:len('YYYYMMDD')])
+                for ymd, hour in history.DELAYED_MARKET_OPENING.items():
                     if start <= date(ymd) <= end:
-                        day = df[col].loc[df[col].str.match(ymd)]
-                        indices[ymd] = day.index
-
-                        # To save original data
-                        for regex, datetime in replacer.items():
-                            series = day.loc[day.str.contains(regex, regex=True)]
-                            series = series.replace(regex={regex: datetime})
-                            series = pd.to_datetime(series, format='%Y%m%d%H%M%S')
-                            exceptions.append(series)
+                        delayed_replacer = dict(replacer)
+                        for regex, hhmmss in delayed_replacer.items():
+                            hhmmss = min(int(hhmmss) + (hour * 10000), 180000)
+                            hhmmss = str(hhmmss).zfill(6)
+                            delayed_replacer[regex] = hhmmss
+                        
+                        for regex, hhmmss in delayed_replacer.items():
+                            data = df.loc[df[col].str.match(ymd), col]
+                            target = data.loc[data.str.contains(regex, regex=True)]
+                            target = target.replace(regex={regex: hhmmss})
+                            for idx, tsp in target.items():
+                                delayed[idx] = pd.to_datetime(tsp, format=fmt)
 
                 # Replace inconvertibles (888888, 999999) to (16:00:00, 18:00:00)
                 df[col].replace(regex=replacer, inplace=True)
@@ -148,16 +155,10 @@ class Server:
                 # To make column as pandas datetime series
                 df[col] = pd.to_datetime(df[col], format=fmt)
 
-                # Subtract delayed market time as if it pretends to start normally
-                for ymd, idx in indices.items():
-                    delay = history.EXCEPTIONAL_DATES[ymd]
-                    df.loc[idx, col] -= pd.DateOffset(hours=delay)
+                # Handle delayed market openings
+                df.loc[list(delayed.keys()), col] = list(delayed.values())
 
-                # Replace subtracted exceptional times back to original
-                for series in exceptions:
-                    df.loc[series.index, col] = series
-
-            # col='일자' or including df.empty for both col
+            # To handle etc.
             else:
                 df[col] = pd.to_datetime(df[col], format=fmt)
 
