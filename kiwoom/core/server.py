@@ -175,12 +175,6 @@ class Server:
             if 'end' in kwargs:
                 df = df.loc[:kwargs['end']]
 
-            # If server sent mixed data
-            if not df.index.is_monotonic_increasing:
-                raise RuntimeError(
-                    f'Downloaded data is not monotonic increasing. Error at Server.history() with code={code}.'
-                )
-
             # Rename column
             if period == 'tick':
                 df.rename(columns={'현재가': '체결가'}, inplace=True)
@@ -297,6 +291,8 @@ class Server:
                         df = pd.concat([db, df], axis=0, join='outer', copy=False)
 
         if not df.index.is_monotonic_increasing:
+            # Write data to check flaws
+            df.to_csv(file + '.err', encoding=config.ENCODING)
             raise RuntimeError(
                 f'Error at Server.history_to_csv(file={file}, ...)/\n'
                 + 'File to write is not monotonic increasing with respect to time.'
