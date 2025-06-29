@@ -1,3 +1,6 @@
+# Version
+from .__version__ import __version__
+
 # Namespace Control
 from . import (
     config,

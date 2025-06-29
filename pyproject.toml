@@ -1,0 +1,61 @@
+[project]
+name = "kiwoom"
+dynamic = ["version"]
+readme = "README.md"
+description = "Simple Python Wrapper for Kiwoom Open API+ (Stable)"
+
+authors = [{name = "breadum", email = "breadum.kr@gmail.com"}]
+license = "MIT"
+keywords =[
+    "Kiwoom",
+    "Heroes",
+    "Open API+",
+    "키움증권",
+    "영웅문",
+    "System Trading",
+    "Algorithmic Trading"
+]
+classifiers = [
+    "Topic :: Office/Business :: Financial :: Investment",
+    "Development Status :: 3 - Alpha",
+    "Operating System :: Microsoft :: Windows",
+    "Environment :: Win32 (MS Windows)",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+os_name = "nt"
+sys_platform = "win32"
+platform_system = "windows"
+requires-python = ">=3.8, <3.12"
+packages = "kiwoom"
+dependencies = [
+    "pyqt5-qt5==5.15.2; sys_platform=='win32' and python_version=='3.11.*'",
+    "PyQt5>=5.15.9; sys_platform=='win32'",
+    "numpy<2, >=1.2; sys_platform=='win32'",
+    "pandas<2; sys_platform=='win32'",
+    "tabulate>=0.9",
+]
+
+[project.urls]
+Homepage = "https://github.com/breadum/kiwoom"
+Tutorials = "https://github.com/breadum/kiwoom/tree/main/tutorials"
+Documentation = "https://github.com/breadum/kiwoom/blob/main/README.md"
+Repository = "https://github.com/breadum/kiwoom"
+Download = " https://pypi.org/project/kiwoom"
+Issues = "https://github.com/breadum/kiwoom/issues"
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.pdm]
+distribution = true
+package-dir = "kiwoom"
+
+[tool.pdm.version]
+source = "file"
+path = "kiwoom/__version__.py"
