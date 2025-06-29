@@ -1,5 +1,6 @@
 # Private files
 *.pkl
+cmds
 
 # Pycharm files
 .idea/
@@ -32,6 +33,9 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+
+# PyPi
+.pypirc
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
