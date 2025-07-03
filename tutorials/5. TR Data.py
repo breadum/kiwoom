@@ -308,9 +308,13 @@ class MyServer(Server):
         print('\tServer.deposit(scr_no, rq_name, tr_code, record_name, prev_next) 호출')
 
         # 예수금 데이터 저장
-        self.share.update_single('deposit', '예수금', int(self.api.get_comm_data(tr_code, rq_name, 0, '예수금')))
+        self.share.update_single(
+            'deposit', 
+            '예수금', 
+            int(self.api.get_comm_data(tr_code, rq_name, 0, '예수금'))
+        )
 
-        # [필수] 대기중인 코드 실행 (177번째 줄)
+        # [필수] 대기중인 코드 실행 (182번째 줄)
         self.api.unloop()
         print('\tServer.deposit(scr_no, rq_name, tr_code, record_name, prev_next) 종료')
 
@@ -372,7 +376,7 @@ class MyServer(Server):
 
             # 다운로드 완료
             self.downloading = False
-            self.api.unloop()  # 216번 째 줄 실행
+            self.api.unloop()  # 225번 째 줄 실행
             print('\tServer.balance(scr_no, rq_name, tr_code, record_name, prev_next) 종료')
 
 
