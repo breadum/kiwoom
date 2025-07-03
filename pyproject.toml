@@ -59,3 +59,8 @@ package-dir = "kiwoom"
 [tool.pdm.version]
 source = "file"
 path = "kiwoom/__version__.py"
+
+[dependency-groups]
+publish = [
+    "twine>=6.1.0",
+]
