@@ -88,3 +88,11 @@ Simple Python Wrapper for Kiwoom Open API+
 
 - 계좌 잔고 조회를 통한 TR 데이터 요청 및 수신 예시 
 - connect, set_connect_hook, comm_rq_data, on_receive_tr_data 활용
+
+#### 6. Trading
+
+- 주문 전송 및 체결 정보 수신 예시
+
+#### 7. Trading Records
+
+- 거래내역 조회 및 엑셀 저장 예시 (영웅문 0343 화면)
