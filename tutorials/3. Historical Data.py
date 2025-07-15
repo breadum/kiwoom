@@ -176,12 +176,6 @@ if __name__ == '__main__':
 
     # Loop start
     while True:
-        # 오전 5시부터 6시 사이에 데이터를 받으면 데이터 결손 발생
-        now = datetime.now()
-        if (now.hour == 4 and now.minute > 50) or (now.hour == 5):
-            print(f"[{clock()}] Avoid 5:00 ~ 6:00 AM.")
-            time.sleep(70 * 60)
-        
         # Print time
         print(f"[{clock()}] Starting a new loop!")
 

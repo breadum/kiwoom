@@ -42,7 +42,7 @@ class Server:
         When Kiwoom.on_event_connect(...) is called, this method will be automatically called.
         """
         print(f'\n로그인 {msg(err_code)}')
-        print(f'\n* 시스템 점검\n  - 월 ~ 토 : 05:05 ~ 05:10\n  - 일 : 04:00 ~ 04:30\n')
+        print(f'\n* 시스템 점검\n  - 월 ~ 토 : 06:50 ~ 06:55\n  - 일 : 05:00 ~ 05:15\n')
         self.api.unloop()
 
     # Default event slot for on_receive_msg_slot
