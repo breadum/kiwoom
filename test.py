@@ -235,6 +235,7 @@ class Bot(Bot):
             return f'현재가 데이터를 수신하지 못했습니다. : {code} '
 
     def run(self):
+        self.login()
         self.register('005930;005380')
         for i in range(5):
             print(bot.real_price('005930'))
