@@ -150,7 +150,7 @@ class Server:
                                 delayed[idx] = pd.to_datetime(tsp, format=fmt)
 
                 # Replace inconvertibles (888888, 999999) to (16:00:00, 18:00:00)
-                df[col].replace(regex=replacer, inplace=True)
+                df[col] = df[col].replace(regex=replacer)
 
                 # To make column as pandas datetime series
                 df[col] = pd.to_datetime(df[col], format=fmt)
@@ -179,6 +179,10 @@ class Server:
             if period == 'tick':
                 df.rename(columns={'현재가': '체결가'}, inplace=True)
 
+            # Validate data
+            if not df.index.is_monotonic_increasing:
+                df = df.sort_index(kind='stable')
+            
             # Save data to csv file
             self.history_to_csv(df, code, kwargs['path'], kwargs['merge'], kwargs['warning'])
 
@@ -290,13 +294,14 @@ class Server:
                         # Just concatenate if no overlapping period.
                         df = pd.concat([db, df], axis=0, join='outer', copy=False)
 
-        if not df.index.is_monotonic_increasing:
-            # Write data to check flaws
-            df.to_csv(file + '.err', encoding=config.ENCODING)
-            raise RuntimeError(
-                f'Error at Server.history_to_csv(file={file}, ...)/\n'
-                + 'File to write is not monotonic increasing with respect to time.'
-            )
+        # == Notice : Does not raise error anymore, sort df by time instead!  ==
+        # if not df.index.is_monotonic_increasing:
+        #     # Write data to check flaws
+        #     df.to_csv(file + '.err', encoding=config.ENCODING)
+        #     raise RuntimeError(
+        #         f'Error at Server.history_to_csv(file={file}, ...)/\n'
+        #         + 'File to write is not monotonic increasing with respect to time.'
+        #     )
 
         # To prevent overwriting
         if not merge and exists(file):
