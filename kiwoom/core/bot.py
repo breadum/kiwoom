@@ -52,7 +52,7 @@ class Bot:
             return True
         return False
 
-    def stock_list(self, market):
+    def stock_list(self, market) -> list[str]:
         """
         Returns all stock codes in the given market
 
@@ -60,10 +60,13 @@ class Bot:
             one of market code in kiwoom.config.markets
         """
         market = str(market)
-        if history.is_market(market):
-            return sorted(self.api.get_code_list_by_market(market).split(';')[:-1])
+        codes = self.api.get_code_list_by_market(market)
+        codes = codes.split(';')[:-1]
+        if not codes:
+            raise ValueError(f'No stock codes for {market=}.')
+        return sorted(codes)
 
-    def sector_list(self, market_gubun):
+    def sector_list(self, market_gubun) -> list[str]:
         """
         Returns all sector codes in the given market_gubun
 
@@ -303,10 +306,22 @@ class Bot:
         if not any([market, sector]) or all([market, sector]):
             raise RuntimeError("Download target must be either of 'market' or 'sector'.")
         elif market is not None:
-            lst, ctype, mname = self.stock_list(market), str(history.STOCK).lower(), history.MARKETS[market]
+            market = market.upper()
+            ctype, mname = str(history.STOCK).lower(), history.MARKETS[market]
+            if market != 'NXT':
+                krx = set(self.stock_list(market))
+                nxt = set(self.stock_list('NXT'))
+                nxt.intersection_update(krx)
+                sor = set([c + '_AL' for c in list(nxt)])
+                lst = (krx - nxt) | sor
+                lst = sorted(list(lst))
+            else:
+                lst = self.stock_list(market)
+                lst = [c + '_AL' for c in lst]
         elif sector is not None:
-            lst, ctype, mname = self.sector_list(sector), str(history.SECTOR).lower(), history.MARKET_GUBUNS[sector]
-
+            ctype, mname = str(history.SECTOR).lower(), history.MARKET_GUBUNS[sector]
+            lst = self.sector_list(sector)
+        
         # Set the portion in download list
         from_, to_ = 0, None
         if all([slice, code]):

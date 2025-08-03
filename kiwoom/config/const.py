@@ -34,7 +34,8 @@ MARKETS = {
     '10': 'KOSDAQ',
     '30': 'K-OTC',
     '50': 'KONEX',
-    '60': 'ETN'
+    '60': 'ETN',
+    'NXT': 'NEXTRADE'
 }
 
 

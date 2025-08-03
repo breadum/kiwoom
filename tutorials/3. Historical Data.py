@@ -73,9 +73,9 @@ class MyBot(Bot):
         # 로그인 요청
         self.login()
 
-        # 시장 데이터 요청
+        # 시장 데이터 요청 (대체 거래소에서도 지원되는 종목은 통합시세로 자동 다운로드 지원)
         kwargs = {
-            # 1) 시장선택 - print(config.MARKETS), {'0': 'KOSPI', '10': 'KOSDAQ', ...}
+            # 1) 시장선택 - print(config.MARKETS), {'0': 'KOSPI', '10': 'KOSDAQ', ..., 'NXT': 'NEXTRADE'}
             'market': '0',
             # 2) 기간선택 - print(config.PERIODS), ['tick', 'min', 'day', 'week', 'month', 'year']
             'period': 'tick',
@@ -157,13 +157,13 @@ if __name__ == '__main__':
 
     # Default args
     kwargs = {
-        'market': '0',
+        'market': 'NXT',
         'period': 'tick',
-        'start': '20220919',
-        'end': '20220923',
+        'start': '20250304',
+        'end': '20250801',
         'merge': True,
         'warning': False,
-        'path': 'C:/Data/market/KOSPI/tick'
+        'path': 'C:/Data/market/NXT/tick'
     }
 
     # Variables to set
