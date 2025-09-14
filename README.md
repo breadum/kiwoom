@@ -17,6 +17,8 @@ Simple Python Wrapper for Kiwoom Open API+ (Stable)
 
 - PyQt5를 이용해 직접 개발하고자 하는 사람을 위한 모듈로 부가적인 기능은 최대한 배제
 
+- 기존 OCX 방식이 아닌 Async 기반 REST API 방식으로 개발하실 분은 [이곳][rest]을 참조  
+  
 ## Main Features
 
 #### 1. Open API+ 함수 호출 간소화
@@ -310,6 +312,8 @@ Simple Python Wrapper for Kiwoom Open API+ (Stable)
 
 - 버그, 기능요청, 문의사항 등은 [Github 이슈 게시판][issue]을 통해 남겨주세요.
 
+
+[rest]: https://github.com/breadum/kiwoom-restful
 [openapi]: https://www3.kiwoom.com/h/customer/download/VOpenApiInfoView?dummyVal=0
 [mit]: https://github.com/breadum/kiwoom/blob/main/LICENSE
 [issue]: https://github.com/breadum/kiwoom/issues
