@@ -6,6 +6,9 @@ from warnings import warn
 
 import pandas as pd
 
+from packaging.version import Version
+
+PANDAS_VERSION = Version(pd.__version__)
 from kiwoom import config
 from kiwoom.config import history
 from kiwoom.config.error import msg
@@ -265,7 +268,10 @@ class Server:
                             start = start.start
 
                         db = db.iloc[:start]
-                        df = pd.concat([db, df], axis=0, join='outer', copy=False)
+                        if PANDAS_VERSION < Version("3.0"):
+                            df = pd.concat([db, df], axis=0, join='outer', copy=False)
+                        else:
+                            df = pd.concat([db, df], axis=0, join='outer')
 
                     except KeyError:
                         err_msg = dedent(
